@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Invoice - Dot Matrix</title>
+  <style>
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      margin: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    td, th {
+      padding: 2px;
+      border: 1px solid black;
+      text-align: center;
+    }
+    .no-border {
+      border: none;
+    }
+    .small-text {
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Company Header -->
+<table class="no-border">
+  <tr class="no-border">
+    <td class="no-border" align="left">
+      Q Connect Trading & Contracting W.L.L<br>
+      Birkat Al Awamer<br>
+      Shop No. 5, Building No: 513<br>
+      Zone: 91, Street: 3085<br>
+      C.R.: 198933<br>
+      Tel: +974 30840765, +974 55604556
+    </td>
+    <td class="no-border" align="right">
+      فاتورة المبيعات<br>
+      SALES INVOICE
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<!-- Customer Details -->
+<table>
+  <tr>
+    <td colspan="2" align="left"><b>Customer Name:</b> ____________________________________</td>
+    <td><b>Document No.:</b> ___________</td>
+  </tr>
+  <tr>
+    <td><b>Date:</b> ___________</td>
+    <td><b>LPO:</b> ___________</td>
+    <td><b>LPO Date:</b> ___________</td>
+  </tr>
+  <tr>
+    <td colspan="3" align="left"><b>Payment Terms:</b> ____________________________________</td>
+  </tr>
+</table>
+
+<br>
+
+<!-- Item Table -->
+<table>
+  <thead>
+    <tr>
+      <th>S.L No.</th>
+      <th>Item Code</th>
+      <th>Item Description</th>
+      <th>Qty.</th>
+      <th>Unit</th>
+      <th>Unit Price (QAR)</th>
+      <th>Total Price (QAR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Repeat this row for each item -->
+    <tr>
+      <td>1</td>
+      <td>00123</td>
+      <td>Sample Item</td>
+      <td>10</td>
+      <td>PCS</td>
+      <td>100.00</td>
+      <td>1000.00</td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<!-- Amounts -->
+<table class="no-border" style="width: 50%; float: right;">
+  <tr>
+    <td><b>Total:</b></td>
+    <td>__________</td>
+  </tr>
+  <tr>
+    <td><b>Discount:</b></td>
+    <td>__________</td>
+  </tr>
+  <tr>
+    <td><b>Net Amount:</b></td>
+    <td>__________</td>
+  </tr>
+</table>
+
+<br style="clear: both;"><br><br>
+
+<!-- In Words -->
+<table class="no-border">
+  <tr class="no-border">
+    <td class="no-border"><b>In Words:</b> _____________________________________________________________________</td>
+  </tr>
+</table>
+
+<br>
+
+<!-- Bank Details -->
+<table class="no-border small-text">
+  <tr class="no-border">
+    <td class="no-border">
+      <b>Bank Details:</b><br>
+      Beneficiary: Q CONNECT TRADING AND CONTRACTING W.L.L<br>
+      Account No: 4010731863001<br>
+      Bank Name: COMMERCIAL BANK QATAR<br>
+      IBAN: QA30CBQA000000004010731863001
+    </td>
+  </tr>
+</table>
+
+<br><br>
+
+<!-- Signature -->
+<table class="no-border">
+  <tr class="no-border">
+    <td class="no-border" align="left">Receiver's Signature</td>
+    <td class="no-border" align="right">For Q Connect Trading & Contracting W.L.L</td>
+  </tr>
+</table>
+
+</body>
+</html>
