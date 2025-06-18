@@ -64,6 +64,11 @@ class Pos_invoices extends CI_Controller
     //create invoice
     public function create()
     {
+		
+		// ini_set('display_errors', 1);
+		// ini_set('display_startup_errors', 1);
+		// error_reporting(E_ALL);
+		
         if (!$this->registerlog->check($this->aauth->get_user()->id)) {
             redirect('register/create');
         }
@@ -72,6 +77,8 @@ class Pos_invoices extends CI_Controller
         $this->load->model('plugins_model', 'plugins');
         $this->load->library("Common");
           $data['custom_fields_c'] = $this->custom->add_fields(1);
+
+		  
 
         $data['taxlist'] = $this->common->taxlist($this->config->item('tax'));
         $data['gateway'] = $this->invocies->gateway_list('Yes');
@@ -88,19 +95,33 @@ class Pos_invoices extends CI_Controller
         $data['cat'] = $this->categories_model->category_list();
         $data['taxdetails'] = $this->common->taxdetail();
         $data['acc_list'] = $this->invocies->accountslist();
+        
+		
 
         $data['emp'] = $this->plugins->universal_api(69);
+
+		
+
         if ($data['emp']['key1']) {
             $this->load->model('employee_model', 'employee');
             $data['employee'] = $this->employee->list_employee();
         }
 
+		// echo "<pre>";
+		// print_r($data['warehouse']);
+		// echo "</pre>";
+		// exit();
+
+		  
+
 
         if ($this->input->get('v2')=='true' or POSV == 2) {
+			//echo 1; exit();
             $head['s_mode'] = false;
             $this->load->view('fixed/header-pos', $head);
             $this->load->view('pos/newinvoice_v2', $data);
         } else {
+			//echo 2; exit();
             $head['s_mode'] = true;
             $this->load->view('fixed/header-pos', $head);
             $this->load->view('pos/newinvoice', $data);
@@ -111,6 +132,10 @@ class Pos_invoices extends CI_Controller
 
     public function draft()
     {
+		// ini_set('display_errors', 1);
+		// ini_set('display_startup_errors', 1);
+		// error_reporting(E_ALL);
+
         $this->load->model('categories_model');
         $data['gateway'] = $this->invocies->gateway_list('Yes');
         $tid = $this->input->get('id');
@@ -128,10 +153,16 @@ class Pos_invoices extends CI_Controller
         $this->load->model('plugins_model', 'plugins');
         $data['exchange'] = $this->plugins->universal_api(5);
         $data['cat'] = $this->categories_model->category_list();
-        $data['lastinvoice'] = $this->invocies->lastinvoice()+1;
+        //$data['lastinvoice'] = $this->invocies->lastinvoice()+1;
+		$data['lastinvoice'] = $this->invocies->lastinvoice();
         $data['taxdetails'] = $this->common->taxdetail();
         $data['taxlist'] = $this->common->taxlist($this->config->item('tax'));
 		$data['acc_list'] = $this->invocies->accountslist();
+
+		// echo "<pre>";
+		// print_r($data['invoice']);
+		// echo "</pre>";
+		// exit();
 
         $data['emp'] = $this->plugins->universal_api(69);
         if ($data['emp']['key1']) {

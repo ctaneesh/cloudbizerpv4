@@ -29,20 +29,41 @@ class Pos_invoices_model extends CI_Model
         parent::__construct();
     }
 
-    public function lastinvoice()
+    // public function lastinvoice()
+    // {
+    //     $this->db->select('tid');
+    //     $this->db->from($this->table);
+    //     $this->db->order_by('id', 'DESC');
+    //     $this->db->limit(1);
+    //     //erp2024 removed condition 17-06-2024
+    //     // $this->db->where('i_class', 1);
+    //     //erp2024 removed condition 17-06-2024
+    //     $query = $this->db->get();
+    //     if ($query->num_rows() > 0) {
+    //         return $query->row()->tid;
+    //     } else {
+    //         return 1000;
+    //     }
+    // }
+
+	public function lastinvoice()
     {
-        $this->db->select('tid');
+        $this->configurations = $this->session->userdata('configurations');
+        $prefix = $this->configurations['invoiceprefix']; 
+        $this->db->select('invoice_number');
         $this->db->from($this->table);
-        $this->db->order_by('id', 'DESC');
+        $this->db->order_by('invoice_date', 'DESC');
         $this->db->limit(1);
-        //erp2024 removed condition 17-06-2024
-        // $this->db->where('i_class', 1);
-        //erp2024 removed condition 17-06-2024
         $query = $this->db->get();
+        // die($this->db->last_query());
         if ($query->num_rows() > 0) {
-            return $query->row()->tid;
+            $last_invoice_number = $query->row()->invoice_number;
+            $parts = explode('/', $last_invoice_number);
+            $last_number = (int)end($parts); 
+            $next_number = $last_number + 1;
+            return $prefix.$next_number;
         } else {
-            return 1000;
+            return $prefix.'1001';
         }
     }
 
@@ -411,8 +432,17 @@ class Pos_invoices_model extends CI_Model
 
     public function draft_details($id, $eid = '')
     {
+		
 
-        $this->db->select('cberp_draft.*,SUM(cberp_draft.shipping + cberp_draft.ship_tax) AS shipping,cberp_customers.*,cberp_customers.customer_id AS cid,cberp_draft.id AS iid,cberp_terms.id AS termid,cberp_terms.title AS termtit,cberp_terms.terms AS terms');
+        $this->db->select('
+		cberp_draft.*,
+		SUM(cberp_draft.shipping + cberp_draft.ship_tax) AS shipping,
+		cberp_customers.*,
+		cberp_customers.customer_id AS cid,
+		cberp_draft.id AS iid,
+		cberp_terms.id AS termid,
+		cberp_terms.title AS termtit,
+		cberp_terms.terms AS terms');
         $this->db->from('cberp_draft');
         $this->db->where('cberp_draft.id', $id);
         if ($eid) {
@@ -421,6 +451,13 @@ class Pos_invoices_model extends CI_Model
         $this->db->join('cberp_customers', 'cberp_draft.csd = cberp_customers.customer_id', 'left');
         $this->db->join('cberp_terms', 'cberp_terms.id = cberp_draft.term', 'left');
         $query = $this->db->get();
+		//echo $this->db->last_query();
+		//exit();
+		// echo "<pre>";
+        // $result =  $query->row_array();
+		// print_r($result);
+		// echo "</pre>";
+		
         return $query->row_array();
 
     }
