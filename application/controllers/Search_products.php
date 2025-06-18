@@ -356,14 +356,14 @@ class Search_products extends CI_Controller
 		// }
 
 		if ($name) {
-			$query = $this->db->query("SELECT id,name,phone,discount_c FROM cberp_customers WHERE $whr (UPPER(name)  LIKE '%" . strtoupper($name) . "%' OR UPPER(phone)  LIKE '" . strtoupper($name) . "%') LIMIT 6");
+			$query = $this->db->query("SELECT customer_id,name,phone,discount FROM cberp_customers WHERE $whr (UPPER(name)  LIKE '%" . strtoupper($name) . "%' OR UPPER(phone)  LIKE '" . strtoupper($name) . "%') LIMIT 6");
 			$result = $query->result_array();
 			echo '<ol>';
 			$i = 1;
 			foreach ($result as $row) {
 				
 				$name = $this->sanitizeString($row['name']);
-				echo "<li onClick=\"PselectCustomer('" . $row['id'] . "','" . $name . "','" . amountFormat_general($row['discount_c']) . "')\"><span>$i</span><p>" . $name . " &nbsp; &nbsp  " . $row['phone'] . "</p></li>";
+				echo "<li onClick=\"PselectCustomer('" . $row['customer_id'] . "','" . $name . "','" . amountFormat_general($row['discount']) . "')\"><span>$i</span><p>" . $name . " &nbsp; &nbsp  " . $row['phone'] . "</p></li>";
 				$i++;
 			}
 			echo '</ol>';
@@ -501,13 +501,14 @@ class Search_products extends CI_Controller
 
 		if ($wid > 0) {
 			$qw .= "(cberp_product_to_store.store_id='$wid') AND ";
-			$join .= 'JOIN cberp_product_to_store ON cberp_product_to_store.product_id=cberp_products.pid ';
+			$join .= 'JOIN cberp_product_to_store ON cberp_product_to_store.product_code=cberp_products.product_code ';
 		}
 		if ($billing_settings['key2']) $qw .= "(cberp_products.expiry IS NULL OR DATE (cberp_products.expiry)<" . date('Y-m-d') . ") AND ";
 
 		if ($cid > 0) {
-			$qw .= "(cberp_products.pcat = '$cid' OR cberp_product_to_category.category_id = '$cid') AND ";
-			$join .= 'LEFT JOIN cberp_product_to_category ON cberp_product_to_category.product_id = cberp_products.pid ';
+			//$qw .= "(cberp_products.pcat = '$cid' OR cberp_product_to_category.category_id = '$cid') AND ";
+			$qw .= "(cberp_product_to_category.category_id = '$cid') AND ";
+			$join .= 'LEFT JOIN cberp_product_to_category ON cberp_product_to_category.product_code = cberp_products.product_code ';
 		}
 		
 		
@@ -523,9 +524,11 @@ class Search_products extends CI_Controller
 		$e = '';
 		if ($billing_settings['key1'] == 1) {
 			$e .= ',cberp_product_serials.serial';
-			$join .= 'LEFT JOIN cberp_product_serials ON cberp_product_serials.product_id=cberp_products.pid ';
+			$join .= 'LEFT JOIN cberp_product_serials ON cberp_product_serials.product_id=cberp_products.product_code ';
 			$qw .= '(cberp_product_serials.status=0) AND  ';
 		}
+
+		$join .= 'LEFT JOIN cberp_product_description ON cberp_product_description.product_code = cberp_products.product_code ';
 
 		$bar = '';
 		$p_class = 'v2_select_pos_item';
@@ -533,30 +536,32 @@ class Search_products extends CI_Controller
 			$flag_p = true;
 			$bar = " (cberp_products.barcode = '" . (substr($name, 0, -1)) . "' OR cberp_products.barcode LIKE '" . $name . "%')";
 
-			$query = "SELECT cberp_products.*  FROM cberp_products $join WHERE " . $qw . "$bar AND (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 6";
+			$query = "SELECT cberp_products.* , cberp_product_description.product_name FROM cberp_products $join WHERE " . $qw . "$bar AND (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 6";
 			$p_class = 'v2_select_pos_item_bar';
 
 		} elseif ($enable_bar == 'false' or !$enable_bar) {
 			$flag_p = true;
 			if ($billing_settings['key1'] == 2) {
 
-				$query = "SELECT cberp_products.*,cberp_product_serials.serial FROM cberp_product_serials  LEFT JOIN cberp_products  ON cberp_products.pid=cberp_product_serials.product_id $join WHERE " . $qw . "cberp_product_serials.serial LIKE '" . strtoupper($name) . "%'  AND (cberp_products.onhand_quantity>0) LIMIT 18";
+				$query = "SELECT cberp_products.*,cberp_product_description.product_name,cberp_product_serials.serial FROM cberp_product_serials  LEFT JOIN cberp_products  ON cberp_products.product_code=cberp_product_serials.product_id $join WHERE " . $qw . "cberp_product_serials.serial LIKE '" . strtoupper($name) . "%'  AND (cberp_products.onhand_quantity>0) LIMIT 18";
 
 			} else {
 
 				if(!empty($name))
 				{
-					$query = "SELECT cberp_products.* $e FROM cberp_products $join WHERE " . $qw . "(UPPER(cberp_product_description.product_name) LIKE '%" . strtoupper($name) . "%' $bar OR cberp_products.product_code LIKE '" . strtoupper($name) . "%') AND (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 18";
+					$query = "SELECT cberp_products.*, cberp_product_description.product_name $e FROM cberp_products $join WHERE " . $qw . "(UPPER(cberp_product_description.product_name) LIKE '%" . strtoupper($name) . "%' $bar OR cberp_products.product_code LIKE '" . strtoupper($name) . "%') AND (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 18";
 				}
 				else{
-					$query = "SELECT cberp_products.* $e FROM cberp_products $join  WHERE  " . $qw . " (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 18";
+					$query = "SELECT cberp_products.*, cberp_product_description.product_name $e FROM cberp_products $join  WHERE  " . $qw . " (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 18";
 				}
 				
 			}
 
 
 		}
-		// echo ($query);
+		
+
+		 
 		if ($flag_p) {	
 			$query = $this->db->query($query);
 			
@@ -566,7 +571,7 @@ class Search_products extends CI_Controller
 			foreach ($result as $row) {
 				if ($bar) $bar = $row['barcode'];
 				$out .= '    <div class="col-2 border mb-1"  ><div class=" rounded" >
-                                 <a  id="posp' . $i . '"  class="' . $p_class . ' round breaklink"   data-name="' . $row['product_name'] . '"  data-price="' . amountExchange_s($row['product_price'], 0, $this->aauth->get_user()->loc) . '"  data-tax="' . amountFormat_general($row['tax_rate']) . '"  data-discount="' . amountFormat_general($row['discount_rate']) . '" data-pcode="' . $row['product_code'] . '"   data-pid="' . $row['pid'] . '"  data-stock="' . amountFormat_general($row['onhand_quantity']) . '" data-unit="' . $row['unit'] . '" data-serial="' . @$row['serial'] . '" data-bar="' . $bar . '">
+                                 <a  id="posp' . $i . '"  class="' . $p_class . ' round breaklink"   data-name="' . $row['product_name'] . '"  data-price="' . amountExchange_s($row['product_price'], 0, $this->aauth->get_user()->loc) . '"  data-tax="' . amountFormat_general($row['tax_rate']) . '"  data-discount="' . amountFormat_general($row['discount_rate']) . '" data-pcode="' . $row['product_code'] . '"   data-pid="' . $row['product_code'] . '"  data-stock="' . amountFormat_general($row['onhand_quantity']) . '" data-unit="' . $row['unit'] . '" data-serial="' . @$row['serial'] . '" data-bar="' . $bar . '">
                                         <img class="round"
                                              src="' . base_url('userfiles/product/' . $row['image']) . '"  style="max-height: 100%;max-width: 100%">
                                         <div class="text-center" style="margin-top: 4px;">

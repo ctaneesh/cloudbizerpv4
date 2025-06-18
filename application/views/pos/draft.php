@@ -193,7 +193,7 @@
 								</div>
 								<input type="text" class="form-control" placeholder="Invoice #"
 									   name="invocieno" id="invocieno"
-									   value="<?php echo $lastinvoice+1; ?>" >
+									   value="<?php echo $lastinvoice; ?>" >
 								<input type="hidden" name="iid"
 									   value="<?php echo $invoice['iid']; ?>">
 								<input type="hidden" name="draft_id"

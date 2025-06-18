@@ -189,7 +189,7 @@
                                                     class="selectpicker form-control teal">
                                                 <?php 
                                                 echo '<option value="0">' . $this->lang->line('All') ?></option><?php foreach ($warehouse as $row) {
-                                                    echo '<option value="' . $row['id'] . '">' . $row['title'] . '</option>';
+                                                    echo '<option value="' . $row['store_id'] . '">' . $row['store_name'] . '</option>';
                                                 } ?>
 
                                             </select></div>
@@ -224,7 +224,7 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder="Invoice #"
                                                        name="invocieno" id="invocieno"
-                                                       value="<?php echo $lastinvoice + 1 ?>">
+                                                       value="<?php echo $lastinvoice ?>">
                                             </div>
                                         </div>
                                         <div class="col-sm-3"><label for="invocieno"
