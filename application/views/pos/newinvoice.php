@@ -224,7 +224,7 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder="Invoice #"
                                                        name="invocieno" id="invocieno"
-                                                       value="<?php echo $lastinvoice ?>">
+                                                       value="<?php echo $lastinvoice ?>"><!--last+1-->
                                             </div>
                                         </div>
                                         <div class="col-sm-3"><label for="invocieno"

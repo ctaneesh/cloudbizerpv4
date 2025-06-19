@@ -91,34 +91,52 @@ class Pos_invoices_model extends CI_Model
     public function invoice_details($id, $eid = '',$loc=null)
     {
 
-        $this->db->select('cberp_invoices.*, SUM(cberp_invoices.shipping + cberp_invoices.ship_tax) AS shipping,cberp_customers.*,cberp_invoices.loc as loc,cberp_invoices.id AS iid,cberp_customers.customer_id AS cid,cberp_terms.id AS termid,cberp_terms.title AS termtit,cberp_terms.terms AS terms');
+        $this->db->select('cberp_invoices.*, SUM(cberp_invoices.shipping + cberp_invoices.shipping_tax) AS shipping,cberp_customers.*,cberp_invoices.loc as loc,cberp_invoices.invoice_number AS iid,cberp_customers.customer_id AS cid,cberp_terms.id AS termid,cberp_terms.title AS termtit,cberp_terms.terms AS terms');
         $this->db->from($this->table);
-        $this->db->where('cberp_invoices.id', $id);
+        $this->db->where('cberp_invoices.invoice_number', $id);
         if ($eid) {
-            $this->db->where('cberp_invoices.eid', $eid);
+            $this->db->where('cberp_invoices.employee_id', $eid);
         }
         // if (@$this->aauth->get_user()->loc) {
         //     $this->db->where('cberp_invoices.loc', $this->aauth->get_user()->loc);
         // }  elseif(!BDATA and !$loc) { $this->db->where('cberp_invoices.loc', 0); }
         // if($loc){ $this->db->where('cberp_invoices.loc', $loc); }
 
-        $this->db->join('cberp_customers', 'cberp_invoices.csd = cberp_customers.customer_id', 'left');
-        $this->db->join('cberp_terms', 'cberp_terms.id = cberp_invoices.term', 'left');
+        $this->db->join('cberp_customers', 'cberp_invoices.customer_id = cberp_customers.customer_id', 'left');
+        $this->db->join('cberp_terms', 'cberp_terms.id = cberp_invoices.payment_terms', 'left');
         $query = $this->db->get();
         return $query->row_array();
 
     }
 
-    public function invoice_products($id)
-    {
+    // public function invoice_products($id)
+    // {
 
-        $this->db->select('cberp_invoice_items.*,cberp_products.onhand_quantity AS totalQty, cberp_products.product_name AS product_name, cberp_products.product_code');
-        $this->db->from('cberp_invoice_items');
-        $this->db->join('cberp_products', 'cberp_products.pid = cberp_invoice_items.pid', 'left');
-        $this->db->where('tid', $id);
-        $query = $this->db->get();
-        return $query->result_array();
-    }
+    //     $this->db->select('cberp_invoice_items.*,cberp_products.onhand_quantity AS totalQty, cberp_products.product_name AS product_name, cberp_products.product_code');
+    //     $this->db->from('cberp_invoice_items');
+    //     $this->db->join('cberp_products', 'cberp_products.product_code = cberp_invoice_items.product_code', 'left');
+    //     $this->db->where('invoice_number', $id);
+    //     $query = $this->db->get();
+    //     return $query->result_array();
+    // }
+
+	public function invoice_products($id)
+	{
+		$this->db->select(
+			'cberp_invoice_items.*, 
+			cberp_products.onhand_quantity AS totalQty, 
+			cberp_product_description.product_name, 
+			cberp_products.product_code'
+		);
+		$this->db->from('cberp_invoice_items');
+		$this->db->join('cberp_products', 'cberp_products.product_code = cberp_invoice_items.product_code', 'left');
+		$this->db->join('cberp_product_description', 'cberp_product_description.product_code = cberp_invoice_items.product_code', 'left');
+		$this->db->where('cberp_invoice_items.invoice_number', $id);
+
+		$query = $this->db->get();
+		return $query->result_array();
+	}
+
 
     public function currencies()
     {

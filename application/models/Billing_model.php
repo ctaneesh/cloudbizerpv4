@@ -24,7 +24,7 @@ class Billing_model extends CI_Model
     {
         $account['id'] = false;
         if ($loc) {
-            $this->db->select('cberp_accounts.id,cberp_accounts.holder,');
+            $this->db->select('cberp_accounts.id,cberp_accounts.holder');
             $this->db->from('cberp_locations');
             $this->db->where('cberp_locations.id', $loc);
             $this->db->join('cberp_accounts', 'cberp_locations.ext = cberp_accounts.id', 'left');
@@ -59,13 +59,13 @@ class Billing_model extends CI_Model
 
         $this->db->select('cberp_invoices.*,cberp_customers.name,cberp_customers.customer_id AS cid');
         $this->db->from('cberp_invoices');
-        $this->db->where('cberp_invoices.id', $tid);
-        $this->db->join('cberp_customers', 'cberp_invoices.csd = cberp_customers.customer_id', 'left');
+        $this->db->where('cberp_invoices.invoice_number', $tid);
+        $this->db->join('cberp_customers', 'cberp_invoices.customer_id = cberp_customers.customer_id', 'left');
 
         $query = $this->db->get();
         $invoice = $query->row_array();
 
-        // print_r($invoice);
+         //print_r($invoice);exit();
 
         if(!$bill_date) $bill_date = date('Y-m-d');
 
@@ -76,11 +76,11 @@ class Billing_model extends CI_Model
             'type' => 'Income',
             'cat' => 'Sales',
             'credit' => $amount,
-            'payer' => $invoice['name'],
-            'payerid' => $invoice['csd'],
+            'payer' => $invoice['invoice_number'],
+            'payerid' => $invoice['customer_id'],
             'method' => $pmethod,
             'date' => $bill_date,
-            'eid' => $invoice['eid'],
+            'eid' => $invoice['employee_id'],
             'tid' => $tid,
             'note' => $note,
             'loc' => $invoice['loc']
@@ -90,11 +90,12 @@ class Billing_model extends CI_Model
         $trans = $this->db->insert_id();
 
 
-        $totalrm = $invoice['total'] - $invoice['pamnt'];
+        $totalrm = $invoice['total'] - $invoice['paid_amount'];
 
         if ($totalrm > $amount) {
-            $this->db->set('pmethod', $pmethod);
-            $this->db->set('pamnt', "pamnt+$amount", FALSE);
+            $this->db->set('payment_method', $pmethod);
+            //$this->db->set('pamnt', "pamnt+$amount", FALSE);
+			$this->db->set('paid_amount', "paid_amount+$amount", FALSE);
 
 			$round_off = $this->custom->api_config(4);
 			$this->db->set('status', 'partial');
@@ -104,7 +105,7 @@ class Billing_model extends CI_Model
 					$this->db->set('status', 'paid');
 				}
 			}
-            $this->db->where('id', $tid);
+            $this->db->where('invoice_number', $tid);
             $this->db->update('cberp_invoices');
 
 
@@ -114,10 +115,10 @@ class Billing_model extends CI_Model
             $this->db->update('cberp_accounts');
 
         } else {
-            $this->db->set('pmethod', $pmethod);
-            $this->db->set('pamnt', "pamnt+$amount", FALSE);
+            $this->db->set('payment_method', $pmethod);
+            $this->db->set('paid_amount', "paid_amount+$amount", FALSE);
             $this->db->set('status', 'paid');
-            $this->db->where('id', $tid);
+            $this->db->where('invoice_number', $tid);
             $this->db->update('cberp_invoices');
             //acount update
             $this->db->set('lastbal', "lastbal+$amount", FALSE);
@@ -155,6 +156,7 @@ class Billing_model extends CI_Model
             return false;
         }
     }
+
 
     public function gateway($id)
     {
@@ -420,7 +422,7 @@ class Billing_model extends CI_Model
 
         $this->db->select('cberp_invoices.*,cberp_customers.name,cberp_customers.customer_id AS cid');
         $this->db->from('cberp_invoices');
-        $this->db->where('cberp_invoices.id', $tid);
+        $this->db->where('cberp_invoices.invoice_number', $tid);
         $this->db->join('cberp_customers', 'cberp_invoices.csd = cberp_customers.customer_id', 'left');
 
         $query = $this->db->get();
