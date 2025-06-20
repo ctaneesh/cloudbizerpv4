@@ -169,8 +169,12 @@
                     </div>
                     <div class="col-md-6 col-sm-12 text-xs-center text-md-right">
                         <h2><?php echo $this->lang->line('INVOICE') ?></h2>
-                        <p class="pb-1"> <?php echo prefix(7) . ' ' . $invoice['tid'] . '</p>
-                            <p class="pb-1">' . $this->lang->line('Reference') . ':' . $invoice['refer'] . '</p>'; ?>
+                        <!-- <p class="pb-1"> <?php echo prefix(7) . ' ' . $invoice['invoice_number'] . '</p>
+                            <p class="pb-1">' . $this->lang->line('Reference') . ':' . $invoice['reference'] . '</p>'; ?> --><!--commented 20-06-25-->
+
+							<p class="pb-1"> <?php echo $invoice['invoice_number'] . '</p>
+                            <p class="pb-1">' . $this->lang->line('Reference') . ':' . $invoice['reference'] . '</p>'; ?>
+							
                         <ul class="px-0 list-unstyled">
                             <li><?php echo $this->lang->line('Gross Amount') ?></li>
                             <li class="lead text-bold-800">
@@ -235,16 +239,16 @@
                                 $sub_t = 0;
 
                                 foreach ($products as $row) {
-                                    $sub_t += $row['price'] * $row['qty'];
-                                    $gst = $row['totaltax'] / 2;
+                                    $sub_t += $row['price'] * $row['quantity'];
+                                    $gst = $row['total_tax'] / 2;
                                     $rate = $row['tax'] / 2;
                                     echo '<tr>
                                         <th scope="row">' . $c . '</th>
-                                        <td>' . $row['product'] . '</td> 
-                                        <td>' . $row['code'] . '</td>                          
+                                        <td>' . $row['product_name'] . '</td> 
+                                        <td>' . $row['product_code'] . '</td>                          
                                         <td>' . amountExchange($row['price'], 0, $this->aauth->get_user()->loc) . '</td>
-                                        <td>' . amountFormat_general($row['qty']) . $row['unit'] . '</td>
-                                        <td>' . amountExchange($row['totaldiscount'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
+                                        <td>' . amountFormat_general($row['quantity']) . $row['unit'] . '</td>
+                                        <td>' . amountExchange($row['total_discount'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
                                         <td>' . amountExchange($gst, 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($rate) . '%)</td>
                                         <td>' . amountExchange($gst, 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($rate) . '%)</td>                           
                                         <td>' . amountExchange($row['subtotal'], 0, $this->aauth->get_user()->loc) . '</td>
@@ -277,16 +281,16 @@
                                     $sub_t = 0;
 
                                     foreach ($products as $row) {
-                                        $sub_t += $row['price'] * $row['qty'];
+                                        $sub_t += $row['price'] * $row['quantity'];
 
                                         echo '<tr>
                                             <th scope="row">' . $c . '</th>
-                                            <td>' . $row['product'] . '</td> 
-                                            <td>' . $row['code'] . '</td>                          
+                                            <td>' . $row['product_name'] . '</td> 
+                                            <td>' . $row['product_code'] . '</td>                          
                                             <td>' . amountExchange($row['price'], 0, $this->aauth->get_user()->loc) . '</td>
-                                            <td>' . amountFormat_general($row['qty']) . $row['unit'] . '</td>
-                                            <td>' . amountExchange($row['totaldiscount'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
-                                            <td>' . amountExchange($row['totaltax'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['tax']) . '%)</td>
+                                            <td>' . amountFormat_general($row['quantity']) . $row['unit'] . '</td>
+                                            <td>' . amountExchange($row['total_discount'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
+                                            <td>' . amountExchange($row['total_tax'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['tax']) . '%)</td>
                                                             
                                             <td>' . amountExchange($row['subtotal'], 0, $this->aauth->get_user()->loc) . '</td>
                                         </tr>';
@@ -315,15 +319,15 @@
                                     $sub_t = 0;
 
                                     foreach ($products as $row) {
-                                        $sub_t += $row['price'] * $row['qty'];
+                                        $sub_t += $row['price'] * $row['quantity'];
                                         echo '<tr>
                                             <th scope="row">' . $c . '</th>
-                                            <td>' . $row['code'] . '</td>                           
-                                            <td>' . $row['product'] . '</td>                           
+                                            <td>' . $row['product_code'] . '</td>                           
+                                            <td>' . $row['product_name'] . '</td>                           
                                             <td>' . amountExchange($row['price'], 0, $this->aauth->get_user()->loc) . '</td>
-                                            <td>' . amountFormat_general($row['qty']) . $row['unit'] . '</td>
-                                            <td>' . amountExchange($row['totaltax'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['tax']) . '%)</td>
-                                            <td>' . amountExchange($row['totaldiscount'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
+                                            <td>' . amountFormat_general($row['quantity']) . $row['unit'] . '</td>
+                                            <td>' . amountExchange($row['total_tax'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['tax']) . '%)</td>
+                                            <td>' . amountExchange($row['total_discount'], 0, $this->aauth->get_user()->loc) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
                                             <td>' . amountExchange($row['subtotal'], 0, $this->aauth->get_user()->loc) . '</td>
                                         </tr>';
 
@@ -348,7 +352,7 @@
                                                 id="pstatus"><?php echo $this->lang->line(ucwords($invoice['status'])) ?></strong></u>
                                     </p>
                                     <p class="lead"><?php echo $this->lang->line('Payment Method') ?>: <u><strong
-                                                id="pmethod"><?php echo $this->lang->line($invoice['pmethod']) ?></strong></u>
+                                                id="pmethod"><?php echo $this->lang->line($invoice['payment_method']) ?></strong></u>
                                     </p>
 
                                     <p class="lead mt-1"><br><?php echo $this->lang->line('Note') ?>:</p>
@@ -397,7 +401,7 @@
                                             <td><?php echo $this->lang->line('Payment Made') ?></td>
                                             <td class="pink text-xs-right">
                                                 (-)
-                                                <?php echo ' <span id="paymade">' . amountExchange($invoice['pamnt'], 0, $this->aauth->get_user()->loc) ?></span>
+                                                <?php echo ' <span id="paymade">' . amountExchange($invoice['paid_amount'], 0, $this->aauth->get_user()->loc) ?></span>
                                             </td>
                                         </tr>
                                         <tr class="bg-grey bg-lighten-4">
@@ -405,7 +409,7 @@
                                             </td>
                                             <td class="text-bold-800 text-xs-right">
                                                 <?php $myp = '';
-                                            $rming = $invoice['total'] - $invoice['pamnt'];
+                                            $rming = $invoice['total'] - $invoice['paid_amount'];
                                             if ($rming < 0) {
                                                 $rming = 0;
 
@@ -647,7 +651,7 @@ $(document).on('click', ".aj_delete", function(e) {
                         <div class="col">
                             <label for="shortnote"  class="col-form-label"><?php echo $this->lang->line('Note') ?></label>
                             <input type="text" class="form-control" name="shortnote" placeholder="Short note"
-                                value="Payment for invoice #<?php echo $invoice['tid'] ?>">
+                                value="Payment for invoice #<?php echo $invoice['invoice_number'] ?>">
                         </div>
                     </div>
                     <div class="modal-footer">

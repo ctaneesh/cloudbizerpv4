@@ -12,8 +12,8 @@
                 <div class="row wrapper white-bg page-heading">
 
                     <div class="col">
-                        <?php $rming = $invoice['total'] - $invoice['pamnt'];
-                        if ($invoice['paymentstatus'] != 'canceled') { ?>
+                        <?php $rming = $invoice['total'] - $invoice['paid_amount'];
+                        if ($invoice['status'] != 'canceled') { ?>
                             <div class="row">
 
 
@@ -90,7 +90,7 @@
                             echo '<b>'.$this->lang->line('INVOICE').' : ' . $invoice['invoice_number'] . '</b></p>
                             <p class="pb-0">' . $this->lang->line('Reference') . ' : ' . $invoice['refer'] . '</p>'; ?>
                             <p ><?php echo $this->lang->line('Payment Status') ?>:
-                                        <u><strong id="pstatus"><?php echo $this->lang->line(ucwords($invoice['paymentstatus'])) ?></strong></u>
+                                        <u><strong id="pstatus"><?php echo $this->lang->line(ucwords($invoice['invoicestatus'])) ?></strong></u>
                                     </p>
                         <ul class="px-0 list-unstyled">
                             <li><?php echo $this->lang->line('Gross Amount') ?> : <strong class="lead"><b><?=$invoice['total']?></b></strong></li>
@@ -151,7 +151,7 @@
                         <div class="col-md-3 col-sm-12 text-right">
                             <?php $date_text = $this->lang->line('Due Date');
                             if ($invoice['i_class'] > 1) $date_text = $this->lang->line('Renew Date');
-                            echo '<p class="mb-0"><span class="text-muted">' . $this->lang->line('Invoice Date') . ' :</span> ' . dateformat($invoice['invoicedate']) . '</p> <p class="mb-0"><span class="text-muted">' . $date_text . ' :</span> ' . dateformat($invoice['invoiceduedate']) . '</p>  <p class="mb-0"><span class="text-muted">' . $this->lang->line('Terms') . ' :</span> ' . $invoice['termtit'] . '</p>';
+                            echo '<p class="mb-0"><span class="text-muted">' . $this->lang->line('Invoice Date') . ' :</span> ' . dateformat($invoice['invoice_date']) . '</p> <p class="mb-0"><span class="text-muted">' . $date_text . ' :</span> ' . dateformat($invoice['due_date']) . '</p>  <p class="mb-0"><span class="text-muted">' . $this->lang->line('Terms') . ' :</span> ' . $invoice['termtit'] . '</p>';
                             ?>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                         <div class="table-responsive col-sm-12">
                             <table class="table table-striped table-bordered zero-configuration dataTable">
                                 <thead>
-                                <?php if ($invoice['taxstatus'] == 'cgst'){ ?>
+                                <?php if ($invoice['tax_status'] == 'cgst'){ ?>
 
                                 <tr>
                                     <th>#</th>
@@ -185,25 +185,25 @@
                                 $sub_t = 0;
 
                                 foreach ($products as $row) {
-                                    $sub_t += $row['price'] * $row['qty'];
-                                    $gst = $row['totaltax'] / 2;
+                                    $sub_t += $row['price'] * $row['product_qty'];
+                                    $gst = $row['total_tax'] / 2;
                                     $rate = $row['tax'] / 2;
                                     echo '<tr>                                    
                                     <td>' . $row['code'] . '</td>   
                                     <th scope="row">' . $c . '</th>    
                                     <td>' . $row['product'] . '</td>                    
                                     <td>' . amountExchange($row['price'], $invoice['multi'], $invoice['loc']) . '</td>
-                                    <td>' . amountFormat_general($row['qty']) . $row['unit'] . '</td>
-                                    <td>' . amountExchange($row['totaldiscount'], $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
+                                    <td>' . amountFormat_general($row['product_qty']) . $row['unit'] . '</td>
+                                    <td>' . amountExchange($row['total_discount'], $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
                                     <td>' . amountExchange($gst, $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($rate) . '%)</td>
                                     <td>' . amountExchange($gst, $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($rate) . '%)</td>                           
                                     <td>' . amountExchange($row['subtotal'], $invoice['multi'], $invoice['loc']) . '</td>
-                                    <td>' . amountExchange($row['pamnt'], $invoice['multi'], $invoice['loc']) . '</td>
+                                    <td>' . amountExchange($row['paid_amount'], $invoice['multi'], $invoice['loc']) . '</td>
                                     </tr>';
 
                                     // echo '<tr><td colspan=7>' . $row['product_des'] . '</td></tr>';
                                     if (CUSTOM) {
-                                        $p_custom_fields = $this->custom->view_fields_data($row['pid'], 4, 1);
+                                        $p_custom_fields = $this->custom->view_fields_data($row['product_code'], 4, 1);
 
 
                                         $z_custom_fields = '';
@@ -223,7 +223,7 @@
                                 </tbody>
                                 <?php
 
-                                } elseif ($invoice['taxstatus'] == 'igst') {
+                                } elseif ($invoice['tax_status'] == 'igst') {
                                     ?>
                                     <tr>
                                         <th>#</th>
@@ -243,23 +243,23 @@
                                     $sub_t = 0;
 
                                     foreach ($products as $row) {
-                                        $sub_t += $row['price'] * $row['qty'];
+                                        $sub_t += $row['price'] * $row['product_qty'];
 
                                         echo '<tr>
                                             <th scope="row">' . $c . '</th> 
                                             <td>' . $row['code'] . '</td>   
                                             <td>' . $row['product'] . '</td>                       
                                             <td>' . amountExchange($row['price'], $invoice['multi'], $invoice['loc']) . '</td>
-                                            <td>' . amountFormat_general($row['qty']) . $row['unit'] . '</td>
-                                            <td>' . amountExchange($row['totaldiscount'], $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
-                                            <td>' . amountExchange($row['totaltax'], $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($row['tax']) . '%)</td>
+                                            <td>' . amountFormat_general($row['product_qty']) . $row['unit'] . '</td>
+                                            <td>' . amountExchange($row['total_discount'], $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($row['discount']) . $this->lang->line($invoice['format_discount']) . ')</td>
+                                            <td>' . amountExchange($row['total_tax'], $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($row['tax']) . '%)</td>
                                                             
                                             <td>' . amountExchange($row['subtotal'], $invoice['multi'], $invoice['loc']) . '</td>
                                         </tr>';
 
                                         // echo '<tr><td colspan=7>' . $row['product_des'] . '</td></tr>';
                                         if (CUSTOM) {
-                                            $p_custom_fields = $this->custom->view_fields_data($row['pid'], 4, 1);
+                                            $p_custom_fields = $this->custom->view_fields_data($row['product_code'], 4, 1);
 
 
                                             $z_custom_fields = '';
@@ -296,24 +296,24 @@
                                     $sub_t = 0;
 
                                     foreach ($products as $row) {
-                                        $sub_t += $row['price'] * $row['qty'];
+                                        $sub_t += $row['price'] * $row['product_qty'];
                                         echo '<tr>
                                             <td scope="row" class="text-center">' . $c . '</td>
                                             
                                             <td>' . $row['product_name'] . '</td>                           
                                             <td>' . $row['product_code'] . '</td>                           
                                             <td class="text-right">' . $row['price'] . '</td>
-                                            <td class="text-center">' . intval($row['qty']) . $row['unit'] . '</td>';
+                                            <td class="text-center">' . intval($row['product_qty']) . $row['unit'] . '</td>';
                                             // echo '<td>' . amountExchange($row['totaltax'], $invoice['multi'], $invoice['loc']) . ' (' . amountFormat_s($row['tax']) . '%)</td>';
 
-                                            echo '<td class="text-right">' . $row['totaldiscount'].'</td>';
+                                            echo '<td class="text-right">' . $row['total_discount'].'</td>';
 
                                             echo '<td class="text-right">' .$row['subtotal'] . '</td>
                                         </tr>';
 
                                         // echo '<tr><td colspan=7>' . $row['product_des'] . '</td></tr>';
                                         if (CUSTOM) {
-                                            $p_custom_fields = $this->custom->view_fields_data($row['pid'], 4, 1);
+                                            $p_custom_fields = $this->custom->view_fields_data($row['product_code'], 4, 1);
 
 
                                             $z_custom_fields = '';
@@ -340,10 +340,10 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <p  class="lead"><?php echo $this->lang->line('Payment Status') ?>:
-                                        <u><strong id="pstatus"><?php echo $this->lang->line(ucwords($invoice['paymentstatus'])) ?></strong></u>
+                                        <u><strong id="pstatus"><?php echo $this->lang->line(ucwords($invoice['invoicestatus'])) ?></strong></u>
                                     </p>
                                     <p class="lead"><?php echo $this->lang->line('Payment Method') ?>: <u><strong
-                                                    id="pmethod"><?php echo $this->lang->line($invoice['pmethod']) ?></strong></u>
+                                                    id="pmethod"><?php echo $this->lang->line($invoice['payment_method']) ?></strong></u>
                                     </p>
 
                                     <p class="lead mt-1"><br><?php echo $this->lang->line('Note') ?>:</p>
@@ -397,7 +397,7 @@
                                     <tr class="d-none1">
                                         <td><?php echo $this->lang->line('Payment Made'); ?></td>
                                         <td class="pink text-right">
-                                            (-) <?php echo ' <span id="paymade">' . $invoice['pamnt']; ?></span></td>
+                                            (-) <?php echo ' <span id="paymade">' . $invoice['paid_amount']; ?></span></td>
                                     </tr>
                                     <tr class="bg-grey bg-lighten-4">
                                         <td class="text-bold-800"><?php echo $this->lang->line('Balance Due'); ?></td>

@@ -91,7 +91,7 @@ class Pos_invoices_model extends CI_Model
     public function invoice_details($id, $eid = '',$loc=null)
     {
 
-        $this->db->select('cberp_invoices.*, SUM(cberp_invoices.shipping + cberp_invoices.shipping_tax) AS shipping,cberp_customers.*,cberp_invoices.loc as loc,cberp_invoices.invoice_number AS iid,cberp_customers.customer_id AS cid,cberp_terms.id AS termid,cberp_terms.title AS termtit,cberp_terms.terms AS terms');
+        $this->db->select('SUM(cberp_invoices.shipping + cberp_invoices.shipping_tax) AS shipping,cberp_customers.*,cberp_customers.status as customer_status,cberp_invoices.*, cberp_invoices.loc as loc,cberp_invoices.invoice_number AS iid,cberp_customers.customer_id AS cid,cberp_terms.id AS termid,cberp_terms.title AS termtit,cberp_terms.terms AS terms');
         $this->db->from($this->table);
         $this->db->where('cberp_invoices.invoice_number', $id);
         if ($eid) {

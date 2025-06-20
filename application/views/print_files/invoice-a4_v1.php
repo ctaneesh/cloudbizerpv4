@@ -206,7 +206,7 @@
     <thead>
         <tr>
             <?php
-                if($invoice['invoicestatus']=='due')
+                if($invoice['status']=='due')
                 {
                     $reciept = 'INVOICE';
                 }
@@ -236,8 +236,8 @@
                 ?>
              </td>
         
-            <td style="text-align:right;"><strong>Invoice No : <?= $invoice['invoice_number']?></strong><br> <strong>Invoice Date : <?= date('d-m-Y', strtotime($invoice['invoicedate']))?></strong><br>
-            <strong>Invoice Due Date : <?= date('d-m-Y', strtotime($invoice['invoiceduedate']))?></strong><br>
+            <td style="text-align:right;"><strong>Invoice No : <?= $invoice['invoice_number']?></strong><br> <strong>Invoice Date : <?= date('d-m-Y', strtotime($invoice['invoice_date']))?></strong><br>
+            <strong>Invoice Due Date : <?= date('d-m-Y', strtotime($invoice['due_date']))?></strong><br>
             <strong>Currency : <?=currency($this->aauth->get_user()->loc)?></strong>
         </td>
         </tr>
@@ -354,23 +354,23 @@
             } else {
                 $flag = '';
             }
-            $sub_t += $row['price'] * $row['qty'];
-            $granddiscount = $granddiscount + $row['totaldiscount'];
+            $sub_t += $row['price'] * $row['quantity'];
+            $granddiscount = $granddiscount + $row['total_discount'];
             $grandtotal = $grandtotal + $row['subtotal'];
-            $producttotal += $row['price'] * $row['qty'];
+            $producttotal += $row['price'] * $row['quantity'];
             if ($row['serial']) $row['product_des'] .= ' - ' . $row['serial'];
             echo '<tr class="item' . $flag . '">  <td style="text-align:center">' . $n . '</td>';
             echo '<td>' . $row['product_code'] . '</td>';
             echo '<td>' . $row['product_name'] . '</td>';
             echo '<td style="width:12%; text-align:right;">' . number_format($row['price'],2) . '</td>';
-            echo '<td style="width:12%;text-align:center;" >' . +$row['qty'] ." ". $row['unit'] . '</td>   ';
+            echo '<td style="width:12%;text-align:center;" >' . +$row['quantity'] ." ". $row['unit'] . '</td>   ';
             if ($invoice['tax'] > 0) {
                 $cols++;
-                echo '<td style="width:16%;">' . $row['totaltax'] . ' <span class="tax">(' . amountFormat_s($row['tax']) . '%)</span></td>';
+                echo '<td style="width:16%;">' . $row['total_tax'] . ' <span class="tax">(' . amountFormat_s($row['tax']) . '%)</span></td>';
             }
             if ($invoice['discount'] > 0) {
                 $cols++;
-                echo ' <td style="width:12%;text-align:center;">' . number_format($row['totaldiscount'],2) . '</td>';
+                echo ' <td style="width:12%;text-align:center;">' . number_format($row['total_discount'],2) . '</td>';
             }
             echo '<td style="text-align:right;">' . number_format($row['subtotal'],2) . '</td></tr>';
 
@@ -382,7 +382,7 @@
             // }
              //erp2024 removed section 06-06-2024
             if (CUSTOM) {
-                $p_custom_fields = $this->custom->view_fields_data($row['pid'], 4, 1);
+                $p_custom_fields = $this->custom->view_fields_data($row['product_code'], 4, 1);
 
                 if (is_array($p_custom_fields[0])) {
                     $z_custom_fields = '';
@@ -428,13 +428,13 @@
 
         <tr>
             <td class="myco2" style="width:50%;" rowspan="<?php echo $sub_t_col ?>"><br>
-            <?php if($invoice['invoicestatus']=='Due')
+            <?php if($invoice['status']=='Due')
             { ?>
-                <p><?php echo $this->lang->line('Payment Method') . ' : <strong>' . $this->lang->line(ucwords($invoice['pmethod'])) . '</strong></p>'?> <br>
+                <p><?php echo $this->lang->line('Payment Method') . ' : <strong>' . $this->lang->line(ucwords($invoice['payment_method'])) . '</strong></p>'?> <br>
            <?php  } ?>
             
-                <p><?php echo $this->lang->line('Status') . ' : <strong>'. $this->lang->line(ucwords($invoice['invoicestatus'])) . '</strong></p>';
-                    if($invoice['invoicestatus']=='post dated cheque')
+                <p><?php echo $this->lang->line('Status') . ' : <strong>'. $this->lang->line(ucwords($invoice['status'])) . '</strong></p>';
+                    if($invoice['status']=='post dated cheque')
                     {
                        
                         echo '<br>'.$this->lang->line('Cheque Date') . ' : <strong>' . date('d-m-Y',strtotime($checkdate['cheque_date'])).'</strong><br>';
@@ -452,7 +452,7 @@
 
                        
                         // echo $this->lang->line('Paid Amount') . ': ' . amountExchange($invoice['pamnt'], $invoice['multi'], $invoice['loc']);
-                        echo $this->lang->line('Paid Amount') . ' : <strong>' . number_format($invoice['pamnt'],2).'</strong><br>';
+                        echo $this->lang->line('Paid Amount') . ' : <strong>' . number_format($invoice['paid_amount'],2).'</strong><br>';
                     }
 
                     // if ($general['t_type'] == 1) {
@@ -507,7 +507,7 @@
             echo '<td></td>';
         // }?>
             <td><?php echo $this->lang->line('Balance Due') ?></td>
-            <td style="text-align:right"><strong><?php $rming = $invoice['total'] - $invoice['pamnt'];
+            <td style="text-align:right"><strong><?php $rming = $invoice['total'] - $invoice['paid_amount'];
                 if ($rming < 0) {
                     $rming = 0;
                 }
