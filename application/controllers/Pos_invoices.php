@@ -3023,83 +3023,157 @@ echo 6;
 
     }
 
-    public function invoice_legacy_bkup()
-    {
+    // public function invoice_legacy_bkup()
+    // {
 
-        $id = $this->input->post('inv');
-		//echo $id; exit();
+    //     $id = $this->input->post('inv');
+	// 	//echo $id; exit();
 
-        if (!$id) {
-            exit('eer');
-        }
+    //     if (!$id) {
+    //         exit('eer');
+    //     }
 
-        // Get the user from the array, using the id as key for retrieval.
-        // Usually a model is to be used for this.
+    //     // Get the user from the array, using the id as key for retrieval.
+    //     // Usually a model is to be used for this.
 
-        $file_name = rand(99,999) . $id.time();
+    //     $file_name = rand(99,999) . $id.time();
 
-        $tid = $id;
-        $data['qrc'] = $file_name. '.png';
-        $data['id'] = $tid;
-        $data['title'] = "Invoice $tid";
-        $data['invoice'] = $this->invocies->invoice_details($tid);
-        if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
-        if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+    //     $tid = $id;
+    //     $data['qrc'] = $file_name. '.png';
+    //     $data['id'] = $tid;
+    //     $data['title'] = "Invoice $tid";
+    //     $data['invoice'] = $this->invocies->invoice_details($tid);
+    //     if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
+    //     if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
         
 
 
-        $this->load->model('billing_model', 'billing');
-        $online_pay = $this->billing->online_pay_settings();
-        if ($online_pay['enable'] == 1) {
-            $token = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
+    //     $this->load->model('billing_model', 'billing');
+    //     $online_pay = $this->billing->online_pay_settings();
+    //     if ($online_pay['enable'] == 1) {
+    //         $token = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
 			
-            $data['qrc'] = $file_name. '.png';
+    //         $data['qrc'] = $file_name. '.png';
 
-            $qrCode = new QrCode(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token));
-			//header('Content-Type: '.$qrCode->getContentType());
-			//echo $qrCode->writeString();
-            $qrCode->writeFile(FCPATH . 'userfiles/pos_temp/' . $data['qrc']);
+    //         $qrCode = new QrCode(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token));
+	// 		//header('Content-Type: '.$qrCode->getContentType());
+	// 		//echo $qrCode->writeString();
+    //         $qrCode->writeFile(FCPATH . 'userfiles/pos_temp/' . $data['qrc']);
 
-			// $qrCode = QrCode::create(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token))
-            //     ->setEncoding(new Encoding('UTF-8'))
-            //     ->setSize(300)
-            //     ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
-            //     ->setForegroundColor(new Color(0, 0, 0))
-            //     ->setBackgroundColor(new Color(255, 255, 255));
+	// 		// $qrCode = QrCode::create(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token))
+    //         //     ->setEncoding(new Encoding('UTF-8'))
+    //         //     ->setSize(300)
+    //         //     ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+    //         //     ->setForegroundColor(new Color(0, 0, 0))
+    //         //     ->setBackgroundColor(new Color(255, 255, 255));
 
-			// 	echo $qrCode.'aa';exit();
+	// 		// 	echo $qrCode.'aa';exit();
 
-            // $writer = new PngWriter();
-            // $result = $writer->write($qrCode);
-            // $result->saveToFile(FCPATH . 'userfiles/pos_temp/' . $data['qrc']);
-        }
+    //         // $writer = new PngWriter();
+    //         // $result = $writer->write($qrCode);
+    //         // $result->saveToFile(FCPATH . 'userfiles/pos_temp/' . $data['qrc']);
+    //     }
 
-		// echo "<pre>";
-		// print_r($data);
-		// echo "</pre>";
-		// exit();
+	// 	// echo "<pre>";
+	// 	// print_r($data);
+	// 	// echo "</pre>";
+	// 	// exit();
 
-        $this->pheight = 0;
-        $this->load->library('pdf');
-        $pdf = $this->pdf->load_thermal();
-        // retrieve data from model or just static date
-        $data['title'] = "items";
-        $pdf->allow_charset_conversion = true;  // Set by default to TRUE
-        $pdf->charset_in = 'UTF-8';
-        //   $pdf->SetDirectionality('rtl'); // Set lang direction for rtl lang
-        $pdf->autoLangToFont = true;
-        $data['round_off'] = $this->custom->api_config(4);
-        $html = $this->load->view('print_files/pos_pdf_compact', $data, true);
-        // render the view into HTML
+    //     $this->pheight = 0;
+    //     $this->load->library('pdf');
+    //     $pdf = $this->pdf->load_thermal();
+    //     // retrieve data from model or just static date
+    //     $data['title'] = "items";
+    //     $pdf->allow_charset_conversion = true;  // Set by default to TRUE
+    //     $pdf->charset_in = 'UTF-8';
+    //     //   $pdf->SetDirectionality('rtl'); // Set lang direction for rtl lang
+    //     $pdf->autoLangToFont = true;
+    //     $data['round_off'] = $this->custom->api_config(4);
+    //     $html = $this->load->view('print_files/pos_pdf_compact', $data, true);
+    //     // render the view into HTML
 
-        $h = 160 + $this->pheight;
-        $pdf->_setPageSize(array(70, $h), $pdf->DefOrientation);
-        $pdf->WriteHTML($html);
+    //     $h = 160 + $this->pheight;
+    //     $pdf->_setPageSize(array(70, $h), $pdf->DefOrientation);
+    //     $pdf->WriteHTML($html);
 
-        $r=$pdf->Output('userfiles/pos_temp/' . $file_name . '.pdf', 'F');
-        echo  json_encode(array('status'=>'Success','file_name'=> $file_name));
+    //     $r=$pdf->Output('userfiles/pos_temp/' . $file_name . '.pdf', 'F');
+    //     echo  json_encode(array('status'=>'Success','file_name'=> $file_name));
 
-    }
+    // }
+
+	public function invoice_legacy()
+	{
+		//error_reporting(E_ALL);
+		//ini_set('display_errors', 1);
+
+		try {
+			$id = $this->input->post('inv');
+			if (!$id) {
+				throw new Exception('Invoice ID not provided');
+			}
+
+			$file_name = rand(99, 999) . $id . time();
+
+			$tid = $id;
+			$data['qrc'] = $file_name . '.png';
+			$data['id'] = $tid;
+			$data['title'] = "Invoice $tid";
+			$data['invoice'] = $this->invocies->invoice_details($tid);
+			if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
+			if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+
+			$this->load->model('billing_model', 'billing');
+			$online_pay = $this->billing->online_pay_settings();
+
+			if ($online_pay['enable'] == 1) {
+				$token = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
+
+				$data['qrc'] = $file_name . '.png';
+
+				$qrCode = QrCode::create(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token))
+					->setEncoding(new Encoding('UTF-8'))
+					->setSize(300)
+					->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+					->setForegroundColor(new Color(0, 0, 0))
+					->setBackgroundColor(new Color(255, 255, 255));
+
+				$writer = new PngWriter();
+				$result = $writer->write($qrCode);
+				
+				$qrPath = FCPATH . 'userfiles/pos_temp/' . $data['qrc'];
+				if (!is_dir(dirname($qrPath))) {
+					mkdir(dirname($qrPath), 0777, true);
+				}
+				$result->saveToFile($qrPath);
+			}
+
+			$this->pheight = 0;
+			$this->load->library('pdf');
+			$pdf = $this->pdf->load_thermal();
+
+			$data['title'] = "items";
+			$pdf->allow_charset_conversion = true;
+			$pdf->charset_in = 'UTF-8';
+			$pdf->autoLangToFont = true;
+
+			$data['round_off'] = $this->custom->api_config(4);
+			$html = $this->load->view('print_files/pos_pdf_compact', $data, true);
+
+			$h = 160 + $this->pheight;
+			$pdf->_setPageSize(array(70, $h), $pdf->DefOrientation);
+			$pdf->WriteHTML($html);
+
+			$pdfPath = 'userfiles/pos_temp/' . $file_name . '.pdf';
+			$r = $pdf->Output($pdfPath, 'F');
+
+			echo json_encode(['status' => 'Success', 'file_name' => $file_name]);
+		} catch (Exception $e) {
+			http_response_code(500);
+			echo json_encode(['status' => 'Error', 'message' => $e->getMessage()]);
+		}
+	}
+
+
 
 	
 
