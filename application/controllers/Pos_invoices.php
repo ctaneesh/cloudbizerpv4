@@ -42,6 +42,9 @@ class Pos_invoices extends CI_Controller
         $this->load->model('pos_invoices_model', 'invocies');
 
         $this->load->model('extended_invoices_model', 'extended_invoice');
+
+		$this->load->model('Billing_model', 'billing');
+
         $this->load->library("Aauth");
         $this->load->library("Registerlog");
         $this->load->library("Common");
@@ -72,6 +75,8 @@ class Pos_invoices extends CI_Controller
         if (!$this->registerlog->check($this->aauth->get_user()->id)) {
             redirect('register/create');
         }
+
+
         $this->load->model('customers_model', 'customers');
         $this->load->model('categories_model');
         $this->load->model('plugins_model', 'plugins');
@@ -160,7 +165,7 @@ class Pos_invoices extends CI_Controller
 		$data['acc_list'] = $this->invocies->accountslist();
 
 		// echo "<pre>";
-		// print_r($data['invoice']);
+		// print_r($data['products']);
 		// echo "</pre>";
 		// exit();
 
@@ -181,6 +186,10 @@ class Pos_invoices extends CI_Controller
         }
         $this->load->view('fixed/footer-pos');
     }
+
+	
+
+	
 
 
     //edit invoice
@@ -244,6 +253,707 @@ class Pos_invoices extends CI_Controller
     }
 
     //action
+    // public function action()
+    // {
+
+   
+    //     $v2 = $this->input->get('v2');
+    //     $ptype = $this->input->post('type');
+    //     $coupon = $this->input->post('coupon');
+    //     $notes = $this->input->post('notes', true);
+    //     $draft_id = $this->input->post('draft_id');
+    //     $coupon_amount = 0;
+    //     $coupon_n = '';
+    //     $customer_id = $this->input->post('customer_id');
+    //     $invocieno = $this->input->post('invocieno');
+    //     $invoicedate = $this->input->post('invoicedate');
+    //     $invocieduedate = $this->input->post('invocieduedate');
+    //     $tax = $this->input->post('tax_handle');
+
+    //     $total_tax = 0;
+
+    //     $discountFormat = $this->input->post('discountFormat');
+    //     $pterms = $this->input->post('pterms');
+    //     $currency = $this->input->post('mcurrency');
+    //     $total_discount = rev_amountExchange_s($this->input->post('after_disc'), $currency, $this->aauth->get_user()->loc);
+    //     $disc_val = numberClean($this->input->post('disc_val'));
+    //     $ship_taxtype = $this->input->post('ship_taxtype');
+    //     $subtotal = rev_amountExchange_s($this->input->post('subtotal'), $currency, $this->aauth->get_user()->loc);
+    //     $shipping = rev_amountExchange_s($this->input->post('shipping'), $currency, $this->aauth->get_user()->loc);
+    //     $shipping_tax = rev_amountExchange_s($this->input->post('ship_tax'), $currency, $this->aauth->get_user()->loc);
+    //     if ($ship_taxtype == 'incl') @$shipping = $shipping - $shipping_tax;
+    //     $refer = $this->input->post('refer', true);
+    //     $total = rev_amountExchange_s($this->input->post('total'), $currency, $this->aauth->get_user()->loc);
+    //     $st_c = 0;
+    //     $print_now = $this->input->post('printnow');
+    //     $account = $this->input->post('account');
+    //     $this->load->model('plugins_model', 'plugins');
+    //     $empl_e = $this->plugins->universal_api(69);
+    //     if ($empl_e['key1']) {
+    //         $emp = $this->input->post('employee');
+    //     } else {
+    //         $emp = $this->aauth->get_user()->id;
+    //     }
+
+
+    //     //Payment button click section  - pay now
+    //     if ($ptype == 4) {
+           
+    //         $p_amount = rev_amountExchange_s($this->input->post('p_amount'), $currency, $this->aauth->get_user()->loc);
+    //         $pmethod = $this->input->post('p_method');
+
+    //         $c_amt = $p_amount - $total;
+    //         if ($c_amt == 0.00) {
+    //             $status = 'Paid';
+    //             $pamnt = $total;
+    //         } elseif ($c_amt < 0.00) {
+    //             $status = 'Partial';
+    //             if ($p_amount == 0.00) $status = 'Due';
+    //             $pamnt = $p_amount;
+    //             $c_amt = 0;
+    //         } else {
+    //             $status = 'Paid';
+    //             $pamnt = $total;
+    //             $roundoff = $this->custom->api_config(4);
+    //             if ($roundoff['other']) $pamnt = round($total, $roundoff['active'], constant($roundoff['other']));
+    //         }
+    //         $i = 0;
+    //         if ($discountFormat == '0') {
+    //             $discstatus = 0;
+    //         } else {
+    //             $discstatus = 1;
+    //         }
+    //         if ($customer_id == 0) {
+    //             echo json_encode(array('status' => 'Error', 'message' =>
+    //                 $this->lang->line('Please add a new client')));
+    //             exit;
+    //         }
+    //         $this->db->trans_start();
+    //         //products
+    //         $transok = true;
+    //         $this->load->library("Common");
+    //         //Invoice Data
+    //         $bill_date = datefordatabase($invoicedate);
+    //         $bill_due_date = datefordatabase($invocieduedate);
+    //         $promo_flag = false;
+    //         if ($coupon) {
+    //             $this->db->select('*');
+    //             $this->db->from('cberp_promo');
+    //             $this->db->where('code', $coupon);
+    //             $query = $this->db->get();
+    //             $result_c = $query->row_array();
+    //             if ($result_c['active'] == 0 && $result_c['available'] > 0) {
+    //                 $promo_flag = true;
+    //                 $amount = $result_c['amount'];
+    //                 $notes .= '-' . $this->input->post('i_coupon');
+    //                 $total_discount += $amount;
+    //             }
+    //         }
+
+    //         $this->db->select('tid');
+    //         $this->db->from('cberp_invoices');
+    //         $this->db->order_by('id', 'DESC');
+    //         $this->db->limit(1);
+    //         $this->db->where('tid', $invocieno);
+    //         $this->db->where('regular_pos_flag', 1); //regular_pos_flag
+    //         $query = $this->db->get();
+    //         if(@$query->row()->tid){
+    //             $this->db->select('tid');
+    //             $this->db->from('cberp_invoices');
+    //             $this->db->order_by('id', 'DESC');
+    //             $this->db->limit(1);
+    //             $this->db->where('regular_pos_flag', 1);
+    //             $query = $this->db->get();
+    //             $invocieno=$query->row()->tid+1;
+    //         }
+
+    //         $data = array('tid' => $invocieno, 'invoicedate' => $bill_date, 'invoiceduedate' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'ship_tax' => $shipping_tax, 'ship_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'total' => $total, 'pmethod' => $pmethod, 'notes' => $notes, 'status' => $status, 'csd' => $customer_id, 'eid' => $emp, 'pamnt' => 0, 'taxstatus' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'refer' => $refer, 'term' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
+
+    //         if ($this->db->insert('cberp_invoices', $data)) 
+    //         {
+                
+    //             $invocieno_n = $invocieno;
+    //             $invocieno2 = $invocieno;
+    //             $invocieno = $this->db->insert_id();
+            
+
+    //             $pid = $this->input->post('pid');
+    //             $productlist = array();
+    //             $prodindex = 0;
+    //             $itc = 0;
+    //             $product_id = $this->input->post('pid');
+    //             $product_name1 = $this->input->post('product_name', true);
+    //             $product_qty = $this->input->post('product_qty');
+    //             $product_price = $this->input->post('product_price');
+    //             $product_tax = $this->input->post('product_tax');
+    //             $product_discount = $this->input->post('product_discount');
+    //             $product_subtotal = $this->input->post('product_subtotal');
+    //             $ptotal_tax = $this->input->post('taxa');
+    //             $ptotal_disc = $this->input->post('disca');
+    //             $product_des = $this->input->post('product_description', true);
+    //             $product_unit = $this->input->post('unit');
+    //             $product_hsn = $this->input->post('hsn', true);
+    //             $product_alert = $this->input->post('alert');
+    //             $product_serial = $this->input->post('serial');
+    //             if (is_array($pid)) {
+    //                 foreach ($pid as $key => $value) {
+    //                     $total_discount += numberClean(@$ptotal_disc[$key]);
+    //                     $total_tax += numberClean($ptotal_tax[$key]);
+
+    //                     $data = array(
+    //                         'tid' => $invocieno,
+    //                         'pid' => $product_id[$key],
+    //                         'product' => $product_name1[$key],
+    //                         'code' => $product_hsn[$key],
+    //                         'qty' => numberClean($product_qty[$key]),
+    //                         'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
+    //                         'tax' => numberClean($product_tax[$key]),
+    //                         'discount' => numberClean($product_discount[$key]),
+    //                         'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
+    //                         'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
+    //                         'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
+    //                         'product_des' => @$product_des[$key],
+    //                         'i_class' => 1,
+    //                         'unit' => $product_unit[$key],
+    //                         'serial' => $product_serial[$key] ?? null
+    //                     );
+
+    //                     $flag = true;
+    //                     $productlist[$prodindex] = $data;
+    //                     $i++;
+    //                     $prodindex++;
+
+    //                     $amt = numberClean($product_qty[$key]);
+
+    //                     if ($ptype AND $product_id[$key] > 0 and $this->common->zero_stock()) {
+
+    //                         if ((numberClean($product_alert[$key]) - $amt) < 0 and $st_c == 0) {
+    //                             echo json_encode(array('status' => 'Error', 'message' => 'Product - <strong>' . $product_name1[$key] . "</strong> - Low quantity. Available stock is  " . $product_alert[$key]));
+    //                             $transok = false;
+    //                             $st_c = 1;
+    //                         } else {
+    //                             $this->db->set('qty', "qty-$amt", FALSE);
+    //                             $this->db->where('pid', $product_id[$key]);
+    //                             $this->db->update('cberp_products');
+    //                         }
+    //                     }
+
+
+    //                     $itc += $amt;
+
+
+    //                 }
+
+    //             }
+    //             if ($prodindex > 0) {
+    //                 $this->db->insert_batch('cberp_invoice_items', $productlist);
+        
+    //                 $this->db->set(array('discount' => rev_amountExchange_s(amountFormat_general($total_discount), $currency, $this->aauth->get_user()->loc), 'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc), 'items' => $itc));
+    //                 $this->db->where('id', $invocieno);
+    //                 $this->db->update('cberp_invoices');
+            
+    //                 if (is_array($product_serial) AND count($product_serial) > 0) {
+    //                     $this->db->set('status', 1);
+    //                     $this->db->where_in('serial', $product_serial);
+    //                     $this->db->update('cberp_product_serials');
+    //                 }
+    //             }
+    //             else {
+    //                 echo json_encode(array('status' => 'Error', 'message' =>
+    //                     "Please choose product from product list. Go to Item manager section if you have not added the products."));
+    //                 $transok = false;
+    //             }
+            
+    //             $validtoken = hash_hmac('ripemd160', $invocieno, $this->config->item('encryption_key'));
+    //             $link = base_url('billing/view?id=' . $invocieno . '&token=' . $validtoken);
+    //             $link = base_url('billing/view?id=' . $invocieno);
+              
+
+    //             if ($transok) {
+    //                 $this->load->library("Printer");
+    //                 $printer = $this->printer->check($this->aauth->get_user()->loc);
+    //                 $p_tid = 'thermal_p';
+    //                 if (@$printer['val2'] == 'server') $p_tid = 'thermal_server';
+            
+    //                 echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice Success') . " <a target='_blank' href='thermal_pdf?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='fa fa-ticket' aria-hidden='true'></span> PDF  </a> &nbsp; &nbsp;   <a id='$p_tid' data-ptid='$invocieno' data-url='" . @$printer['val3'] . "'  class='btn btn-info btn-sm white breaklink'><span class='fa fa-ticket' aria-hidden='true'></span> " . $this->lang->line('Thermal Printer') . "  </a> &nbsp; &nbsp;<a href='#' class='btn btn-reddit btn-sm breaklink print_image' id='print_image' data-inid='$invocieno'><span class='fa fa-window-restore' aria-hidden='true'></span></a> &nbsp; &nbsp; <a target='_blank' href='printinvoice?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='fa fa-print' aria-hidden='true'></span> A4  </a> &nbsp; &nbsp; <a href='view?id=$invocieno' class='btn btn-purple btn-sm'><span class='fa fa-eye' aria-hidden='true'></span> " . $this->lang->line('View') . "  </a> &nbsp; &nbsp; <a href='$link' class='btn btn-blue-grey btn-sm breaklink'><span class='fa fa-globe' aria-hidden='true'></span> " . $this->lang->line('Public View') . " </a> &nbsp;<a href='create?v2=$v2' class='btn btn-flickr btn-sm breaklink'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('Create') . "  </a>"));                
+    //             }
+    //             $this->load->model('billing_model', 'billing');
+    //             $tnote = '#' . $invocieno_n . '-' . $pmethod;
+    //             switch ($pmethod) {
+    //                 case 'Cash' :
+    //                     $r_amt1 = $pamnt;
+    //                     $r_amt2 = 0;
+    //                     $r_amt3 = 0;
+    //                     break;
+    //                 case 'Card Swipe' :
+    //                     $r_amt1 = 0;
+    //                     $r_amt2 = $pamnt;
+    //                     $r_amt3 = 0;
+    //                     break;
+    //                 case 'Bank' :
+    //                     $r_amt1 = 0;
+    //                     $r_amt2 = 0;
+    //                     $r_amt3 = $pamnt;
+    //                     break;
+    //             }
+    //             $d_trans = $this->plugins->universal_api(69);
+                
+    //             if ($d_trans['key2']) {
+    //                     $t_data = array(
+    //                     'type' => 'Income',
+    //                     'cat' => 'Sales',
+    //                     'payerid' => $customer_id,
+    //                     'method' => $pmethod,
+    //                     'date' => $bill_date,
+    //                     'eid' =>$emp,
+    //                     'tid' => $invocieno,
+    //                     'loc' =>$this->aauth->get_user()->loc
+    //                 );
+            
+    //                 $dual = $this->custom->api_config(65);
+    //                 $this->db->select('holder');
+    //                 $this->db->from('cberp_accounts');
+    //                 $this->db->where('id', $dual['key2']);
+    //                 $query = $this->db->get();
+    //                 $account_d = $query->row_array();
+    //                 $t_data['credit'] = 0;
+    //                 $t_data['debit'] = $total;
+    //                 $t_data['type'] = 'Expense';
+    //                 $t_data['acid'] = $dual['key2'];
+    //                 $t_data['account'] = $account_d['holder'];
+    //                 $t_data['note'] = 'Debit ' . $tnote;
+            
+    //                 $this->db->insert('cberp_transactions', $t_data);
+    //                 //account update
+    //                 $this->db->set('lastbal', "lastbal-$total", FALSE);
+    //                 $this->db->where('id', $dual['key2']);
+    //                 $this->db->update('cberp_accounts');
+                    
+            
+    //             }
+
+    //             if ($pamnt > 0) 
+    //             {
+    //                 $this->billing->paynow($invocieno, $pamnt, $tnote, $pmethod, $this->aauth->get_user()->loc, $bill_date, $account);
+    //             }
+    //             $this->registerlog->update($this->aauth->get_user()->id, $r_amt1, $r_amt2, $r_amt3, 0, $c_amt);
+
+
+    //             if ($promo_flag) {
+    //                 $cqty = $result_c['available'] - 1;
+    //                 if ($cqty > 0) {
+    //                     $data = array('available' => $cqty);
+    //                 } else {
+    //                     $data = array('active' => 1, 'available' => $cqty);
+    //                 }
+    //                 $amount = $result_c['amount'];
+    //                 $this->db->set($data);
+    //                 $this->db->where('id', $result_c['id']);
+    //                 $this->db->update('cberp_promo');
+            
+    //                 if ($result_c['reflect'] > 0) {
+    //                     $data = array(
+    //                         'payerid' => 0,
+    //                         'payer' => $this->lang->line('Coupon') . '-' . $result_c['code'],
+    //                         'acid' => $result_c['reflect'],
+    //                         'account' => 'Promo',
+    //                         'date' => date('Y-m-d'),
+    //                         'debit' => 0,
+    //                         'credit' => $amount,
+    //                         'type' => 'Income',
+    //                         'cat' => $this->lang->line('Coupon'),
+    //                         'method' => 'Transfer',
+    //                         'eid' => $this->aauth->get_user()->id,
+    //                         'note' => $this->lang->line('Coupon') . ' ' . $result_c['code'],
+    //                         'loc' => $this->aauth->get_user()->loc
+    //                     );
+    //                     $this->db->set('lastbal', "lastbal+$amount", FALSE);
+    //                     $this->db->where('id', $result_c['reflect']);
+    //                     $this->db->update('cberp_accounts');
+    //                     $this->db->insert('cberp_transactions', $data);
+    //                 }
+    //             }
+               
+    //         } 
+    //         else {
+    //             echo json_encode(array('status' => 'Error', 'message' =>
+    //                 "Invalid Entry!"));
+    //             $transok = false;
+    //         }
+    //         if ($transok) {
+    //             $this->db->trans_complete();
+    //         } else {
+    //             $this->db->trans_rollback();
+    //         }
+    //     } 
+        
+        
+        
+        
+    //     elseif ($ptype == 2) {
+    //         ///card section
+    //         $discountFormat = $this->input->post('discountFormat');
+    //         $pterms = $this->input->post('pterms');
+    //         $currency = $this->input->post('mcurrency');
+    //         $i = 0;
+    //         if ($discountFormat == '0') {
+    //             $discstatus = 0;
+    //         } else {
+    //             $discstatus = 1;
+    //         }
+    //         if ($customer_id == 0) {
+    //             echo json_encode(array('status' => 'Error', 'message' =>
+    //                 $this->lang->line('Please add a new client')));
+    //             exit;
+    //         }
+    //         $this->db->trans_start();
+    //         //products
+    //         $transok = true;
+    //         //Invoice Data
+    //         $bill_date = datefordatabase($invoicedate);
+    //         $bill_due_date = datefordatabase($invocieduedate);
+
+    //         $promo_flag = false;
+    //         if ($coupon) {
+    //             $this->db->select('*');
+    //             $this->db->from('cberp_promo');
+    //             $this->db->where('code', $coupon);
+    //             $query = $this->db->get();
+    //             $result_c = $query->row_array();
+    //             if ($result_c['active'] == 0 && $result_c['available'] > 0) {
+    //                 $promo_flag = true;
+    //                 $amount = $result_c['amount'];
+    //                 $notes .= '-' . $this->input->post('i_coupon');
+    //                 $total_discount += $amount;
+    //             }
+    //         }
+    //         $data = array('tid' => $invocieno, 'invoicedate' => $bill_date, 'invoiceduedate' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'total' => $total, 'notes' => $notes, 'csd' => $customer_id, 'eid' => $emp, 'taxstatus' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'refer' => $refer, 'term' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
+    //         $invoice_true = false;
+    //         if ($this->db->insert('cberp_invoices', $data)) {
+    //             $invoice_true = true;
+    //             $tid = $invocieno;
+    //             $invocieno2 = $invocieno;
+    //             $invocieno = $this->db->insert_id();
+    //             $pid = $this->input->post('pid');
+    //             $productlist = array();
+    //             $prodindex = 0;
+    //             $itc = 0;
+    //             $product_id = $this->input->post('pid');
+    //             $product_name1 = $this->input->post('product_name', true);
+    //             $product_qty = $this->input->post('product_qty');
+    //             $product_price = $this->input->post('product_price');
+    //             $product_tax = $this->input->post('product_tax');
+    //             $product_discount = $this->input->post('product_discount');
+    //             $product_subtotal = $this->input->post('product_subtotal');
+    //             $ptotal_tax = $this->input->post('taxa');
+    //             $ptotal_disc = $this->input->post('disca');
+    //             $product_des = $this->input->post('product_description', true);
+    //             $product_unit = $this->input->post('unit');
+    //             $product_hsn = $this->input->post('hsn');
+    //             $product_alert = $this->input->post('alert');
+    //             $product_serial = $this->input->post('serial');
+    //             foreach ($pid as $key => $value) {
+    //                 $total_discount += numberClean(@$ptotal_disc[$key]);
+    //                 $total_tax += numberClean($ptotal_tax[$key]);
+    //                 $data = array(
+    //                     'tid' => $invocieno,
+    //                     'pid' => $product_id[$key],
+    //                     'product' => $product_name1[$key],
+    //                     'code' => $product_hsn[$key],
+    //                     'qty' => numberClean($product_qty[$key]),
+    //                     'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'tax' => numberClean($product_tax[$key]),
+    //                     'discount' => numberClean($product_discount[$key]),
+    //                     'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'product_des' => $product_des[$key],
+    //                     'i_class' => 1,
+    //                     'unit' => $product_unit[$key],
+    //                     'serial' => $product_serial[$key]
+    //                 );
+    //                 $productlist[$prodindex] = $data;
+    //                 $i++;
+    //                 $prodindex++;
+    //                 $amt = numberClean($product_qty[$key]);
+    //                 if ($product_id[$key] > 0 and $this->common->zero_stock()) {
+
+    //                 	if($draft_id){
+	// 						$this->db->set('qty', "qty-$amt", FALSE);
+	// 						$this->db->where('pid', $product_id[$key]);
+	// 						$this->db->update('cberp_products');
+	// 					} elseif ((numberClean($product_alert[$key]) - $amt) < 0 and $st_c == 0) {
+    //                         echo json_encode(array('status' => 'Error', 'message' => 'Product - <strong>' . $product_name1[$key] . "</strong> - Low quantity. Available stock is  " . $product_alert[$key]));
+    //                         $transok = false;
+    //                         $st_c = 1;
+    //                     } else {
+    //                         $this->db->set('qty', "qty-$amt", FALSE);
+    //                         $this->db->where('pid', $product_id[$key]);
+    //                         $this->db->update('cberp_products');
+    //                     }
+    //                 }
+    //                 $itc += $amt;
+    //             }
+    //             if ($prodindex > 0) {
+    //                 $this->db->insert_batch('cberp_invoice_items', $productlist);
+    //                 if (count($product_serial) > 0) {
+    //                     $this->db->set('status', 1);
+    //                     $this->db->where_in('serial', $product_serial);
+    //                     $this->db->update('cberp_product_serials');
+    //                 }
+    //             } else {
+    //                 echo json_encode(array('status' => 'Error', 'message' =>
+    //                     "Please choose product from product list. Go to Item manager section if you have not added the products."));
+    //                 $transok = false;
+    //             }
+    //             $validtoken = hash_hmac('ripemd160', $invocieno, $this->config->item('encryption_key'));
+    //             $link = base_url('billing/view?id=' . $invocieno . '&token=' . $validtoken);
+    //             if ($promo_flag) {
+    //                 $cqty = $result_c['available'] - 1;
+    //                 if ($cqty > 0) {
+    //                     $data = array('available' => $cqty);
+    //                 } else {
+    //                     $data = array('active' => 1, 'available' => $cqty);
+    //                 }
+
+    //                 $this->db->set($data);
+    //                 $this->db->where('id', $result_c['id']);
+    //                 $this->db->update('cberp_promo');
+
+    //                 if ($result_c['reflect'] > 0) {
+    //                     $data = array(
+    //                         'payerid' => 0,
+    //                         'payer' => $this->lang->line('Coupon') . '-' . $result_c['code'],
+    //                         'acid' => $result_c['reflect'],
+    //                         'account' => 'Promo',
+    //                         'date' => date('Y-m-d'),
+    //                         'debit' => 0,
+    //                         'credit' => $amount,
+    //                         'type' => 'Income',
+    //                         'cat' => $this->lang->line('Coupon'),
+    //                         'method' => 'Transfer',
+    //                         'eid' => $this->aauth->get_user()->id,
+    //                         'note' => $this->lang->line('Coupon') . ' ' . $this->lang->line('Delete') . ' ' . $this->lang->line('Qty') . '-' . $result_c['available'],
+    //                         'loc' => $this->aauth->get_user()->loc
+    //                     );
+    //                     $this->db->set('lastbal', "lastbal+$amount", FALSE);
+    //                     $this->db->where('id', $result_c['reflect']);
+    //                     $this->db->update('cberp_accounts');
+    //                     $this->db->insert('cberp_transactions', $data);
+    //                 }
+    //             }
+
+    //         } else {
+    //             echo json_encode(array('status' => 'Error', 'message' =>
+    //                 "Invalid Entry!"));
+    //             $transok = false;
+    //         }
+
+
+    //         //card process
+    //         //card process
+    //         if ($invoice_true) {
+    //             $gateway = $this->input->post('gateway', true);
+    //             setcookie("pos_set", base_url('pos_invoices/view?id=' . $invocieno), time() + 30 * 24 * 60 * 60, '/');
+    //             $validtoken = hash_hmac('ripemd160', $invocieno, $this->config->item('encryption_key'));
+    //             $quckpay = base_url() . "billing/card?id=$invocieno&itype=inv&token=$validtoken&gid=$gateway";
+
+    //             if ($transok) echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice Success') . " <script type='text/javascript' >window.location.replace('$quckpay');</script><a target='_blank' href='$quckpay' class='btn btn-blue btn-sm breaklink'><span class='icon-printer' aria-hidden='true'></span> " . $this->lang->line('Pay') . "  </a> &nbsp; &nbsp;    <a target='_blank' href='thermal_pdf?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='icon-printer' aria-hidden='true'></span> " . $this->lang->line('Print') . "  </a> &nbsp; &nbsp;    &nbsp; &nbsp; <a href='view?id=$invocieno' class='btn btn-purple btn-sm breaklink'><span class='icon-file-text2' aria-hidden='true'></span> " . $this->lang->line('View') . "  </a> &nbsp; &nbsp; <a href='$link' class='btn btn-blue-grey btn-sm'><span class='icon-earth' aria-hidden='true'></span> " . $this->lang->line('Public View') . " </a> <a href='create?v2=$v2' class='btn btn-amber btn-sm breaklink'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('Create') . "  </a>"));
+    //         }
+
+    //         if ($transok) {
+    //             $this->db->trans_complete();
+    //         } else {
+    //             $this->db->trans_rollback();
+    //         }
+    //     } else {
+    //     //draft
+    //         $p_amount = 0;
+    //         $pmethod = $this->input->post('p_method', true);
+
+    //         $c_amt = @$p_amount - $total;
+    //         if ($c_amt == 0.00) {
+    //             $status = 'Paid';
+    //             $pamnt = $total;
+    //         } elseif ($c_amt < 0.00) {
+    //             $status = 'Partial';
+    //             $pamnt = $p_amount;
+
+
+    //         } else {
+    //             $status = 'Paid';
+    //             $pamnt = $total;
+    //         }
+
+
+    //         $i = 0;
+    //         if ($discountFormat == '0') {
+    //             $discstatus = 0;
+    //         } else {
+    //             $discstatus = 1;
+    //         }
+
+    //         if ($customer_id == 0) {
+    //             echo json_encode(array('status' => 'Error', 'message' =>
+    //                 $this->lang->line('Please add a new client')));
+    //             exit;
+    //         }
+    //         $this->db->trans_start();
+    //         //products
+    //         $transok = true;
+    //         //Invoice Data
+    //         $bill_date = datefordatabase($invoicedate);
+    //         $bill_due_date = datefordatabase($invocieduedate);
+    //         $promo_flag = false;
+    //         $data = array('tid' => $invocieno, 'invoicedate' => $bill_date, 'invoiceduedate' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'ship_tax' => $shipping_tax, 'ship_tax_type' => $ship_taxtype, 'total' => $total, 'pmethod' => $pmethod, 'notes' => $notes, 'status' => $status, 'csd' => $customer_id, 'eid' => $this->aauth->get_user()->id, 'pamnt' => 0, 'taxstatus' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'refer' => $refer, 'term' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
+    //         if ($this->db->insert('cberp_draft', $data)) {
+    //             $invocieno2 = $invocieno;
+    //             $invocieno = $this->db->insert_id();
+    //             $pid = $this->input->post('pid');
+    //             $productlist = array();
+    //             $prodindex = 0;
+    //             $itc = 0;
+
+    //             $product_id = $this->input->post('pid');
+    //             $product_name1 = $this->input->post('product_name', true);
+    //             $product_qty = $this->input->post('product_qty');
+    //             $product_price = $this->input->post('product_price');
+    //             $product_tax = $this->input->post('product_tax');
+    //             $product_discount = $this->input->post('product_discount');
+    //             $product_subtotal = $this->input->post('product_subtotal');
+    //             $ptotal_tax = $this->input->post('taxa');
+    //             $ptotal_disc = $this->input->post('disca');
+    //             $product_des = $this->input->post('product_description', true);
+    //             $product_unit = $this->input->post('unit');
+    //             $product_hsn = $this->input->post('hsn');
+
+
+    //             foreach ($pid as $key => $value) {
+
+
+    //                 $total_discount += numberClean(@$ptotal_disc[$key]);
+    //                 $total_tax += numberClean($ptotal_tax[$key]);
+
+    //                 $data = array(
+    //                     'tid' => $invocieno,
+    //                     'pid' => $product_id[$key],
+    //                     'product' => $product_name1[$key],
+    //                     'code' => $product_hsn[$key],
+    //                     'qty' => numberClean($product_qty[$key]),
+    //                     'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'tax' => numberClean($product_tax[$key]),
+    //                     'discount' => numberClean($product_discount[$key]),
+    //                     'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
+    //                     'product_des' => $product_des[$key] ?? null,
+    //                     'i_class' => 1,
+    //                     'unit' => $product_unit[$key]
+    //                 );
+
+    //                 $flag = true;
+    //                 $productlist[$prodindex] = $data;
+    //                 $i++;
+    //                 $prodindex++;
+    //                 $amt = numberClean($product_qty[$key]);
+    //                 $itc += $amt;
+    //             }
+
+    //             if ($prodindex > 0) {
+    //                 $this->db->insert_batch('cberp_draft_items', $productlist);
+    //                 $this->db->set(array('discount' => rev_amountExchange_s(amountFormat_general($total_discount), $currency, $this->aauth->get_user()->loc), 'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc), 'items' => $itc));
+    //                 $this->db->where('id', $invocieno);
+    //                 $this->db->update('cberp_draft');
+
+    //             } else {
+    //                 echo json_encode(array('status' => 'Error', 'message' =>
+    //                     "Please choose product from product list. Go to Item manager section if you have not added the products."));
+    //                 $transok = false;
+    //             }
+
+    //             $validtoken = hash_hmac('ripemd160', $invocieno, $this->config->item('encryption_key'));
+    //             $link = base_url('billing/view?id=' . $invocieno . '&token=' . $validtoken);
+    //             if ($transok) echo json_encode(array('status' => 'Success', 'message' =>
+    //                 $this->lang->line('Draft Success') . " <a href='create' class='btn btn-info btn-sm'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('New') . "  </a>"));
+
+    //         } else {
+    //             echo json_encode(array('status' => 'Error', 'message' =>
+    //                 "Invalid Entry!"));
+    //             $transok = false;
+    //         }
+    //         if ($transok) {
+    //             $this->db->trans_complete();
+    //         } else {
+    //             $this->db->trans_rollback();
+    //         }
+    //     }
+    //     if ($transok) {
+    //         $this->db->from('univarsal_api');
+    //         $this->db->where('univarsal_api.id', 56);
+    //         $query = $this->db->get();
+    //         $auto = $query->row_array();
+    //         if ($auto['key1'] == 1) {
+    //             $this->db->select('name,email');
+    //             $this->db->from('cberp_customers');
+    //             $this->db->where('id', $customer_id);
+    //             $query = $this->db->get();
+    //             $customer = $query->row_array();
+
+    //             $this->load->model('communication_model');
+    //             $invoice_mail = $this->send_invoice_auto($invocieno, $invocieno2, $bill_date, $total, $currency);
+    //             $attachmenttrue = false;
+    //             $attachment = '';
+    //             $this->communication_model->send_corn_email($customer['email'], $customer['name'], $invoice_mail['subject'], $invoice_mail['message'], $attachmenttrue, $attachment);
+
+    //         }
+
+    //         if ($auto['key2'] == 1) {
+    //             $this->db->select('name,phone');
+    //             $this->db->from('cberp_customers');
+    //             $this->db->where('id', $customer_id);
+    //             $query = $this->db->get();
+    //             $customer = $query->row_array();
+
+    //             $this->load->model('plugins_model', 'plugins');
+    //             $invoice_sms = $this->send_sms_auto($invocieno, $invocieno2, $bill_date, $total, $currency);
+
+    //             $mobile = $customer['phone'];
+    //             $text_message = $invoice_sms['message'];
+    //             $this->load->model('sms_model', 'sms');
+    //             $this->sms->send_sms($mobile, $text_message, false);
+
+
+    //         }
+    //         if($draft_id>0){
+    //              $this->db->delete('cberp_draft', array('id' => $draft_id));
+    //             $this->db->delete('cberp_draft_items', array('tid' => $draft_id));
+    //         }
+    //     }
+    //     //profit calculation
+    //     $t_profit = 0;
+    //     $this->db->select('cberp_invoice_items.pid, cberp_invoice_items.price, cberp_invoice_items.qty, cberp_products.product_cost');
+    //     $this->db->from('cberp_invoice_items');
+    //     $this->db->join('cberp_products', 'cberp_products.pid = cberp_invoice_items.pid', 'left');
+    //     $this->db->where('cberp_invoice_items.tid', $invocieno);
+    //     $query = $this->db->get();
+    //     $pids = $query->result_array();
+    //     foreach ($pids as $profit) {
+    //         $t_cost = $profit['product_cost'] * $profit['qty'];
+    //         $s_cost = $profit['price'] * $profit['qty'];
+
+    //         $t_profit += $s_cost - $t_cost;
+    //     }
+    //     $data = array('type' => 9, 'rid' => $invocieno, 'col1' => $t_profit, 'd_date' => $bill_date);
+
+    //     $this->db->insert('cberp_metadata', $data);
+
+    //     if ($print_now) {
+    //         $print = $this->thermal_print($invocieno, false, false);
+    //     }
+    // }
+
+
+	//action
     public function action()
     {
 
@@ -341,31 +1051,45 @@ class Pos_invoices extends CI_Controller
                 }
             }
 
-            $this->db->select('tid');
+            $this->configurations = $this->session->userdata('configurations');
+            $prefix = $this->configurations['invoiceprefix']; 
+
+            $this->db->select('invoice_number');
             $this->db->from('cberp_invoices');
-            $this->db->order_by('id', 'DESC');
+            $this->db->order_by('invoice_number', 'DESC');
             $this->db->limit(1);
-            $this->db->where('tid', $invocieno);
-            $this->db->where('regular_pos_flag', 1); //regular_pos_flag
+            //$this->db->where('invoice_number', $invocieno);
+            //$this->db->where('regular_pos_flag', 1); //regular_pos_flag
             $query = $this->db->get();
-            if(@$query->row()->tid){
-                $this->db->select('tid');
+
+            if(@$query->row()->invoice_number){
+                $this->db->select('invoice_number');
                 $this->db->from('cberp_invoices');
-                $this->db->order_by('id', 'DESC');
+                $this->db->order_by('invoice_number', 'DESC');
                 $this->db->limit(1);
-                $this->db->where('regular_pos_flag', 1);
+                //$this->db->where('regular_pos_flag', 1);
                 $query = $this->db->get();
-                $invocieno=$query->row()->tid+1;
+                //$invocieno=$query->row()->tid+1;
+
+                if ($query->num_rows() > 0) {
+		            $last_invoice_number = $query->row()->invoice_number;
+		            $parts = explode('/', $last_invoice_number);
+		            $last_number = (int)end($parts); 
+		            $next_number = $last_number + 1;
+		            $invocieno = $prefix.$next_number;
+		        } else {
+		            $invocieno = $prefix.'1001';
+		        }
             }
 
-            $data = array('tid' => $invocieno, 'invoicedate' => $bill_date, 'invoiceduedate' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'ship_tax' => $shipping_tax, 'ship_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'total' => $total, 'pmethod' => $pmethod, 'notes' => $notes, 'status' => $status, 'csd' => $customer_id, 'eid' => $emp, 'pamnt' => 0, 'taxstatus' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'refer' => $refer, 'term' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
+            $data = array('invoice_number' => $invocieno, 'invoice_date' => $bill_date, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'total' => $total, 'payment_method' => $pmethod, 'notes' => $notes, 'status' => $status, 'customer_id' => $customer_id, 'employee_id' => $emp, 'paid_amount' => 0, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
 
             if ($this->db->insert('cberp_invoices', $data)) 
             {
                 
                 $invocieno_n = $invocieno;
                 $invocieno2 = $invocieno;
-                $invocieno = $this->db->insert_id();
+                $invocieno = $invocieno;
             
 
                 $pid = $this->input->post('pid');
@@ -392,21 +1116,22 @@ class Pos_invoices extends CI_Controller
                         $total_tax += numberClean($ptotal_tax[$key]);
 
                         $data = array(
-                            'tid' => $invocieno,
-                            'pid' => $product_id[$key],
-                            'product' => $product_name1[$key],
-                            'code' => $product_hsn[$key],
-                            'qty' => numberClean($product_qty[$key]),
+                            'invoice_number' => $invocieno,
+                            //'pid' => $product_id[$key],
+							'product_code' => $product_id[$key],
+                            //'product' => $product_name1[$key],
+                            //'code' => $product_hsn[$key],
+                            'quantity' => numberClean($product_qty[$key]),
                             'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
                             'tax' => numberClean($product_tax[$key]),
                             'discount' => numberClean($product_discount[$key]),
                             'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
-                            'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
-                            'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
-                            'product_des' => @$product_des[$key],
-                            'i_class' => 1,
-                            'unit' => $product_unit[$key],
-                            'serial' => $product_serial[$key] ?? null
+                            'total_tax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
+                            'total_discount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
+                            //'product_des' => @$product_des[$key],
+                            //'i_class' => 1,
+                            //'unit' => $product_unit[$key],
+                            //'serial' => $product_serial[$key] ?? null
                         );
 
                         $flag = true;
@@ -423,9 +1148,13 @@ class Pos_invoices extends CI_Controller
                                 $transok = false;
                                 $st_c = 1;
                             } else {
-                                $this->db->set('qty', "qty-$amt", FALSE);
-                                $this->db->where('pid', $product_id[$key]);
-                                $this->db->update('cberp_products');
+                                // $this->db->set('qty', "qty-$amt", FALSE);
+                                // $this->db->where('pid', $product_id[$key]);
+                                // $this->db->update('cberp_products');
+
+								$this->db->set('kg_quantity', "kg_quantity - $amt", FALSE);
+								$this->db->where('product_code', $product_id[$key]);
+								$this->db->update('cberp_products');
                             }
                         }
 
@@ -439,11 +1168,17 @@ class Pos_invoices extends CI_Controller
                 if ($prodindex > 0) {
                     $this->db->insert_batch('cberp_invoice_items', $productlist);
         
-                    $this->db->set(array('discount' => rev_amountExchange_s(amountFormat_general($total_discount), $currency, $this->aauth->get_user()->loc), 'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc), 'items' => $itc));
-                    $this->db->where('id', $invocieno);
+                    $this->db->set(
+						array(
+							'total_discount' => rev_amountExchange_s(amountFormat_general($total_discount), $currency, $this->aauth->get_user()->loc), 
+							'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc), 
+							//'items' => $itc
+						));
+                    $this->db->where('invoice_number', $invocieno);
                     $this->db->update('cberp_invoices');
             
-                    if (is_array($product_serial) AND count($product_serial) > 0) {
+                    //if (is_array($product_serial) AND count($product_serial) > 0) {
+                    if (is_array($product_serial) && count(array_filter($product_serial)) > 0) {
                         $this->db->set('status', 1);
                         $this->db->where_in('serial', $product_serial);
                         $this->db->update('cberp_product_serials');
@@ -618,13 +1353,13 @@ class Pos_invoices extends CI_Controller
                     $total_discount += $amount;
                 }
             }
-            $data = array('tid' => $invocieno, 'invoicedate' => $bill_date, 'invoiceduedate' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'total' => $total, 'notes' => $notes, 'csd' => $customer_id, 'eid' => $emp, 'taxstatus' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'refer' => $refer, 'term' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
+            $data = array('invoice_number' => $invocieno, 'invoice_date' => $bill_date, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $emp, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
             $invoice_true = false;
             if ($this->db->insert('cberp_invoices', $data)) {
                 $invoice_true = true;
                 $tid = $invocieno;
                 $invocieno2 = $invocieno;
-                $invocieno = $this->db->insert_id();
+                $invocieno = $invocieno;
                 $pid = $this->input->post('pid');
                 $productlist = array();
                 $prodindex = 0;
@@ -647,21 +1382,21 @@ class Pos_invoices extends CI_Controller
                     $total_discount += numberClean(@$ptotal_disc[$key]);
                     $total_tax += numberClean($ptotal_tax[$key]);
                     $data = array(
-                        'tid' => $invocieno,
-                        'pid' => $product_id[$key],
-                        'product' => $product_name1[$key],
-                        'code' => $product_hsn[$key],
-                        'qty' => numberClean($product_qty[$key]),
+                        'invoice_number' => $invocieno,
+                        'product_code' => $product_id[$key],
+                        //'product' => $product_name1[$key],
+                        //'code' => $product_hsn[$key],
+                        'quantity' => numberClean($product_qty[$key]),
                         'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
                         'tax' => numberClean($product_tax[$key]),
                         'discount' => numberClean($product_discount[$key]),
                         'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
-                        'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
-                        'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
-                        'product_des' => $product_des[$key],
-                        'i_class' => 1,
-                        'unit' => $product_unit[$key],
-                        'serial' => $product_serial[$key]
+                        'total_tax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
+                        'total_discount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
+                        //'product_des' => $product_des[$key],
+                        //'i_class' => 1,
+                        //'unit' => $product_unit[$key],
+                        //'serial' => $product_serial[$key]
                     );
                     $productlist[$prodindex] = $data;
                     $i++;
@@ -670,17 +1405,26 @@ class Pos_invoices extends CI_Controller
                     if ($product_id[$key] > 0 and $this->common->zero_stock()) {
 
                     	if($draft_id){
-							$this->db->set('qty', "qty-$amt", FALSE);
-							$this->db->where('pid', $product_id[$key]);
+							// $this->db->set('qty', "qty-$amt", FALSE);
+							// $this->db->where('pid', $product_id[$key]);
+							// $this->db->update('cberp_products');
+
+							$this->db->set('kg_quantity', "kg_quantity - $amt", FALSE);
+							$this->db->where('product_code', $product_id[$key]);
 							$this->db->update('cberp_products');
+
 						} elseif ((numberClean($product_alert[$key]) - $amt) < 0 and $st_c == 0) {
                             echo json_encode(array('status' => 'Error', 'message' => 'Product - <strong>' . $product_name1[$key] . "</strong> - Low quantity. Available stock is  " . $product_alert[$key]));
                             $transok = false;
                             $st_c = 1;
                         } else {
-                            $this->db->set('qty', "qty-$amt", FALSE);
-                            $this->db->where('pid', $product_id[$key]);
-                            $this->db->update('cberp_products');
+                            // $this->db->set('qty', "qty-$amt", FALSE);
+                            // $this->db->where('pid', $product_id[$key]);
+                            // $this->db->update('cberp_products');
+
+                            $this->db->set('kg_quantity', "kg_quantity - $amt", FALSE);
+							$this->db->where('product_code', $product_id[$key]);
+							$this->db->update('cberp_products');
                         }
                     }
                     $itc += $amt;
@@ -796,10 +1540,10 @@ class Pos_invoices extends CI_Controller
             $bill_date = datefordatabase($invoicedate);
             $bill_due_date = datefordatabase($invocieduedate);
             $promo_flag = false;
-            $data = array('tid' => $invocieno, 'invoicedate' => $bill_date, 'invoiceduedate' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'ship_tax' => $shipping_tax, 'ship_tax_type' => $ship_taxtype, 'total' => $total, 'pmethod' => $pmethod, 'notes' => $notes, 'status' => $status, 'csd' => $customer_id, 'eid' => $this->aauth->get_user()->id, 'pamnt' => 0, 'taxstatus' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'refer' => $refer, 'term' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
+            $data = array('invoice_number' => $invocieno, 'invoice_date' => $bill_date, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'total' => $total, 'payment_method' => $pmethod, 'notes' => $notes, 'status' => $status, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'paid_amount' => 0, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'i_class' => 1, 'loc' => $this->aauth->get_user()->loc);
             if ($this->db->insert('cberp_draft', $data)) {
                 $invocieno2 = $invocieno;
-                $invocieno = $this->db->insert_id();
+                $invocieno = $invocieno;
                 $pid = $this->input->post('pid');
                 $productlist = array();
                 $prodindex = 0;
@@ -826,20 +1570,20 @@ class Pos_invoices extends CI_Controller
                     $total_tax += numberClean($ptotal_tax[$key]);
 
                     $data = array(
-                        'tid' => $invocieno,
-                        'pid' => $product_id[$key],
-                        'product' => $product_name1[$key],
-                        'code' => $product_hsn[$key],
-                        'qty' => numberClean($product_qty[$key]),
+                        'invoice_number' => $invocieno,
+                        'product_code' => $product_id[$key],
+                        //'product' => $product_name1[$key],
+                        //'code' => $product_hsn[$key],
+                        'quantity' => numberClean($product_qty[$key]),
                         'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
                         'tax' => numberClean($product_tax[$key]),
                         'discount' => numberClean($product_discount[$key]),
                         'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
-                        'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
-                        'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
-                        'product_des' => $product_des[$key] ?? null,
-                        'i_class' => 1,
-                        'unit' => $product_unit[$key]
+                        'total_tax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
+                        'total_discount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
+                        //'product_des' => $product_des[$key] ?? null,
+                        //'i_class' => 1,
+                        //'unit' => $product_unit[$key]echooooooo
                     );
 
                     $flag = true;
@@ -886,7 +1630,7 @@ class Pos_invoices extends CI_Controller
             if ($auto['key1'] == 1) {
                 $this->db->select('name,email');
                 $this->db->from('cberp_customers');
-                $this->db->where('id', $customer_id);
+                $this->db->where('customer_id', $customer_id);
                 $query = $this->db->get();
                 $customer = $query->row_array();
 
@@ -901,7 +1645,7 @@ class Pos_invoices extends CI_Controller
             if ($auto['key2'] == 1) {
                 $this->db->select('name,phone');
                 $this->db->from('cberp_customers');
-                $this->db->where('id', $customer_id);
+                $this->db->where('customer_id', $customer_id);
                 $query = $this->db->get();
                 $customer = $query->row_array();
 
@@ -922,15 +1666,15 @@ class Pos_invoices extends CI_Controller
         }
         //profit calculation
         $t_profit = 0;
-        $this->db->select('cberp_invoice_items.pid, cberp_invoice_items.price, cberp_invoice_items.qty, cberp_products.product_cost');
+        $this->db->select('cberp_invoice_items.product_code, cberp_invoice_items.price, cberp_invoice_items.quantity, cberp_products.product_cost');
         $this->db->from('cberp_invoice_items');
-        $this->db->join('cberp_products', 'cberp_products.pid = cberp_invoice_items.pid', 'left');
-        $this->db->where('cberp_invoice_items.tid', $invocieno);
+        $this->db->join('cberp_products', 'cberp_products.product_code = cberp_invoice_items.product_code', 'left');
+        $this->db->where('cberp_invoice_items.invoice_number', $invocieno);
         $query = $this->db->get();
         $pids = $query->result_array();
         foreach ($pids as $profit) {
-            $t_cost = $profit['product_cost'] * $profit['qty'];
-            $s_cost = $profit['price'] * $profit['qty'];
+            $t_cost = $profit['product_cost'] * $profit['quantity'];
+            $s_cost = $profit['price'] * $profit['quantity'];
 
             $t_profit += $s_cost - $t_cost;
         }
@@ -942,6 +1686,8 @@ class Pos_invoices extends CI_Controller
             $print = $this->thermal_print($invocieno, false, false);
         }
     }
+
+	
 
 
     public function ajax_list()
@@ -1999,8 +2745,11 @@ echo 6;
         $data['invoice'] = $this->invocies->invoice_details($tid, $this->limited);
         $data['round_off'] = $this->custom->api_config(4);
 
+		
+
         if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
-        if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['eid']);
+        if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+		//print_r($data['employee']);exit();
         $this->load->model('billing_model', 'billing');
         $online_pay = $this->billing->online_pay_settings();
         if ($online_pay['enable'] == 1) {
@@ -2041,7 +2790,8 @@ echo 6;
         $pdf->WriteHTML($html);
         // render the view into HTML
         // write the HTML into the PDF
-        $file_name = preg_replace('/[^A-Za-z0-9]+/', '-', 'PosInvoice_' . $data['invoice']['name'] . '_' . $data['invoice']['tid']);
+        //$file_name = preg_replace('/[^A-Za-z0-9]+/', '-', 'PosInvoice_' . $data['invoice']['name'] . '_' . $data['invoice']['invoice_number']);
+		$file_name = preg_replace('/[^A-Za-z0-9]+/', '-', 'PosInvoice_' . $data['invoice']['invoice_number'] . '_' . $data['invoice']['invoice_number']);
         if ($this->input->get('d')) {
             $pdf->Output($file_name . '.pdf', 'D');
         } else {
