@@ -64,7 +64,8 @@
         <?php } ?>
         <tr>
             <td><?php echo $this->lang->line('Invoice') ?></td>
-            <td><?php echo $this->config->item('prefix') . ' #' . $invoice['invoice_number'] ?></td>
+            <!-- <td><?php echo $this->config->item('prefix') . ' #' . $invoice['invoice_number'] ?></td> -->
+			<td><?php echo ' #' . $invoice['invoice_number'] ?></td>
         </tr>
         <tr>
             <td><?php echo $this->lang->line('Invoice Date') ?></td>

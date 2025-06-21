@@ -1191,8 +1191,9 @@ class Pos_invoices extends CI_Controller
                 }
             
                 $validtoken = hash_hmac('ripemd160', $invocieno, $this->config->item('encryption_key'));
+				//echo $validtoken;exit();
                 $link = base_url('billing/view?id=' . $invocieno . '&token=' . $validtoken);
-                $link = base_url('billing/view?id=' . $invocieno);
+                //$link = base_url('billing/view?id=' . $invocieno);
               
 
                 if ($transok) {
@@ -1201,8 +1202,9 @@ class Pos_invoices extends CI_Controller
                     $p_tid = 'thermal_p';
                     if (@$printer['val2'] == 'server') $p_tid = 'thermal_server';
             
-                    echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice Success') . " <a target='_blank' href='thermal_pdf?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='fa fa-ticket' aria-hidden='true'></span> PDF  </a> &nbsp; &nbsp;   <a id='$p_tid' data-ptid='$invocieno' data-url='" . @$printer['val3'] . "'  class='btn btn-info btn-sm white breaklink'><span class='fa fa-ticket' aria-hidden='true'></span> " . $this->lang->line('Thermal Printer') . "  </a> &nbsp; &nbsp;<a href='#' class='btn btn-reddit btn-sm breaklink print_image' id='print_image' data-inid='$invocieno'><span class='fa fa-window-restore' aria-hidden='true'></span></a> &nbsp; &nbsp; <a target='_blank' href='printinvoice?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='fa fa-print' aria-hidden='true'></span> A4  </a> &nbsp; &nbsp; <a href='view?id=$invocieno' class='btn btn-purple btn-sm'><span class='fa fa-eye' aria-hidden='true'></span> " . $this->lang->line('View') . "  </a> &nbsp; &nbsp; <a href='$link' class='btn btn-blue-grey btn-sm breaklink'><span class='fa fa-globe' aria-hidden='true'></span> " . $this->lang->line('Public View') . " </a> &nbsp;<a href='create?v2=$v2' class='btn btn-flickr btn-sm breaklink'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('Create') . "  </a>"));                
-                }
+                    echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice Success') . " <a target='_blank' href='thermal_pdf?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='fa fa-ticket' aria-hidden='true'></span> PDF  </a> &nbsp; &nbsp;   <a id='$p_tid' data-ptid='$invocieno' data-url='" . @$printer['val3'] . "'  class='btn btn-info btn-sm white breaklink'><span class='fa fa-ticket' aria-hidden='true'></span> " . $this->lang->line('Thermal Printer') . "  </a> &nbsp; &nbsp;<a href='#' class='btn btn-reddit btn-sm breaklink print_image' id='print_image' data-inid='$invocieno'><span class='fa fa-window-restore' aria-hidden='true'></span></a> &nbsp; &nbsp; <a target='_blank' href='printinvoice?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='fa fa-print' aria-hidden='true'></span> A4  </a> &nbsp; &nbsp; <a href='view?id=$invocieno' class='btn btn-purple btn-sm' target='_blank'><span class='fa fa-eye' aria-hidden='true'></span> " . $this->lang->line('View') . "  </a> &nbsp; &nbsp; <a href='$link' class='btn btn-blue-grey btn-sm breaklink' target='_blank'><span class='fa fa-globe' aria-hidden='true'></span> " . $this->lang->line('Public View') . " </a> &nbsp;<a href='create?v2=$v2' class='btn btn-flickr btn-sm breaklink'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('Create') . "  </a>"));                
+                
+				}
                 $this->load->model('billing_model', 'billing');
                 $tnote = '#' . $invocieno_n . '-' . $pmethod;
                 switch ($pmethod) {
@@ -1493,7 +1495,7 @@ class Pos_invoices extends CI_Controller
                 $validtoken = hash_hmac('ripemd160', $invocieno, $this->config->item('encryption_key'));
                 $quckpay = base_url() . "billing/card?id=$invocieno&itype=inv&token=$validtoken&gid=$gateway";
 
-                if ($transok) echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice Success') . " <script type='text/javascript' >window.location.replace('$quckpay');</script><a target='_blank' href='$quckpay' class='btn btn-blue btn-sm breaklink'><span class='icon-printer' aria-hidden='true'></span> " . $this->lang->line('Pay') . "  </a> &nbsp; &nbsp;    <a target='_blank' href='thermal_pdf?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='icon-printer' aria-hidden='true'></span> " . $this->lang->line('Print') . "  </a> &nbsp; &nbsp;    &nbsp; &nbsp; <a href='view?id=$invocieno' class='btn btn-purple btn-sm breaklink'><span class='icon-file-text2' aria-hidden='true'></span> " . $this->lang->line('View') . "  </a> &nbsp; &nbsp; <a href='$link' class='btn btn-blue-grey btn-sm'><span class='icon-earth' aria-hidden='true'></span> " . $this->lang->line('Public View') . " </a> <a href='create?v2=$v2' class='btn btn-amber btn-sm breaklink'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('Create') . "  </a>"));
+                if ($transok) echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice Success') . " <script type='text/javascript' >window.location.replace('$quckpay');</script><a target='_blank' href='$quckpay' class='btn btn-blue btn-sm breaklink'><span class='icon-printer' aria-hidden='true'></span> " . $this->lang->line('Pay') . "  </a> &nbsp; &nbsp;    <a target='_blank' href='thermal_pdf?id=$invocieno' class='btn btn-blue btn-sm breaklink'><span class='icon-printer' aria-hidden='true'></span> " . $this->lang->line('Print') . "  </a> &nbsp; &nbsp;    &nbsp; &nbsp; <a target='_blank' href='view?id=$invocieno' class='btn btn-purple btn-sm breaklink'><span class='icon-file-text2' aria-hidden='true'></span> " . $this->lang->line('View') . "  </a> &nbsp; &nbsp; <a href='$link' class='btn btn-blue-grey btn-sm' target='_blank'><span class='icon-earth' aria-hidden='true'></span> " . $this->lang->line('Public View') . " </a> <a href='create?v2=$v2' class='btn btn-amber btn-sm breaklink'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('Create') . "  </a>"));
             }
 
             if ($transok) {
@@ -1609,7 +1611,7 @@ class Pos_invoices extends CI_Controller
                 $validtoken = hash_hmac('ripemd160', $invocieno, $this->config->item('encryption_key'));
                 $link = base_url('billing/view?id=' . $invocieno . '&token=' . $validtoken);
                 if ($transok) echo json_encode(array('status' => 'Success', 'message' =>
-                    $this->lang->line('Draft Success') . " <a href='create' class='btn btn-info btn-sm'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('New') . "  </a>"));
+                    $this->lang->line('Draft Success') . " <a href='create' class='btn btn-info btn-sm' target='_blank'><span class='fa fa-plus-circle' aria-hidden='true'></span> " . $this->lang->line('New') . "  </a>"));
 
             } else {
                 echo json_encode(array('status' => 'Error', 'message' =>
@@ -2063,18 +2065,18 @@ class Pos_invoices extends CI_Controller
 
         $data['invoice'] = $this->invocies->invoice_details($tid, $this->limited);
         $data['attach'] = $this->invocies->attach($tid);
-        if ($data['invoice']['id']) $data['products'] = $this->invocies->invoice_products($tid);
-        if ($data['invoice']['id']) $data['activity'] = $this->invocies->invoice_transactions($tid);
+        if ($data['invoice']['invoice_number']) $data['products'] = $this->invocies->invoice_products($tid);
+        if ($data['invoice']['invoice_number']) $data['activity'] = $this->invocies->invoice_transactions($tid);
         $data['c_custom_fields'] = $this->custom->view_fields_data($data['invoice']['cid'], 1);
 
         $this->load->library("Printer");
         $data['printer'] = $this->printer->check($data['invoice']['loc']);
 
-        $data['employee'] = $this->invocies->employee($data['invoice']['eid']);
-        $head['title'] = "Invoice " . $data['invoice']['tid'];
+        $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+        $head['title'] = "Invoice " . $data['invoice']['invoice_number'];
         $head['usernm'] = $this->aauth->get_user()->username;
         $this->load->view('fixed/header', $head);
-        if ($data['invoice']['id']) $this->load->view('pos/view', $data);
+        if ($data['invoice']['invoice_number']) $this->load->view('pos/view', $data);
         $this->load->view('fixed/footer');
 
     }
@@ -2085,10 +2087,17 @@ class Pos_invoices extends CI_Controller
         $tid = $this->input->get('id');
         $data['id'] = $tid;
         $data['round_off'] = $this->custom->api_config(4);
+		
         $data['invoice'] = $this->invocies->invoice_details($tid, $this->limited);
-        if ($data['invoice']['id']) $data['products'] = $this->invocies->invoice_products($tid);
-        if ($data['invoice']['id']) $data['employee'] = $this->invocies->employee($data['invoice']['eid']);
-        if (CUSTOM) $data['c_custom_fields'] = $this->custom->view_fields_data($data['invoice']['cid'], 1, 1);
+		
+		
+        if ($data['invoice']['invoice_number']) $data['products'] = $this->invocies->invoice_products($tid);
+		// echo "<pre>";
+		// print_r($data['invoice']);
+		// echo "</pre>";
+		// exit();
+        if ($data['invoice']['invoice_number']) $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+        if (CUSTOM) $data['c_custom_fields'] = $this->custom->view_fields_data($data['invoice']['customer_id'], 1, 1);
         if ($data['invoice']['i_class'] == 1) {
             $pref = prefix(7);
         } else {
@@ -2115,9 +2124,9 @@ class Pos_invoices extends CI_Controller
         $pdf->SetHTMLFooter('<div style="text-align: right;font-family: serif; font-size: 8pt; color: #5C5C5C; font-style: italic;margin-top:-6pt;">{PAGENO}/{nbpg} #' . $data['invoice']['tid'] . '</div>');
         $pdf->WriteHTML($html);
         if ($this->input->get('d')) {
-            $pdf->Output('Invoice_pos' . $data['invoice']['tid'] . '.pdf', 'D');
+            $pdf->Output('Invoice_pos' . $data['invoice']['invoice_number'] . '.pdf', 'D');
         } else {
-            $pdf->Output('Invoice_pos' . $data['invoice']['tid'] . '.pdf', 'I');
+            $pdf->Output('Invoice_pos' . $data['invoice']['invoice_number'] . '.pdf', 'I');
         }
     }
 
@@ -2745,6 +2754,10 @@ echo 6;
         $data['invoice'] = $this->invocies->invoice_details($tid, $this->limited);
         $data['round_off'] = $this->custom->api_config(4);
 
+		// echo "<pre>";
+		// print_r($data['invoice']);
+		// echo "</pre>";
+		// exit();
 		
 
         if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
@@ -3010,63 +3023,161 @@ echo 6;
 
     }
 
-        public function invoice_legacy()
-    {
+    // public function invoice_legacy_bkup()
+    // {
 
-        $id = $this->input->post('inv');
+    //     $id = $this->input->post('inv');
+	// 	//echo $id; exit();
 
-        if (!$id) {
-            exit('eer');
-        }
+    //     if (!$id) {
+    //         exit('eer');
+    //     }
 
-        // Get the user from the array, using the id as key for retrieval.
-        // Usually a model is to be used for this.
+    //     // Get the user from the array, using the id as key for retrieval.
+    //     // Usually a model is to be used for this.
 
-        $file_name = rand(99,999) . $id.time();
+    //     $file_name = rand(99,999) . $id.time();
 
-        $tid = $id;
-        $data['qrc'] = $file_name. '.png';
-        $data['id'] = $tid;
-        $data['title'] = "Invoice $tid";
-        $data['invoice'] = $this->invocies->invoice_details($tid);
-        if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
-        if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['eid']);
+    //     $tid = $id;
+    //     $data['qrc'] = $file_name. '.png';
+    //     $data['id'] = $tid;
+    //     $data['title'] = "Invoice $tid";
+    //     $data['invoice'] = $this->invocies->invoice_details($tid);
+    //     if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
+    //     if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+        
 
 
-        $this->load->model('billing_model', 'billing');
-        $online_pay = $this->billing->online_pay_settings();
-        if ($online_pay['enable'] == 1) {
-            $token = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
-            $data['qrc'] = $file_name. '.png';
+    //     $this->load->model('billing_model', 'billing');
+    //     $online_pay = $this->billing->online_pay_settings();
+    //     if ($online_pay['enable'] == 1) {
+    //         $token = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
+			
+    //         $data['qrc'] = $file_name. '.png';
 
-            $qrCode = new QrCode(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token));
+    //         $qrCode = new QrCode(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token));
+	// 		//header('Content-Type: '.$qrCode->getContentType());
+	// 		//echo $qrCode->writeString();
+    //         $qrCode->writeFile(FCPATH . 'userfiles/pos_temp/' . $data['qrc']);
 
-//header('Content-Type: '.$qrCode->getContentType());
-//echo $qrCode->writeString();
-            $qrCode->writeFile(FCPATH . 'userfiles/pos_temp/' . $data['qrc']);
-        }
+	// 		// $qrCode = QrCode::create(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token))
+    //         //     ->setEncoding(new Encoding('UTF-8'))
+    //         //     ->setSize(300)
+    //         //     ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+    //         //     ->setForegroundColor(new Color(0, 0, 0))
+    //         //     ->setBackgroundColor(new Color(255, 255, 255));
 
-        $this->pheight = 0;
-        $this->load->library('pdf');
-        $pdf = $this->pdf->load_thermal();
-        // retrieve data from model or just static date
-        $data['title'] = "items";
-        $pdf->allow_charset_conversion = true;  // Set by default to TRUE
-        $pdf->charset_in = 'UTF-8';
-        //   $pdf->SetDirectionality('rtl'); // Set lang direction for rtl lang
-        $pdf->autoLangToFont = true;
-        $data['round_off'] = $this->custom->api_config(4);
-        $html = $this->load->view('print_files/pos_pdf_compact', $data, true);
-        // render the view into HTML
+	// 		// 	echo $qrCode.'aa';exit();
 
-        $h = 160 + $this->pheight;
-        $pdf->_setPageSize(array(70, $h), $pdf->DefOrientation);
-        $pdf->WriteHTML($html);
+    //         // $writer = new PngWriter();
+    //         // $result = $writer->write($qrCode);
+    //         // $result->saveToFile(FCPATH . 'userfiles/pos_temp/' . $data['qrc']);
+    //     }
 
-        $r=$pdf->Output('userfiles/pos_temp/' . $file_name . '.pdf', 'F');
-        echo  json_encode(array('status'=>'Success','file_name'=> $file_name));
+	// 	// echo "<pre>";
+	// 	// print_r($data);
+	// 	// echo "</pre>";
+	// 	// exit();
 
-    }
+    //     $this->pheight = 0;
+    //     $this->load->library('pdf');
+    //     $pdf = $this->pdf->load_thermal();
+    //     // retrieve data from model or just static date
+    //     $data['title'] = "items";
+    //     $pdf->allow_charset_conversion = true;  // Set by default to TRUE
+    //     $pdf->charset_in = 'UTF-8';
+    //     //   $pdf->SetDirectionality('rtl'); // Set lang direction for rtl lang
+    //     $pdf->autoLangToFont = true;
+    //     $data['round_off'] = $this->custom->api_config(4);
+    //     $html = $this->load->view('print_files/pos_pdf_compact', $data, true);
+    //     // render the view into HTML
+
+    //     $h = 160 + $this->pheight;
+    //     $pdf->_setPageSize(array(70, $h), $pdf->DefOrientation);
+    //     $pdf->WriteHTML($html);
+
+    //     $r=$pdf->Output('userfiles/pos_temp/' . $file_name . '.pdf', 'F');
+    //     echo  json_encode(array('status'=>'Success','file_name'=> $file_name));
+
+    // }
+
+	public function invoice_legacy()
+	{
+		//error_reporting(E_ALL);
+		//ini_set('display_errors', 1);
+
+		try {
+			$id = $this->input->post('inv');
+			if (!$id) {
+				throw new Exception('Invoice ID not provided');
+			}
+
+			$file_name = rand(99, 999) . $id . time();
+
+			$tid = $id;
+			$data['qrc'] = $file_name . '.png';
+			$data['id'] = $tid;
+			$data['title'] = "Invoice $tid";
+			$data['invoice'] = $this->invocies->invoice_details($tid);
+			if ($data['invoice']) $data['products'] = $this->invocies->invoice_products($tid);
+			if ($data['invoice']) $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+
+			$this->load->model('billing_model', 'billing');
+			$online_pay = $this->billing->online_pay_settings();
+
+			if ($online_pay['enable'] == 1) {
+				$token = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
+
+				$data['qrc'] = $file_name . '.png';
+
+				$qrCode = QrCode::create(base_url('billing/card?id=' . $tid . '&itype=inv&token=' . $token))
+					->setEncoding(new Encoding('UTF-8'))
+					->setSize(300)
+					->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+					->setForegroundColor(new Color(0, 0, 0))
+					->setBackgroundColor(new Color(255, 255, 255));
+
+				$writer = new PngWriter();
+				$result = $writer->write($qrCode);
+				
+				$qrPath = FCPATH . 'userfiles/pos_temp/' . $data['qrc'];
+				if (!is_dir(dirname($qrPath))) {
+					mkdir(dirname($qrPath), 0777, true);
+				}
+				$result->saveToFile($qrPath);
+			}
+
+			$this->pheight = 0;
+			$this->load->library('pdf');
+			$pdf = $this->pdf->load_thermal();
+
+			$data['title'] = "items";
+			$pdf->allow_charset_conversion = true;
+			$pdf->charset_in = 'UTF-8';
+			$pdf->autoLangToFont = true;
+
+			$data['round_off'] = $this->custom->api_config(4);
+			$html = $this->load->view('print_files/pos_pdf_compact', $data, true);
+
+			$h = 160 + $this->pheight;
+			$pdf->_setPageSize(array(70, $h), $pdf->DefOrientation);
+			$pdf->WriteHTML($html);
+
+			$pdfPath = 'userfiles/pos_temp/' . $file_name . '.pdf';
+			$r = $pdf->Output($pdfPath, 'F');
+
+			echo json_encode(['status' => 'Success', 'file_name' => $file_name]);
+		} catch (Exception $e) {
+			http_response_code(500);
+			echo json_encode(['status' => 'Error', 'message' => $e->getMessage()]);
+		}
+	}
+
+
+
+	
+
+
     public function invoice_clean()
     {
         $file_id = $this->input->post('file_id', true);
