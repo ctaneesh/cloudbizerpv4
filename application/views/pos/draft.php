@@ -54,8 +54,8 @@
 							</tr>';
 							echo '    <tr>
 							<td>
-							<input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['qty']) . '" >
-							<input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['qty']) . '" >
+							<input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['quantity']) . '" >
+							<input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['quantity']) . '" >
 							</td> 
 							<td>
 							<input type="text" class="form-control req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
@@ -72,10 +72,11 @@
 							<input type="hidden" name="disca[]" id="disca-' . $i . '" value="' . amountExchange_s($row['totaldiscount'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
 							<input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' . $i . '" value="' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '"> 
 							<input type="hidden" class="pdIn" name="pid[]" id="pid-' . $i . '" value="' . $row['pid'] . '"> <input type="hidden" name="unit[]" id="unit-' . $i . '" value="' . $row['unit'] . '"> 
-							<input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['code'] . '"><input type="hidden" id="alert-' . $i . '" value="' . amountFormat_general($row['qty']) . '" name="alert[]"> 
+							<input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['code'] . '"><input type="hidden" id="alert-' . $i . '" value="' . amountFormat_general($row['quantity']) . '" name="alert[]"> 
 							</tr>';
 							$i++;
-						} ?>
+						} 
+						?>
 						</tbody>
 					</table>
 					<br>
@@ -219,7 +220,7 @@
 									   value="<?php echo $lastinvoice; ?>" >
 								<input type="hidden" name="iid"
 									   value="<?php echo $invoice['iid']; ?>">
-								<input type="hidden" name="draft_id"
+								<input type="text" name="draft_id"
 									   value="<?php echo $invoice['iid']; ?>">
 							</div>
 						</div>
@@ -357,12 +358,23 @@
 			<div class="form-group row">
 
 
-				<div class="col-sm-1"></div>
-				<div class="col-sm-10">
-					<input type="text" class="form-control text-center round" name="product_barcode"
-						   placeholder="Enter Product name or Code" id="search_bar" autocomplete="off"
-						   autofocus="autofocus">
-				</div>
+				<div class="col-sm-9">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fa fa-barcode p-0"></i>&nbsp;<input type="checkbox"
+                                                                                      aria-label="Enable BarCode"
+                                                                                      value="1" id="bar_only">
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control text-center round mousetrap"
+                                       name="product_barcode"
+                                       placeholder="Enter Product name, code or scan barcode" id="search_bar"
+                                       autocomplete="off" autofocus="autofocus">
+                            </div>
+
+
+                        </div>
 			</div>
 
 			<div class="row">
@@ -402,6 +414,8 @@
 
 
 </form>
+
+<audio id="beep" src="<?= assets_url() ?>assets/js/beep.wav" autoplay="false"></audio>
 
 
 <div class="modal fade" id="addCustomer" role="dialog">
@@ -732,6 +746,7 @@
 		method: 'POST',
 		data: 'cid=' + $('#categories').val() + '&wid=' + $('#warehouses option:selected').val() + '&' + crsf_token + '=' + crsf_hash,
 		success: function (data) {
+			//console.log(data);
 			$('#pos_item').html(data);
 		}
 	});
@@ -818,23 +833,38 @@
 		update_register();
 	});
 
+	// $('#pos_basic_pay').on("click", function (e) {//commented 23-06-25 Anjana
+	// 	e.preventDefault();
+	// 	$('#basicPay').modal('toggle');
+	// 	$("#notify .message").html("<strong>Processing</strong>: .....");
+	// 	$("#notify").removeClass("alert-danger").addClass("alert-primary").fadeIn();
+	// 	$("html, body").animate({scrollTop: $('#notify').offset().top - 100}, 1000);
+	// 	var o_data = $("#data_form").serialize() + '&p_amount=' + accounting.unformat($('#p_amount').val(), accounting.settings.number.decimal) + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type');
+	// 	var action_url = $('#action-url').val();
+	// 	addObject(o_data, action_url);
+
+	// 	setTimeout(
+	// 			function () {
+	// 				update_register();
+	// 			}, 3000);
+
+
+	// });
+
 	$('#pos_basic_pay').on("click", function (e) {
-		e.preventDefault();
-		$('#basicPay').modal('toggle');
-		$("#notify .message").html("<strong>Processing</strong>: .....");
-		$("#notify").removeClass("alert-danger").addClass("alert-primary").fadeIn();
-		$("html, body").animate({scrollTop: $('#notify').offset().top - 100}, 1000);
-		var o_data = $("#data_form").serialize() + '&p_amount=' + accounting.unformat($('#p_amount').val(), accounting.settings.number.decimal) + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type');
-		var action_url = $('#action-url').val();
-		addObject(o_data, action_url);
-
-		setTimeout(
-				function () {
-					update_register();
-				}, 3000);
-
-
-	});
+        e.preventDefault();
+        $('#basicPay').modal('toggle');
+        $("#notify .message").html("<strong>Processing</strong>: .....");
+        $("#notify").removeClass("alert-danger").addClass("alert-primary").fadeIn();
+        $("html, body").animate({scrollTop: $('body').offset().top - 100}, 1000);
+        var o_data = $("#data_form").serialize() + '&p_amount=' + accounting.unformat($('#p_amount').val(), accounting.settings.number.decimal) + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type') + '&account=' + $("#p_account option:selected").val() + '&employee=' + $("#employee option:selected").val();
+        var action_url = $('#action-url').val();
+        addObject(o_data, action_url);
+        setTimeout(
+            function () {
+                update_register();
+            }, 3000);
+    });
 
 	$('#pos_basic_print').on("click", function (e) {
 		e.preventDefault();
@@ -850,6 +880,154 @@
 					update_register();
 				}, 3000);
 	});
+
+
+	///////add new code ///////
+
+	    $('#categories').change(function () {
+        var whr = $('#v2_warehouses option:selected').val();
+        var cat = $('#v2_categories option:selected').val();
+        
+        $.ajax({
+            type: "POST",
+            url: baseurl + 'search_products/pos_search',
+            data: 'wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash,
+            beforeSend: function () {
+                $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+            },
+            success: function (data) {
+
+                $("#pos_item").html(data);
+
+            }
+        });
+    });
+    $('#warehouses').change(function () {
+        var whr = $('#v2_warehouses option:selected').val();
+        var cat = $('#v2_categories option:selected').val();
+        $.ajax({
+            type: "POST",
+            url: baseurl + 'search_products/pos_search',
+            data: 'wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash,
+            beforeSend: function () {
+                $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+            },
+            success: function (data) {
+
+                $("#pos_item").html(data);
+
+            }
+        });
+    })
+
+	$(document).ready(function () {
+
+        if (localStorage.bar_only && localStorage.bar_only != '') {
+            $('#bar_only').attr('checked', 'checked');
+
+        } else {
+            $('#bar_only').removeAttr('checked');
+        }
+
+        $('#bar_only').click(function () {
+
+            if ($('#bar_only').is(':checked')) {
+
+                localStorage.bar_only = $('#bar_only').val();
+            } else {
+                localStorage.bar_only = '';
+            }
+            $('#search_bar').attr('readonly', false);
+        });
+
+        Mousetrap.bind('alt+x', function () {
+            $('#search_bar').focus();
+        });
+        Mousetrap.bind('alt+c', function () {
+            $('#pos-customer-box').focus();
+        });
+
+        Mousetrap.bind('alt+z', function () {
+            $('.possubmit2').click();
+        });
+        Mousetrap.bind('alt+n', function () {
+            window.location.href = "<?=base_url('pos_invoices/create') ?>";
+        });
+        Mousetrap.bind('alt+q', function () {
+            $('#posp0').click();
+            $('#search_bar').val('');
+        });
+        Mousetrap.bind('alt+s', function () {
+            if ($('#basicPay').hasClass('show')) {
+                $('#pos_basic_print').click();
+            } else {
+                $('.possubmit3').click();
+            }
+
+        });
+
+
+        $('#search_bar').keyup(function (event) {
+
+            if (!$(this).attr('readonly')) {
+                //$('#search_bar').keyup(function () {
+                var whr = $('#warehouses option:selected').val();
+                var cat = $('#categories option:selected').val();
+                // if (this.value.length > 2) {
+                    $.ajax({
+                        type: "POST",
+                        url: baseurl + 'search_products/pos_search',
+                        data: 'name=' + $(this).val() + '&wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash + '&bar=' + $('#bar_only').prop('checked'),
+                        beforeSend: function () {
+                            $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+                        },
+                        success: function (data) {
+                            $("#pos_item").html(data);
+
+                        }
+                    });
+
+                // }
+            }
+
+            if (event.keyCode == 13 && !$('#search_bar').attr('readonly')) {
+				
+                $('#search_bar').attr('readonly', true);
+                wait = false;
+                def_timeout(1000).then(function () {
+                    $('#posp0').click();
+                    //alert("a");
+                    def_timeout(1800).then(function () {
+
+
+                        var whr = $('#warehouses option:selected').val();
+                        var cat = $('#categories option:selected').val();
+						//alert(whr);
+                        $.ajax({
+                            type: "POST",
+                            url: baseurl + 'search_products/pos_search',
+                            data: 'name=' + $(this).val() + '&wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash + '&bar=' + $('#bar_only').prop('checked'),
+                            beforeSend: function () {
+                                $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+                            },
+                            success: function (data) {
+                                $("#pos_item").html(data);
+                                $('#search_bar').attr('readonly', false);
+                                $('#search_bar').val('');
+                            }
+
+                        });
+                    });
+
+
+                });
+
+
+            }
+        });
+    });
+
+	//////////////////////////
 </script> <?php
 /*
 The MIT License (MIT)

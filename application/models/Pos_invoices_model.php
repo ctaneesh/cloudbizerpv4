@@ -423,14 +423,28 @@ class Pos_invoices_model extends CI_Model
         return $query->result_array();
     }
 
-    public function drafts()
+    // public function drafts()//commented 23-06-25
+    // {
+
+
+    //     $this->db->select('cberp_draft.id,cberp_draft.tid,cberp_draft.invoicedate');
+    //     $this->db->from('cberp_draft');
+    //     //    $this->db->where('cberp_draft.loc', $this->aauth->get_user()->loc);
+    //     $this->db->order_by('id', 'DESC');
+    //     $this->db->limit(12);
+    //     $query = $this->db->get();
+    //     return $query->result_array();
+
+    // }
+
+	public function drafts()
     {
 
 
-        $this->db->select('cberp_draft.id,cberp_draft.tid,cberp_draft.invoicedate');
-        $this->db->from('cberp_draft');
-    //    $this->db->where('cberp_draft.loc', $this->aauth->get_user()->loc);
-        $this->db->order_by('id', 'DESC');
+        $this->db->select('cberp_invoices.invoice_number,cberp_invoices.invoice_date');
+        $this->db->from('cberp_invoices');
+        $this->db->where('cberp_invoices.status', 'Draft');
+        $this->db->order_by('cberp_invoices.invoice_number', 'DESC');
         $this->db->limit(12);
         $query = $this->db->get();
         return $query->result_array();
@@ -441,46 +455,79 @@ class Pos_invoices_model extends CI_Model
     {
 
         $this->db->select('*');
-        $this->db->from('cberp_draft_items');
-        $this->db->where('tid', $id);
+        $this->db->from('cberp_invoice_items');
+        $this->db->where('invoice_number', $id);
         $query = $this->db->get();
         return $query->result_array();
 
     }
 
-    public function draft_details($id, $eid = '')
-    {
+    // public function draft_details($id, $eid = '')//23/06/25
+    // {
 		
 
-        $this->db->select('
-		cberp_draft.*,
-		SUM(cberp_draft.shipping + cberp_draft.ship_tax) AS shipping,
-		cberp_customers.*,
-		cberp_customers.customer_id AS cid,
-		cberp_draft.id AS iid,
-		cberp_terms.id AS termid,
-		cberp_terms.title AS termtit,
-		cberp_terms.terms AS terms');
-        $this->db->from('cberp_draft');
-        $this->db->where('cberp_draft.id', $id);
-        if ($eid) {
-            $this->db->where('cberp_draft.eid', $eid);
-        }
-        $this->db->join('cberp_customers', 'cberp_draft.csd = cberp_customers.customer_id', 'left');
-        $this->db->join('cberp_terms', 'cberp_terms.id = cberp_draft.term', 'left');
-        $query = $this->db->get();
-		//echo $this->db->last_query();
-		//exit();
-		// echo "<pre>";
-        // $result =  $query->row_array();
-		// print_r($result);
-		// echo "</pre>";
+    //     $this->db->select('
+	// 	cberp_draft.*,
+	// 	SUM(cberp_draft.shipping + cberp_draft.ship_tax) AS shipping,
+	// 	cberp_customers.*,
+	// 	cberp_customers.customer_id AS cid,
+	// 	cberp_draft.id AS iid,
+	// 	cberp_terms.id AS termid,
+	// 	cberp_terms.title AS termtit,
+	// 	cberp_terms.terms AS terms');
+    //     $this->db->from('cberp_draft');
+    //     $this->db->where('cberp_draft.id', $id);
+    //     if ($eid) {
+    //         $this->db->where('cberp_draft.eid', $eid);
+    //     }
+    //     $this->db->join('cberp_customers', 'cberp_draft.csd = cberp_customers.customer_id', 'left');
+    //     $this->db->join('cberp_terms', 'cberp_terms.id = cberp_draft.term', 'left');
+    //     $query = $this->db->get();
+	// 	//echo $this->db->last_query();
+	// 	//exit();
+	// 	// echo "<pre>";
+    //     // $result =  $query->row_array();
+	// 	// print_r($result);
+	// 	// echo "</pre>";
 		
-        return $query->row_array();
+    //     return $query->row_array();
 
-    }
+    // }
 
-        public function accountslist()
+
+	public function draft_details($id, $eid = '')
+	{
+			
+
+			$this->db->select('
+			cberp_invoices.*,
+			SUM(cberp_invoices.shipping + cberp_invoices.shipping_tax) AS shipping,
+			cberp_customers.*,
+			cberp_customers.customer_id AS cid,
+			cberp_invoices.invoice_number AS iid,
+			cberp_terms.id AS termid,
+			cberp_terms.title AS termtit,
+			cberp_terms.terms AS terms');
+			$this->db->from('cberp_invoices');
+			$this->db->where('cberp_invoices.invoice_number', $id);
+			$this->db->where('cberp_invoices.status', 'Draft');
+			if ($eid) {
+				$this->db->where('cberp_invoices.employee_id', $eid);
+			}
+			$this->db->join('cberp_customers', 'cberp_invoices.customer_id = cberp_customers.customer_id', 'left');
+			$this->db->join('cberp_terms', 'cberp_terms.id = cberp_invoices.payment_terms', 'left');
+			$query = $this->db->get();
+			//echo $this->db->last_query();
+			//exit();
+			// echo "<pre>";
+			// $result =  $query->row_array();
+			// print_r($result);
+			// echo "</pre>";
+			
+			return $query->row_array();
+
+	}
+    public function accountslist()
     {
         $this->db->select('*');
         $this->db->from('cberp_accounts');
