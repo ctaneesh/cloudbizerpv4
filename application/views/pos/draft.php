@@ -49,10 +49,34 @@
 						<tbody id="pos_items">
 						<?php $i = 0;
 						foreach ($products as $row) {
-							echo '<tr id="ppid-' . $i . '"><td colspan="7"><input type="text" class="form-control text-center" name="product_name[]" placeholder="Enter Product name or Code" id="productname-' . $i . '"  value="' . $row['product'] . '"></td></tr>';
-							echo '    <tr><td><input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['qty']) . '" ><input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['qty']) . '" ></td> <td><input type="text" class="form-control req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '"></td><td> <input type="text" class="form-control p-mobile vat" name="product_tax[]" id="vat-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['tax']) . '"></td>  <td><input type="text" class="form-control p-mobile discount pos_w" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' . $i . '" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['discount']) . '"></td> <td><span class="currenty">' . $this->config->item('currency') . '</span> <strong><span class="ttlText" id="result-' . $i . '">' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '</span></strong></td> <td class="text-center"><button type="button" data-rowid="' . $i . '" class="btn btn-danger removeItem" title="Remove"> <i class="fa fa-minus-square"></i> </button> </td><input type="hidden" name="taxa[]" id="taxa-' . $i . '" value="' . amountExchange_s($row['totaltax'], $invoice['multi'], $this->aauth->get_user()->loc) . '"><input type="hidden" name="disca[]" id="disca-' . $i . '" value="' . amountExchange_s($row['totaldiscount'], $invoice['multi'], $this->aauth->get_user()->loc) . '"><input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' . $i . '" value="' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '"> <input type="hidden" class="pdIn" name="pid[]" id="pid-' . $i . '" value="' . $row['pid'] . '"> <input type="hidden" name="unit[]" id="unit-' . $i . '" value="' . $row['unit'] . '"> <input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['code'] . '"><input type="hidden" id="alert-' . $i . '" value="' . amountFormat_general($row['qty']) . '" name="alert[]"> </tr>';
-							$i++;
-						} ?>
+                            echo '<tr id="ppid-' . $i . '">
+                            <td colspan="7"><input type="text" class="form-control text-center" name="product_name[]" placeholder="Enter Product name or Code" id="productname-' . $i . '"  value="' . $row['product_name'] . '"></td>
+                            </tr>';
+                            echo '    <tr>
+                            <td>
+                            <input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['quantity']) . '" >
+                            <input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['quantity']) . '" >
+                            </td> 
+                            <td>
+                            <input type="text" class="form-control req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
+                            </td>
+                            <td> <input type="text" class="form-control p-mobile vat" name="product_tax[]" id="vat-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['tax']) . '">
+                            </td>  
+                            <td><input type="text" class="form-control p-mobile discount pos_w" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' . $i . '" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['discount']) . '">
+                            </td> 
+                            <td><span class="currenty">' . $this->config->item('currency') . '</span> <strong><span class="ttlText" id="result-' . $i . '">' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '</span></strong>
+                            </td> 
+                            <td class="text-center"><button type="button" data-rowid="' . $i . '" class="btn btn-danger removeItem" title="Remove"> <i class="fa fa-minus-square"></i> </button> 
+                            </td>
+                            <input type="hidden" name="taxa[]" id="taxa-' . $i . '" value="' . amountExchange_s($row['total_tax'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
+                            <input type="hidden" name="disca[]" id="disca-' . $i . '" value="' . amountExchange_s($row['total_discount'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
+                            <input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' . $i . '" value="' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '"> 
+                            <input type="hidden" class="pdIn" name="pid[]" id="pid-' . $i . '" value="' . $row['product_code'] . '"> <input type="hidden" name="unit[]" id="unit-' . $i . '" value="' . $row['unit'] . '"> 
+                            <input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['product_code'] . '"><input type="hidden" id="alert-' . $i . '" value="' . amountFormat_general($row['quantity']) . '" name="alert[]"> 
+                            </tr>';
+                            $i++;
+} 
+						?>
 						</tbody>
 					</table>
 					<br>
@@ -297,9 +321,9 @@
 					<select
 							id="warehouses"
 							class="selectpicker form-control teal">
-						<?php echo $this->common->default_warehouse();
+						<?php //echo $this->common->default_warehouse();
 						echo '<option value="0">' . $this->lang->line('All') ?></option><?php foreach ($warehouse as $row) {
-							echo '<option value="' . $row['id'] . '">' . $row['title'] . '</option>';
+							echo '<option value="' . $row['store_id'] . '">' . $row['store_name'] . '</option>';
 						} ?>
 
 					</select></div>
@@ -334,12 +358,23 @@
 			<div class="form-group row">
 
 
-				<div class="col-sm-1"></div>
-				<div class="col-sm-10">
-					<input type="text" class="form-control text-center round" name="product_barcode"
-						   placeholder="Enter Product name or Code" id="search_bar" autocomplete="off"
-						   autofocus="autofocus">
-				</div>
+				<div class="col-sm-9">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="fa fa-barcode p-0"></i>&nbsp;<input type="checkbox"
+                                                                                      aria-label="Enable BarCode"
+                                                                                      value="1" id="bar_only">
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control text-center round mousetrap"
+                                       name="product_barcode"
+                                       placeholder="Enter Product name, code or scan barcode" id="search_bar"
+                                       autocomplete="off" autofocus="autofocus">
+                            </div>
+
+
+                        </div>
 			</div>
 
 			<div class="row">
@@ -379,6 +414,8 @@
 
 
 </form>
+
+<audio id="beep" src="<?= assets_url() ?>assets/js/beep.wav" autoplay="false"></audio>
 
 
 <div class="modal fade" id="addCustomer" role="dialog">
@@ -702,6 +739,28 @@
 		</div>
 	</div>
 </div>
+<div id="pos_print" class="modal fade" role="dialog">
+    <div class="modal-dialog ">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title">Legacy Print Mode</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body border_no_print" id="print_section">
+                <embed src="<?= base_url('assets/images/ssl-seal.png') ?>"
+                       type="application/pdf" height="600px" width="470" id="loader_pdf">
+                <input id="loader_file" value="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 <script type="text/javascript">
 	$.ajax({
 		url: baseurl + 'search_products/pos_search',
@@ -709,6 +768,7 @@
 		method: 'POST',
 		data: 'cid=' + $('#categories').val() + '&wid=' + $('#warehouses option:selected').val() + '&' + crsf_token + '=' + crsf_hash,
 		success: function (data) {
+			//console.log(data);
 			$('#pos_item').html(data);
 		}
 	});
@@ -795,23 +855,38 @@
 		update_register();
 	});
 
+	// $('#pos_basic_pay').on("click", function (e) {//commented 23-06-25 Anjana
+	// 	e.preventDefault();
+	// 	$('#basicPay').modal('toggle');
+	// 	$("#notify .message").html("<strong>Processing</strong>: .....");
+	// 	$("#notify").removeClass("alert-danger").addClass("alert-primary").fadeIn();
+	// 	$("html, body").animate({scrollTop: $('#notify').offset().top - 100}, 1000);
+	// 	var o_data = $("#data_form").serialize() + '&p_amount=' + accounting.unformat($('#p_amount').val(), accounting.settings.number.decimal) + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type');
+	// 	var action_url = $('#action-url').val();
+	// 	addObject(o_data, action_url);
+
+	// 	setTimeout(
+	// 			function () {
+	// 				update_register();
+	// 			}, 3000);
+
+
+	// });
+
 	$('#pos_basic_pay').on("click", function (e) {
-		e.preventDefault();
-		$('#basicPay').modal('toggle');
-		$("#notify .message").html("<strong>Processing</strong>: .....");
-		$("#notify").removeClass("alert-danger").addClass("alert-primary").fadeIn();
-		$("html, body").animate({scrollTop: $('#notify').offset().top - 100}, 1000);
-		var o_data = $("#data_form").serialize() + '&p_amount=' + accounting.unformat($('#p_amount').val(), accounting.settings.number.decimal) + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type');
-		var action_url = $('#action-url').val();
-		addObject(o_data, action_url);
-
-		setTimeout(
-				function () {
-					update_register();
-				}, 3000);
-
-
-	});
+        e.preventDefault();
+        $('#basicPay').modal('toggle');
+        $("#notify .message").html("<strong>Processing</strong>: .....");
+        $("#notify").removeClass("alert-danger").addClass("alert-primary").fadeIn();
+        $("html, body").animate({scrollTop: $('body').offset().top - 100}, 1000);
+        var o_data = $("#data_form").serialize() + '&p_amount=' + accounting.unformat($('#p_amount').val(), accounting.settings.number.decimal) + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type') + '&account=' + $("#p_account option:selected").val() + '&employee=' + $("#employee option:selected").val();
+        var action_url = $('#action-url').val();
+        addObject(o_data, action_url);
+        setTimeout(
+            function () {
+                update_register();
+            }, 3000);
+    });
 
 	$('#pos_basic_print').on("click", function (e) {
 		e.preventDefault();
@@ -827,6 +902,199 @@
 					update_register();
 				}, 3000);
 	});
+
+
+	///////add new code ///////
+
+	var file_id;
+    $(document.body).on('click', '.print_image', function (e) {
+
+        e.preventDefault();
+
+        var inv_id = $(this).attr('data-inid');
+
+        jQuery.ajax({
+            url: '<?php echo base_url('pos_invoices/invoice_legacy') ?>',
+            type: 'POST',
+            data: 'inv=' + inv_id + '&' + crsf_token + '=' + crsf_hash,
+            dataType: 'json',
+            success: function (data) {
+                file_id= data.file_name;
+                $("#loader_pdf").attr('src','<?= base_url() ?>userfiles/pos_temp/'+data.file_name+'.pdf');
+                $("#loader_file").val(data.file_name);
+            },
+        });
+
+        $('#pos_print').modal('toggle');
+        $("#print_section").printThis({
+            //  beforePrint: function (e) {$('#pos_print').modal('hide');},
+
+            printDelay: 500,
+            afterPrint: clean_data()
+        });
+    });
+
+
+    function clean_data() {
+        setTimeout(function(){
+        var file_id= $("#loader_file").val();
+        jQuery.ajax({
+            url: '<?php echo base_url('pos_invoices/invoice_clean') ?>',
+            type: 'POST',
+            data: 'file_id=' + file_id + '&' + crsf_token + '=' + crsf_hash,
+            dataType: 'json',
+            success: function (data) {
+
+            },
+        });
+}, 2500);
+
+    }
+
+	    $('#categories').change(function () {
+        var whr = $('#v2_warehouses option:selected').val();
+        var cat = $('#v2_categories option:selected').val();
+        
+        $.ajax({
+            type: "POST",
+            url: baseurl + 'search_products/pos_search',
+            data: 'wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash,
+            beforeSend: function () {
+                $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+            },
+            success: function (data) {
+
+                $("#pos_item").html(data);
+
+            }
+        });
+    });
+    $('#warehouses').change(function () {
+        var whr = $('#v2_warehouses option:selected').val();
+        var cat = $('#v2_categories option:selected').val();
+        $.ajax({
+            type: "POST",
+            url: baseurl + 'search_products/pos_search',
+            data: 'wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash,
+            beforeSend: function () {
+                $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+            },
+            success: function (data) {
+
+                $("#pos_item").html(data);
+
+            }
+        });
+    })
+
+	$(document).ready(function () {
+
+        if (localStorage.bar_only && localStorage.bar_only != '') {
+            $('#bar_only').attr('checked', 'checked');
+
+        } else {
+            $('#bar_only').removeAttr('checked');
+        }
+
+        $('#bar_only').click(function () {
+
+            if ($('#bar_only').is(':checked')) {
+
+                localStorage.bar_only = $('#bar_only').val();
+            } else {
+                localStorage.bar_only = '';
+            }
+            $('#search_bar').attr('readonly', false);
+        });
+
+        Mousetrap.bind('alt+x', function () {
+            $('#search_bar').focus();
+        });
+        Mousetrap.bind('alt+c', function () {
+            $('#pos-customer-box').focus();
+        });
+
+        Mousetrap.bind('alt+z', function () {
+            $('.possubmit2').click();
+        });
+        Mousetrap.bind('alt+n', function () {
+            window.location.href = "<?=base_url('pos_invoices/create') ?>";
+        });
+        Mousetrap.bind('alt+q', function () {
+            $('#posp0').click();
+            $('#search_bar').val('');
+        });
+        Mousetrap.bind('alt+s', function () {
+            if ($('#basicPay').hasClass('show')) {
+                $('#pos_basic_print').click();
+            } else {
+                $('.possubmit3').click();
+            }
+
+        });
+
+
+        $('#search_bar').keyup(function (event) {
+
+            if (!$(this).attr('readonly')) {
+                //$('#search_bar').keyup(function () {
+                var whr = $('#warehouses option:selected').val();
+                var cat = $('#categories option:selected').val();
+                // if (this.value.length > 2) {
+                    $.ajax({
+                        type: "POST",
+                        url: baseurl + 'search_products/pos_search',
+                        data: 'name=' + $(this).val() + '&wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash + '&bar=' + $('#bar_only').prop('checked'),
+                        beforeSend: function () {
+                            $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+                        },
+                        success: function (data) {
+                            $("#pos_item").html(data);
+
+                        }
+                    });
+
+                // }
+            }
+
+            if (event.keyCode == 13 && !$('#search_bar').attr('readonly')) {
+				
+                $('#search_bar').attr('readonly', true);
+                wait = false;
+                def_timeout(1000).then(function () {
+                    $('#posp0').click();
+                    //alert("a");
+                    def_timeout(1800).then(function () {
+
+
+                        var whr = $('#warehouses option:selected').val();
+                        var cat = $('#categories option:selected').val();
+						//alert(whr);
+                        $.ajax({
+                            type: "POST",
+                            url: baseurl + 'search_products/pos_search',
+                            data: 'name=' + $(this).val() + '&wid=' + whr + '&cid=' + cat + '&' + crsf_token + '=' + crsf_hash + '&bar=' + $('#bar_only').prop('checked'),
+                            beforeSend: function () {
+                                $("#customer-box").css("background", "#FFF url(" + baseurl + "assets/custom/load-ring.gif) no-repeat 165px");
+                            },
+                            success: function (data) {
+                                $("#pos_item").html(data);
+                                $('#search_bar').attr('readonly', false);
+                                $('#search_bar').val('');
+                            }
+
+                        });
+                    });
+
+
+                });
+
+
+            }
+        });
+    });
+
+	//////////////////////////
 </script> <?php
 /*
 The MIT License (MIT)

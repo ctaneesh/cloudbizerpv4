@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Print Invoice #<?php echo $invoice['tid'] ?></title>
+    <title>Print Invoice #<?php echo $invoice['invoice_number'] ?></title>
     <style>
         body {
             margin: 0;
@@ -64,11 +64,12 @@
         <?php } ?>
         <tr>
             <td><?php echo $this->lang->line('Invoice') ?></td>
-            <td><?php echo $this->config->item('prefix') . ' #' . $invoice['tid'] ?></td>
+            <!-- <td><?php echo $this->config->item('prefix') . ' #' . $invoice['invoice_number'] ?></td> -->
+			<td><?php echo ' #' . $invoice['invoice_number'] ?></td>
         </tr>
         <tr>
             <td><?php echo $this->lang->line('Invoice Date') ?></td>
-            <td><?php echo dateformat($invoice['invoicedate']) . ' ' . date('H:i:s') ?><br></td>
+            <td><?php echo dateformat($invoice['invoice_date']) . ' ' . date('H:i:s') ?><br></td>
         </tr>
         <tr>
             <td><?php echo $this->lang->line('Customer') ?></td>
@@ -93,8 +94,8 @@
         foreach ($products as $row) {
             $this->pheight = $this->pheight + 8;
             echo '<tr>
-            <td >' . $row['product'] . '</td>
-             <td>' . +$row['qty'] . ' ' . $row['unit'] . '</td>
+            <td >' . $row['product_name'] . '</td>
+             <td>' . +$row['quantity'] . ' ' . $row['unit'] . '</td>
             <td class="text-right">' . number_format($row['subtotal'],2) . '</td>
         </tr><tr><td colspan="3">&nbsp;</td></tr>';
         // <td>' . amountExchange($row['subtotal'], $invoice['multi'], $invoice['loc']) . '</td>
@@ -102,8 +103,8 @@
     </table>
     <hr>
     <table class="inv_info">
-        <?php if ($invoice['taxstatus'] == 'cgst') {
-            $gst = $row['totaltax'] / 2;
+        <?php if ($invoice['tax_status'] == 'cgst') {
+            $gst = $row['total_tax'] / 2;
             $rate = $row['tax'] / 2;
             ?>
              
@@ -119,7 +120,7 @@
                 <td><b><?php echo number_format($gst,2);
                 // echo amountExchange($gst, $invoice['multi'], $invoice['loc']) ?></b> (<?= $rate ?>%)</td>
             </tr>
-        <?php } else if ($invoice['taxstatus'] == 'igst') {
+        <?php } else if ($invoice['tax_status'] == 'igst') {
             ?>
             <tr>
                 <td><b><?php echo $this->lang->line('IGST') ?></b></td>

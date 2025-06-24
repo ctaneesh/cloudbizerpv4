@@ -209,9 +209,11 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="tab3" role="tabpanel" aria-labelledby="base-tab3">
-                                    <?php foreach ($draft_list as $rowd) {
-                                        echo '<li class="indigo p-1"><a href="' . base_url() . 'pos_invoices/draft?id=' . $rowd['id'] . '"> #' . $rowd['tid'] . ' (' . $rowd['invoicedate'] . ')</a></li>';
-                                    } ?>
+                                   <?php foreach ($draft_list as $rowd) {
+										$formatted_date = date('Y-m-d', strtotime($rowd['invoice_date']));
+										echo '<li class="indigo p-1"><a href="' . base_url() . 'pos_invoices/draft?id=' . $rowd['invoice_number'] . '"> #' . $rowd['invoice_number'] . ' (' . $formatted_date . ')</a></li>';
+									} ?>
+
                                 </div>
                                 <div class="tab-pane" id="tab4" role="tabpanel" aria-labelledby="base-tab4">
                                     <div class="form-group row">
@@ -224,7 +226,7 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder="Invoice #"
                                                        name="invocieno" id="invocieno"
-                                                       value="<?php echo $lastinvoice ?>">
+                                                       value="<?php echo $lastinvoice ?>"><!--last+1-->
                                             </div>
                                         </div>
                                         <div class="col-sm-3"><label for="invocieno"
@@ -801,8 +803,7 @@
             </div>
             <div class="modal-body border_no_print" id="print_section">
                 <embed src="<?= base_url('assets/images/ssl-seal.png') ?>"
-                       type="application/pdf" height="600px" width="470" id="loader_pdf"
-                ">
+                       type="application/pdf" height="600px" width="470" id="loader_pdf">
                 <input id="loader_file" value="">
             </div>
             <div class="modal-footer">

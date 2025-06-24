@@ -44,6 +44,9 @@ class Billing extends CI_Controller
 
     public function view()
     {
+		// ini_set('display_errors', 1);
+		// ini_set('display_startup_errors', 1);
+		// error_reporting(E_ALL);
 
         if (!$this->input->get()) {
             exit();
@@ -53,7 +56,11 @@ class Billing extends CI_Controller
         $token = $this->input->get('token');
         $data['crm'] = $this->input->get('crm', true) ?: '';
 
+		
+
         $validtoken = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
+		//echo $token;
+		//exit();
 
         if (hash_equals($token, $validtoken)) {
 
@@ -69,14 +76,14 @@ class Billing extends CI_Controller
             $data['products'] = $this->invocies->invoice_products($tid);
             $data['activity'] = $this->invocies->invoice_transactions($tid);
             $data['attach'] = $this->invocies->attach($tid);
-            if (CUSTOM) $data['c_custom_fields'] = $this->custom->view_fields_data($data['invoice']['cid'], 1, 1);
+            if (CUSTOM) $data['c_custom_fields'] = $this->custom->view_fields_data($data['invoice']['customer_id'], 1, 1);
             $data['gateway'] = $this->billing->gateway_list('Yes');
 
 
-            $data['employee'] = $this->invocies->employee($data['invoice']['eid']);
+            $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
 
             $head['usernm'] = '';
-            $head['title'] = "Invoice " . $data['invoice']['tid'];
+            $head['title'] = "Invoice " . $data['invoice']['invoice_number'];
             $this->load->view('billing/header', $head);
             $this->load->view('billing/view', $data);
             $this->load->view('billing/footer');
