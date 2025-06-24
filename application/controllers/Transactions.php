@@ -347,9 +347,9 @@ class Transactions extends CI_Controller
     public function paypurchase()
     {
 
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         // if (!$this->aauth->premission(2)) {
         //     exit('<h3>Sorry! You have insufficient permissions to access this section</h3>');
         // }
@@ -358,7 +358,8 @@ class Transactions extends CI_Controller
         $received_amount = 0;
         $transaction_number = get_latest_trans_number();
         $tid = $this->input->post('tid', true);
-        $receipt_number = $this->input->post('receipt_number', true);
+        $receipt_number = $this->input->post('receipt_number', true);        
+        $last_receipt_number = $this->transactions->last_purchase_payment_receipt_number(); 
         $receipt_id = $this->input->post('receipt_id', true);
         $purchase_id = $this->input->post('purchase_id', true);    
         $purchase_number = $this->input->post('purchase_number', true);    
@@ -379,10 +380,10 @@ class Transactions extends CI_Controller
         $query = $this->db->get();
         $account = $query->row_array();
 
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $dataai = [];
                     
-        $dataai['payer'] = $cname;
+        // $dataai['payer'] = $cname;
         $dataai['payerid'] = $cid;
         $dataai['note'] = $note;
         $dataai['payment_method'] = $pmethod;
@@ -393,12 +394,27 @@ class Transactions extends CI_Controller
         $dataai['trans_type'] = 'Purchase';
         $postedchequeflg = 0;
         $status = 'post dated cheque';
+        $data_payments = [
+            'receipt_number' => $last_receipt_number,
+            'transaction_number' => $transaction_number,
+            'payment_amount' => $amount,
+            'payment_method' => $pmethod,
+            'chart_of_account_1' => $bank_account_id,                        
+            'chart_of_account_2' => $coa_account_id,                        
+            'note' => $note,                        
+            'created_by' => $this->session->userdata('id'),
+            'created_date' => date('Y-m-d H:i:s')
+        ];
         if($pmethod=="Cheque")
         {
             $dataai['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
             $dataai['cheque_account_number'] = $this->input->post('cheque_account_number', true);
             $dataai['cheque_number'] = $this->input->post('cheque_number', true);
             $dataai['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
+            $data_payments['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
+            $data_payments['cheque_account_number'] = $this->input->post('cheque_account_number', true);
+            $data_payments['cheque_number'] = $this->input->post('cheque_number', true);
+            $data_payments['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
             $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($dataai['cheque_date'])) ? 1 : 0;     
                    
         }
@@ -416,12 +432,21 @@ class Transactions extends CI_Controller
             $dataai['account_number'] = $this->input->post('account_number', true);
             $dataai['account_holder_name'] = $this->input->post('account_holder_name', true);
             $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
+            $data_payments['account_bank_name'] = $this->input->post('account_bank_name', true);
+            $data_payments['account_bank_address'] = $this->input->post('account_bank_address', true);
+            $data_payments['account_number'] = $this->input->post('account_number', true);
+            $data_payments['account_holder_name'] = $this->input->post('account_holder_name', true);
+            $data_payments['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
         }
         else{}
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+
+         $this->db->insert('cberp_purchase_receipt_payments', $data_payments); 
+         $this->db->insert('cberp_purchase_receipt_payments_details', ['receipt_number'=>$last_receipt_number,'purchase_reciept_number'=>$receipt_number,'paid_amount'=>$amount]); 
+     
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $this->db->select('order_total,customer_id,paid_amount');
         $this->db->from('cberp_purchase_orders');
-        $this->db->where('id', $tid);
+        $this->db->where('purchase_number', $purchase_number);
         $query = $this->db->get();
         $purchaseresult = $query->row();
         $purchase_totalrm = $purchaseresult->order_total - $purchaseresult->paid_amount; 
@@ -496,19 +521,19 @@ class Transactions extends CI_Controller
             $this->db->insert('cberp_bank_transactions',$banktrans_data);
 
 
-            $dataai['trans_num'] = $transaction_number;
-            $this->db->insert('transactions_ai', $dataai);
+            $dataai['transaction_number'] = $transaction_number;
+            $this->db->insert('cberp_payments', $dataai);
             
             if ($totalrm > $amount) {            
                 $this->db->set('payment_transaction_number', $transaction_number);
                 $this->db->set('payment_status', 'Partial');
                 $this->db->set('purchase_paid_date', date('Y-m-d'));
                 $this->db->set('purchase_paid_amount', "purchase_paid_amount+$amount", FALSE);
-                $this->db->where('id', $receipt_id);
+                $this->db->where('purchase_reciept_number', $receipt_number);
                 $this->db->update('cberp_purchase_receipts');
-                history_table_log('purchase_receipt_log','reciept_id',$receipt_id,'Payment Update');
+                // history_table_log('purchase_receipt_log','reciept_id',$receipt_id,'Payment Update');
                 //erp2024 06-01-2025 detailed history log starts
-                detailed_log_history('Purchasereceipt',$receipt_id,'Payment Update', $_POST['changedFields']);
+                detailed_log_history('Purchasereceipt',$receipt_number,'Payment Update', $_POST['changedFields']);
                 //erp2024 06-01-2025 detailed history log ends 
             } 
             else {            
@@ -516,11 +541,11 @@ class Transactions extends CI_Controller
                 $this->db->set('payment_status', 'Paid');
                 $this->db->set('purchase_paid_date', date('Y-m-d'));
                 $this->db->set('purchase_paid_amount', "purchase_paid_amount+$amount", FALSE);
-                $this->db->where('id', $receipt_id);
+                $this->db->where('purchase_reciept_number', $receipt_number);
                 $this->db->update('cberp_purchase_receipts');
-                history_table_log('purchase_receipt_log','reciept_id',$receipt_id,'Payment Update');
+                // history_table_log('purchase_receipt_log','reciept_id',$receipt_id,'Payment Update');
                 //erp2024 06-01-2025 detailed history log starts
-                detailed_log_history('Purchasereceipt',$receipt_id,'Payment Update', $_POST['changedFields']);
+                detailed_log_history('Purchasereceipt',$receipt_number,'Payment Update', $_POST['changedFields']);
                 //erp2024 06-01-2025 detailed history log ends 
             }
 
@@ -1013,14 +1038,15 @@ class Transactions extends CI_Controller
         //     exit('<h3>Sorry! You have insufficient permissions to access this section</h3>');
 
         // }
-        //transactions_ai
+        //cberp_payments
         $remaining_amount = 0;
         $invoice_numbers = $this->input->post('tid');         
         // $existing_transaction_number = get_payment_trans_number($invoice_numbers);
         // $transaction_number = ($existing_transaction_number) ? $existing_transaction_number :get_latest_trans_number();
         $transaction_number = get_latest_trans_number(); 
+        $receipt_number = $this->transactions->last_invoice_payment_receipt_number(); 
         $received_amount = rev_amountExchange_s($this->input->post('amount', true), 0, $this->aauth->get_user()->loc);          
-        $payment_recieved = $received_amount;
+        $payment_recieved = $received_amount; 
         $paydate = $this->input->post('paydate', true);
         $note = $this->input->post('shortnote', true);
         $pmethod = $this->input->post('pmethod', true);
@@ -1033,26 +1059,75 @@ class Transactions extends CI_Controller
         $invoice_type=$this->input->post('invoice_type');
         $customerid=$this->input->post('customerid');
 
-        $this->db->select('total,subtotal,invoice_number');
+        $this->db->select('grand_total as total,subtotal,invoice_number');
         $this->db->from('cberp_invoices');
         $this->db->where_in('invoice_number', $selectedInvoice_numbers);
         $query = $this->db->get();
         $result = $query->result_array();
-
-    
-
-        $this->db->set('payment_type', $pmethod);
-        $this->db->where_in('invoice_number', $selectedInvoice_numbers);
-        $this->db->update('cberp_invoices');
+        // $this->db->set('payment_type', $pmethod);
+        // $this->db->where_in('invoice_number', $selectedInvoice_numbers);
+        // $this->db->update('cberp_invoices');
 
         
-        $this->db->select('holder');
+        $this->db->select('holder,acn');
         $this->db->from('cberp_accounts');
         $this->db->where('id', $coa_account_id);
         $acc_query = $this->db->get();
         $account = $acc_query->row_array();
         $transaction_id = "";
         if(!empty($result)){
+            $postedchequeflg = 0;
+            
+            $data_payments = [
+                    'receipt_number' => $receipt_number,
+                    'transaction_number' => $transaction_number,
+                    'payment_amount' => $received_amount,
+                    'payment_method' => $pmethod,
+                    'chart_of_account_1' => $bank_account_id,                        
+                    'chart_of_account_2' => $coa_account_id,                        
+                    'note' => $note,                        
+                    'created_by' => $this->session->userdata('id'),
+                    'created_date' => date('Y-m-d H:i:s')
+            ];
+            $status = 'post dated cheque';
+            if($pmethod=="Cheque")
+            {
+                $dataai['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
+                $dataai['cheque_account_number'] = $this->input->post('cheque_account_number', true);
+                $dataai['cheque_number'] = $this->input->post('cheque_number', true);
+                $dataai['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
+                $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($dataai['cheque_date'])) ? 1 : 0;     
+
+                $data_payments['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
+                $data_payments['cheque_account_number'] = $this->input->post('cheque_account_number', true);
+                $data_payments['cheque_number'] = $this->input->post('cheque_number', true);
+                $data_payments['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
+                $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($data_payments['cheque_date'])) ? 1 : 0;     
+                        
+            }
+            else if($pmethod=="Card")
+            {
+                // $dataai['card_number'] = $this->input->post('card_number', true);
+                // $dataai['cvc'] = $this->input->post('cvc', true);
+                // $dataai['card_holder'] = $this->input->post('card_holder', true);
+                // $dataai['card_expiry_date'] = datefordatabase($this->input->post('card_expiry_date', true));
+            }
+            else if($pmethod=="Bank")
+            {
+                $dataai['account_bank_name'] = $this->input->post('account_bank_name', true);
+                $dataai['account_bank_address'] = $this->input->post('account_bank_address', true);
+                $dataai['account_number'] = $this->input->post('account_number', true);
+                $dataai['account_holder_name'] = $this->input->post('account_holder_name', true);
+                $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
+
+                $data_payments['account_bank_name'] = $this->input->post('account_bank_name', true);
+                $data_payments['account_bank_address'] = $this->input->post('account_bank_address', true);
+                $data_payments['account_number'] = $this->input->post('account_number', true);
+                $data_payments['account_holder_name'] = $this->input->post('account_holder_name', true);
+                $data_payments['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
+            }
+            else{}                   
+            $this->db->insert('cberp_invoice_payments', $data_payments); 
             $epsilon = 0.0001;
             foreach($result as $key=>$row)
             {
@@ -1136,44 +1211,20 @@ class Transactions extends CI_Controller
                             $this->db->update('cberp_customers');
                         }
                     }
-                    // #erp2024 new insertion for transactions_ai table payment_recieved_amount
+                    // #erp2024 new insertion for cberp_payments table payment_recieved_amount
                     $dataai = [];
                     
-                    $dataai['payer'] = $cname;
-                    $dataai['payerid'] = $cid;
+                    // $dataai['payer'] = $cname;
+                    // $dataai['payerid'] = $cid;
                     $dataai['note'] = $note;
                     $dataai['payment_method'] = $pmethod;
-                    $dataai['invoice_id']     = $row['invoice_number'];
+                    $dataai['invoice_number'] = $row['invoice_number'];
                     $dataai['amount']         = $received_amount;
                     $dataai['transfered_account_id'] = $coa_account_id;
-                    $dataai['transfered_account_name'] = $account['holder'];
-                    $postedchequeflg = 0;
-                    $status = 'post dated cheque';
-                    if($pmethod=="Cheque")
-                    {
-                        $dataai['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
-                        $dataai['cheque_account_number'] = $this->input->post('cheque_account_number', true);
-                        $dataai['cheque_number'] = $this->input->post('cheque_number', true);
-                        $dataai['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
-                        $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($dataai['cheque_date'])) ? 1 : 0;     
-                               
-                    }
-                    else if($pmethod=="Card")
-                    {
-                        $dataai['card_number'] = $this->input->post('card_number', true);
-                        $dataai['cvc'] = $this->input->post('cvc', true);
-                        $dataai['card_holder'] = $this->input->post('card_holder', true);
-                        $dataai['card_expiry_date'] = datefordatabase($this->input->post('card_expiry_date', true));
-                    }
-                    else if($pmethod=="Bank")
-                    {
-                        $dataai['account_bank_name'] = $this->input->post('account_bank_name', true);
-                        $dataai['account_bank_address'] = $this->input->post('account_bank_address', true);
-                        $dataai['account_number'] = $this->input->post('account_number', true);
-                        $dataai['account_holder_name'] = $this->input->post('account_holder_name', true);
-                        $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
-                    }
-                    else{}
+                    // $dataai['transfered_account_name'] = $account['holder'];
+
+                   
+
                     $data = array(
                         'acid' => $coa_account_id,
                         // 'account' => $account['holder'],
@@ -1197,7 +1248,7 @@ class Transactions extends CI_Controller
                         
                         // $this->db->delete('cberp_transactions',['transaction_number'=> $transaction_number]); 
                         // $this->db->delete('cberp_bank_transactions',['from_trans_number'=> $transaction_number]); 
-                        $this->db->select('total,customer_id,payment_recieved_amount');
+                        $this->db->select('grand_total as total,customer_id,paid_amount as payment_recieved_amount');
                         $this->db->from('cberp_invoices');
                         $this->db->where('invoice_number', $row['invoice_number']);
                         $query = $this->db->get();
@@ -1238,6 +1289,7 @@ class Transactions extends CI_Controller
 
                             update_customer_credit($cid, $paid_amount,$cust_avalable_credit_limit);
                             update_invoice($invoice_numbers, $pmethod,  $balance_amount_to_pay, $payment_status);
+                             $this->db->insert('cberp_invoice_payments_details', ['receipt_number'=>$receipt_number,'invoice_number'=>$row['invoice_number'],'paid_amount'=>$paid_amount]); 
                             insert_payment_transaction_link($invoice_number, $transaction_number, $bank_tansaction_number);
 
                         } else {
@@ -1259,24 +1311,28 @@ class Transactions extends CI_Controller
                                 history_table_with_foreginkey_log('cberp_invoice_payment_log','payment_id',$this->db->insert_id(),'invoice_id',$invoice_numbers,'Create');
                                 update_customer_credit($cid, $received_amount,$cust_avalable_credit_limit);
                                 update_invoice($invoice_numbers, $pmethod, $paid_amount, $payment_status);
+                                
+                                 $this->db->insert('cberp_invoice_payments_details', ['receipt_number'=>$receipt_number,'invoice_number'=>$row['invoice_number'],'paid_amount'=>$received_amount]); 
                                 insert_payment_transaction_link($invoice_number, $transaction_number, $bank_tansaction_number);
                             }
                             $received_amount = 0; 
                         }
 
-                        $dataai['trans_num'] = $transaction_number;
-                        $this->db->insert('transactions_ai', $dataai);
-                        $logdata = array(
-                            'invoice_number' => $row['invoice_number'],
-                            'transaction_id' => $transaction_number,
-                            'transactionai_id' => $this->db->insert_id(),
-                            'created_by' => $this->session->userdata('id'),
-                            'created_date' => date('Y-m-d'),
-                            'created_time' => date('H:i:s'),
-                            'ip_address'=> $this->getClientIpAddress(),
-                            'payment_status'=> $status,
-                        );
-                        $this->db->insert('invoice_payment_log_ai', $logdata);
+                        // $dataai['transaction_number'] = $transaction_number;
+                        // $this->db->insert('cberp_payments', $dataai);
+
+                        // die($this->db->last_query());
+                        // $logdata = array(
+                        //     'invoice_number' => $row['invoice_number'],
+                        //     'transaction_id' => $transaction_number,
+                        //     'transactionai_id' => $this->db->insert_id(),
+                        //     'created_by' => $this->session->userdata('id'),
+                        //     'created_date' => date('Y-m-d'),
+                        //     'created_time' => date('H:i:s'),
+                        //     'ip_address'=> $this->getClientIpAddress(),
+                        //     'payment_status'=> $status,
+                        // );
+                        // $this->db->insert('invoice_payment_log_ai', $logdata);
                         
                     }
                     else{
@@ -1630,7 +1686,7 @@ class Transactions extends CI_Controller
                             $this->db->update('cberp_customers');
                         }
                     }
-                    // #erp2024 new insertion for transactions_ai table
+                    // #erp2024 new insertion for cberp_payments table
                     $nullupdate = [
                         'card_number' => NULL,
                         'cvc' => NULL,
@@ -1753,8 +1809,8 @@ class Transactions extends CI_Controller
 
                         update_customer_credit($cid, $received_amount,$cust_avalable_credit_limit);
                         $dataai['trans_num'] = $transaction_number;
-                        $this->db->update('transactions_ai', $nullupdate,['id'=>$trans_ai_id]);
-                        $this->db->update('transactions_ai', $dataai,['id'=>$trans_ai_id]);
+                        $this->db->update('cberp_payments', $nullupdate,['id'=>$trans_ai_id]);
+                        $this->db->update('cberp_payments', $dataai,['id'=>$trans_ai_id]);
 
                         $logdata = array(
                             'invoiceid' => $row['id'],
@@ -1983,7 +2039,7 @@ class Transactions extends CI_Controller
                             $this->db->update('cberp_customers');
                         }
                     }
-                    // #erp2024 new insertion for transactions_ai table
+                    // #erp2024 new insertion for cberp_payments table
                     $nullupdate = [
                         'card_number' => NULL,
                         'cvc' => NULL,
@@ -2065,8 +2121,8 @@ class Transactions extends CI_Controller
                         if($received_amount > 0)
                         {
                             $dataai['trans_num'] = $transaction_number;
-                            $this->db->update('transactions_ai', $nullupdate,['id'=>$trans_ai_id]);
-                            $this->db->update('transactions_ai', $dataai,['id'=>$trans_ai_id]);
+                            $this->db->update('cberp_payments', $nullupdate,['id'=>$trans_ai_id]);
+                            $this->db->update('cberp_payments', $dataai,['id'=>$trans_ai_id]);
                             $logdata = array(
                                 'invoiceid' => $row['id'],
                                 'transaction_id' => $transaction_number,
@@ -2266,7 +2322,7 @@ class Transactions extends CI_Controller
         // $query = $this->db->get();
         // $account = $query->row_array();
 
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $nullupdate = [
             'card_number' => NULL,
             'cvc' => NULL,
@@ -2319,7 +2375,7 @@ class Transactions extends CI_Controller
             $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
         }
         else{}
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $this->db->select('order_total,customer_id,paid_amount');
         $this->db->from('cberp_purchase_orders');
         $this->db->where('id', $tid);
@@ -2422,8 +2478,8 @@ class Transactions extends CI_Controller
 
 
             $dataai['trans_num'] = $transaction_number;
-            $this->db->update('transactions_ai', $nullupdate,['id'=>$trans_ai_id]);
-            $this->db->update('transactions_ai', $dataai,['id'=>$trans_ai_id]);
+            $this->db->update('cberp_payments', $nullupdate,['id'=>$trans_ai_id]);
+            $this->db->update('cberp_payments', $dataai,['id'=>$trans_ai_id]);
                 
             $this->db->set('payment_status', ucfirst($status));
             $this->db->set('purchase_paid_date', date('Y-m-d'));
@@ -2481,7 +2537,7 @@ class Transactions extends CI_Controller
         $totaldueamt = $this->input->post('totaldueamt', true);
         $totalinvoiceamount = $this->input->post('totalinvoiceamount', true);
         $paid_amount = $this->input->post('paid_amount', true);
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $nullupdate = [
             'card_number' => NULL,
             'cvc' => NULL,
@@ -2535,7 +2591,7 @@ class Transactions extends CI_Controller
             $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
         }
         else{}
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
    
         $this->db->select('claim_total as bill_amount, payment_recieved_amount');
         $this->db->from('cberp_expense_claims'); 
@@ -2627,8 +2683,8 @@ class Transactions extends CI_Controller
    
    
             $dataai['trans_num'] = $transaction_number;
-            $this->db->update('transactions_ai', $nullupdate,['id'=>$trans_ai_id]);
-            $this->db->update('transactions_ai', $dataai,['id'=>$trans_ai_id]);
+            $this->db->update('cberp_payments', $nullupdate,['id'=>$trans_ai_id]);
+            $this->db->update('cberp_payments', $dataai,['id'=>$trans_ai_id]);
 
             $this->db->set('payment_status', $status);
             $this->db->set('payment_recieved_date', date('Y-m-d'));
@@ -2668,7 +2724,7 @@ class Transactions extends CI_Controller
         $query = $this->db->get();
         $account = $query->row_array();
    
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $dataai = [];
                     
         $dataai['payer'] = $cname;
@@ -2707,7 +2763,7 @@ class Transactions extends CI_Controller
             $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
         }
         else{}
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
    
         $this->db->select('claim_total as bill_amount, payment_recieved_amount');
         $this->db->from('cberp_expense_claims'); 
@@ -2780,7 +2836,7 @@ class Transactions extends CI_Controller
    
    
             $dataai['trans_num'] = $transaction_number;
-            $this->db->insert('transactions_ai', $dataai);
+            $this->db->insert('cberp_payments', $dataai);
             
             if ($totalrm > $amount) {            
                 // $this->db->set('payment_transaction_number', $transaction_number);
@@ -2818,14 +2874,14 @@ class Transactions extends CI_Controller
         //     exit('<h3>Sorry! You have insufficient permissions to access this section</h3>');
 
         // } $note
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $remaining_amount = 0;
         $invoice_retutn_number = $this->input->post('invoice_retutn_number');  
         $shortnote = $this->input->post('shortnote');   
         $return_number = $this->input->post('return_number');   
-        
+        $receipt_number = $this->transactions->last_invoice_return_receipt_number(); 
         
 
         $transaction_number =  get_latest_trans_number(); 
@@ -2844,27 +2900,44 @@ class Transactions extends CI_Controller
 
         $paydate = datefordatabase($paydate);
         $invoice_number = $this->input->post('inv_id');   
-        
+        $transok = true;
+        $this->load->library("Common");
+        $this->db->trans_start();
         $dataai = [];
                     
         $dataai['payer'] = $cname;
         $dataai['payerid'] = $cid;
         $dataai['note'] = $shortnote;
         $dataai['payment_method'] = $pmethod;
-        $dataai['invoice_id']     = $invoice_number;
+        $dataai['invoice_number']     = $invoice_number;
         $dataai['amount']         = $received_amount;
         $dataai['transfered_account_id'] = $coa_account_id;
         $dataai['record_from'] = 'Invoice Return';
         $dataai['note'] = $shortnote;
         $postedchequeflg = 0;
-        $status = 'post dated cheque';
+        $status = 'post dated cheque';        
+        $data_payments = [
+            'receipt_number' => $receipt_number,
+            'transaction_number' => $transaction_number,
+            'payment_amount' => $received_amount,
+            'payment_method' => $pmethod,
+            'chart_of_account_1' => $bank_account_id,                        
+            'chart_of_account_2' => $coa_account_id,                        
+            'note' => $shortnote,                        
+            'created_by' => $this->session->userdata('id'),
+            'created_date' => date('Y-m-d H:i:s')
+        ];
         if($pmethod=="Cheque")
         {
             $dataai['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
             $dataai['cheque_account_number'] = $this->input->post('cheque_account_number', true);
             $dataai['cheque_number'] = $this->input->post('cheque_number', true);
             $dataai['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
-            $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($dataai['cheque_date'])) ? 1 : 0;     
+            $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($dataai['cheque_date'])) ? 1 : 0;    
+            $data_payments['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
+            $data_payments['cheque_account_number'] = $this->input->post('cheque_account_number', true);
+            $data_payments['cheque_number'] = $this->input->post('cheque_number', true);
+            $data_payments['cheque_date'] = datefordatabase($this->input->post('cheque_date', true)); 
                 
         }
         else if($pmethod=="Card")
@@ -2881,8 +2954,21 @@ class Transactions extends CI_Controller
             $dataai['account_number'] = $this->input->post('account_number', true);
             $dataai['account_holder_name'] = $this->input->post('account_holder_name', true);
             $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
+
+            $data_payments['account_bank_name'] = $this->input->post('account_bank_name', true);
+            $data_payments['account_bank_address'] = $this->input->post('account_bank_address', true);
+            $data_payments['account_number'] = $this->input->post('account_number', true);
+            $data_payments['account_holder_name'] = $this->input->post('account_holder_name', true);
+            $data_payments['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
         }
         else{}
+         $this->db->insert('cberp_invoice_return_payments', $data_payments);
+          $data_payment_details = [
+            'receipt_number' => $receipt_number,
+            'paid_amount' => $received_amount,
+            'invoice_reurn_number' => $invoice_retutn_number
+        ];
+        $this->db->insert('cberp_invoice_return_payments_details', $data_payment_details);
         $data = array(
             'acid' => $coa_account_id,
             'type' => 'Asset',
@@ -2896,10 +2982,8 @@ class Transactions extends CI_Controller
             // 'tid' => $invoice_retutn_number,
             'loc' => $this->aauth->get_user()->loc,
         );
-        $dataai['trans_num'] = $transaction_number;
-
-
-        $this->db->insert('transactions_ai', $dataai);
+        // $dataai['transaction_number'] = $transaction_number;
+        // $this->db->insert('cberp_payments', $dataai);
 
         
         $this->db->update('cberp_stock_returns',['payment_status'=>'Paid','payment_recieved_amount'=>$received_amount,'payment_recieved_date'=>date('Y-m-d H:i:s')],['invoice_retutn_number'=>$invoice_retutn_number]);
@@ -2934,6 +3018,11 @@ class Transactions extends CI_Controller
         // ========================================================================
         $response = array('status' => 'Success', 'message' => $this->lang->line('Transaction has been added'));
         echo json_encode($response);
+        if ($transok) {
+            $this->db->trans_complete();
+        } else {
+            $this->db->trans_rollback();
+        }
         
     }
     public function invoice_return_payment_edit(){
@@ -2948,7 +3037,7 @@ class Transactions extends CI_Controller
         $returnid = $this->input->post('tid');   
         $notes = $this->input->post('notes');   
         $return_number = $this->input->post('return_number');   
-        
+        $receipt_number = $this->transactions->last_invoice_return_receipt_number(); 
         
         $transaction_number = $this->input->post('transcation_number');
         $bank_transaction_number = $this->input->post('banktransaction_number');
@@ -2984,7 +3073,12 @@ class Transactions extends CI_Controller
             $dataai['cheque_account_number'] = $this->input->post('cheque_account_number', true);
             $dataai['cheque_number'] = $this->input->post('cheque_number', true);
             $dataai['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
-            $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($dataai['cheque_date'])) ? 1 : 0;     
+            $postedchequeflg = (strtotime(date('Y-m-d')) < strtotime($dataai['cheque_date'])) ? 1 : 0;   
+
+            // $data_payments['cheque_pay_from'] = $this->input->post('cheque_pay_from', true);
+            // $data_payments['cheque_account_number'] = $this->input->post('cheque_account_number', true);
+            // $data_payments['cheque_number'] = $this->input->post('cheque_number', true);
+            // $data_payments['cheque_date'] = datefordatabase($this->input->post('cheque_date', true));
                 
         }
         else if($pmethod=="Card")
@@ -3001,8 +3095,15 @@ class Transactions extends CI_Controller
             $dataai['account_number'] = $this->input->post('account_number', true);
             $dataai['account_holder_name'] = $this->input->post('account_holder_name', true);
             $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
+
+            // $data_payments['account_bank_name'] = $this->input->post('account_bank_name', true);
+            // $data_payments['account_bank_address'] = $this->input->post('account_bank_address', true);
+            // $data_payments['account_number'] = $this->input->post('account_number', true);
+            // $data_payments['account_holder_name'] = $this->input->post('account_holder_name', true);
+            // $data_payments['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
         }
         else{}
+        
         $data = array(
             'acid' => $coa_account_id,
             'type' => 'Asset',
@@ -3025,7 +3126,7 @@ class Transactions extends CI_Controller
         $bank_account_id_old = $this->input->post('bank_account_old', true);
 
         $this->db->delete('cberp_transactions', ['transaction_number'=>$transaction_number]);
-        $this->db->update('transactions_ai', $dataai,['transaction_number'=>$transaction_number]);
+        $this->db->update('cberp_payments', $dataai,['transaction_number'=>$transaction_number]);
 
         $this->db->update('cberp_stock_returns',['payment_status'=>'Paid',],['id'=>$returnid]);
         insert_return_transaction('debit', 'Invoice Return', $received_amount, $coa_account_id, $transaction_number);
@@ -3099,7 +3200,7 @@ class Transactions extends CI_Controller
         $query = $this->db->get();
         $account = $query->row_array();
 
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $dataai = [];
                     
         $dataai['payer'] = $cname;
@@ -3138,7 +3239,7 @@ class Transactions extends CI_Controller
             $dataai['account_ifsc_code'] = $this->input->post('account_ifsc_code', true);
         }
         else{}
-        // #erp2024 01-10-2024 new insertion for transactions_ai table
+        // #erp2024 01-10-2024 new insertion for cberp_payments table
         $this->db->select('total,supplier_id,payment_recieved_amount');
         $this->db->from('cberp_purchase_reciept_returns');
         $this->db->where('receipt_return_number', $receipt_return_number);
@@ -3210,7 +3311,7 @@ class Transactions extends CI_Controller
 
 
             $dataai['trans_num'] = $transaction_number;
-            $this->db->insert('transactions_ai', $dataai);
+            $this->db->insert('cberp_payments', $dataai);
             
             if ($totalrm > $amount) {            
                 // $this->db->set('payment_transaction_number', $transaction_number);

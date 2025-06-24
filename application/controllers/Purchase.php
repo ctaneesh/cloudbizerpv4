@@ -55,9 +55,8 @@ class Purchase extends CI_Controller
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
-        $data['your_approval_level'] =  linked_user_module_approvals_by_module_number($module_number,$this->session->userdata('id'));
-        $data['approval_level_users'] =  linked_user_module_approvals_by_module_number($module_number);
-        // print_r($data['your_approval_level']); die();
+        $data['your_approval_level'] =  linked_user_module_approvals_by_module_number($this->module_number,$this->session->userdata('id'));
+        $data['approval_level_users'] =  linked_user_module_approvals_by_module_number($this->module_number);
        
         $data['lastinvoice'] = $this->purchase->lastpurchase();
         $data['permissions'] = load_permissions('Stock','Purchase Order','New Order');
@@ -202,9 +201,9 @@ class Purchase extends CI_Controller
     //action
     public function action()
     {
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
        
 
         $currency = $this->input->post('mcurrency');
@@ -263,10 +262,10 @@ class Purchase extends CI_Controller
         //Invoice Data purchase_number store_id
         $bill_date = datefordatabase($purchase_order_date);
         $bill_due_date = datefordatabase($duedate);
-        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $order_total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $payment_terms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'));
+        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $order_total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $payment_terms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'));
         $this->session->unset_userdata('selectedValues');
 
-        //erp2024 find amout limit 19-07-2024 /////////////////////////////////////////
+        //erp2024 find amout limit 19-07-2024 ///////////////////////////////////////// discstatus
         $amount_limit = $this->authorizationapproval->amount_limit($this->session->userdata('id'));
         $history =[];
         if($this->input->post('completed_status')=='1'){
@@ -423,8 +422,7 @@ class Purchase extends CI_Controller
                         'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
                         'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
                         'totaldiscount' => numberClean($product_discount[$key]),
-                        'account_code' => $account_code[$key],
-                        'unit' => $product_unit[$key]
+                        'account_code' => $account_code[$key]
                     );
 
                     $code = trim($product_hsn[$key]);     
@@ -589,8 +587,7 @@ class Purchase extends CI_Controller
                             'discount' => numberClean($product_discount[$key]),                            
                             'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
                             'totaldiscount' => numberClean($product_discount[$key]),
-                            'account_code' => $account_code[$key],
-                            'unit' => $product_unit[$key],
+                            'account_code' => $account_code[$key]
                             
                         );
         
@@ -725,7 +722,7 @@ class Purchase extends CI_Controller
         //Invoice Data
         $bill_date = datefordatabase($purchase_order_date);
         $bill_due_date = datefordatabase($invocieduedate);
-        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'),'assigned_to'=>$this->input->post('employee'));
+        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'),'assigned_to'=>$this->input->post('employee'));
         $this->session->unset_userdata('selectedValues');
 
         $data['purchase_number'] = $this->input->post('purchase_number');
@@ -737,7 +734,7 @@ class Purchase extends CI_Controller
         //////////////////////////////////////////////////////////////////////////////////
         $qtid = $this->purchase->check_quote_existornot($data['purchase_number']);        
         // $this->db->delete('cberp_purchase_order_items', array('tid' => $qtid)); 
-        if($qtid > 0)
+        if($qtid)
         {
             $changedProducts = [];
             $wholeProducts = [];            
@@ -870,7 +867,7 @@ class Purchase extends CI_Controller
            {
                upload_files($_FILES['upfile'], 'Purchaseorder',$purchase_number);
            }
-        // file upload section ends 22-01-2025
+            // file upload section ends 22-01-2025
             $pid = $this->input->post('pid');
             $productlist = array();
             $prodindex = 0;
@@ -889,8 +886,6 @@ class Purchase extends CI_Controller
             $product_unit = $this->input->post('unit');
             $product_hsn = $this->input->post('hsn');
             $account_code = $this->input->post('expense_account_number');
-
-           
             foreach ($pid as $key => $value) {
                 if(!empty($product_id[$key]) && !empty($product_name1[$key]) && $product_qty[$key]>0)
                 {
@@ -910,7 +905,6 @@ class Purchase extends CI_Controller
                         'totaldiscount' => numberClean($product_discount[$key]),
                         // 'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
                         'account_code' => $account_code[$key],
-                        'unit' => $product_unit[$key],
                         'purchase_number' => $purchase_number
                     );
 
@@ -1041,7 +1035,7 @@ class Purchase extends CI_Controller
         //Invoice Data
         $bill_date = datefordatabase($invoicedate);
         $bill_due_date = datefordatabase($invocieduedate);
-        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'),'approved_by'=>$this->session->userdata('id'),'approved_date'=>date('Y-m-d H:i:s'),'assigned_to'=>$this->input->post('employee'));
+        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'),'assigned_to'=>$this->input->post('employee'));
         $this->session->unset_userdata('selectedValues');
        
         //erp2024 find amout limit 19-07-2024 /////////////////////////////////////////
@@ -1144,7 +1138,7 @@ class Purchase extends CI_Controller
                     'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
                     'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
                     'account_code' => $account_code[$key],
-                    'unit' => $product_unit[$key],
+                    // 'unit' => $product_unit[$key],
                     'purchase_number' => $purchase_number,
                 );
                 $code = trim($product_hsn[$key]);
@@ -1205,15 +1199,15 @@ class Purchase extends CI_Controller
             $prodindex++;
             $amt = numberClean($product_qty[$key]);
 
-            if ($product_id[$key] > 0) {
-                if ($this->input->post('update_stock') == 'yes') {
+            // if ($product_id[$key] > 0) {
+            //     if ($this->input->post('update_stock') == 'yes') {
 
-                    $this->db->set('qty', "qty+$amt", FALSE);
-                    $this->db->where('pid', $product_id[$key]);
-                    $this->db->update('cberp_products');
-                }
-                $itc += $amt;
-            }
+            //         $this->db->set('qty', "qty+$amt", FALSE);
+            //         $this->db->where('pid', $product_id[$key]);
+            //         $this->db->update('cberp_products');
+            //     }
+            //     $itc += $amt;
+            // }
 
         }
 
@@ -1303,7 +1297,7 @@ class Purchase extends CI_Controller
                     $actionbtn = '<a href="' . base_url("purchase/create?id=$invoices->purchase_number") . '" title="Approve Now" class="btn btn-sm btn-secondary"><i class="fa fa-edit"></i></a>&nbsp;<a href="' . base_url("purchase/create?id=$invoices->purchase_number") . '" title="Approve Now" class="btn btn-sm btn-secondary">Ready To Send</a>';
                     break;
                 case ($invoices->order_status == "Sent"):
-                    $validtoken = hash_hmac('ripemd160', 'p' . $invoices->id, $this->config->item('encryption_key'));
+                    $validtoken = hash_hmac('ripemd160', 'p' . $invoices->purchase_number, $this->config->item('encryption_key'));
                     $approvstatus = '<span class="st-approved">' . $this->lang->line('Approved') . '</span>';
                     $actionbtn = '<a href="' . base_url("purchase/create?id=$invoices->purchase_number") . '" title="Approve Now" class="btn btn-sm btn-secondary"><i class="fa fa-edit"></i></a>&nbsp;<a href="' . base_url("Invoices/costing?pid=$invoices->purchase_number&token=$validtoken") . '" title="Purchase Receipt" class="btn btn-sm btn-secondary">Purchase Receipt</a>';
                     break;
@@ -1343,12 +1337,12 @@ class Purchase extends CI_Controller
             else if($invoices->receipt_status=="2"){ $receipt_status =  '<span class="st-partial">' . $this->lang->line(ucwords("Partial")) . '</span>'; }
             $row[] = $receipt_status;
             
-            $validtoken = hash_hmac('ripemd160', 'p' . $invoices->id, $this->config->item('encryption_key'));
-            $link = base_url('billing/printorder?id=' . $invoices->id . '&token=' . $validtoken);
+            $validtoken = hash_hmac('ripemd160', 'p' . $invoices->purchase_number, $this->config->item('encryption_key'));
+            $link = base_url('billing/printorder?id=' . $invoices->purchase_number . '&token=' . $validtoken);
             
-            // $row[] = '<a href="' . base_url("purchase/view?id=$invoices->id") . '" class="btn btn-sm btn-success"><i class="fa fa-eye"></i></a> <a href="#" data-object-id="' . $invoices->id . '" class="btn btn-danger btn-sm delete-object"><span class="fa fa-trash"></span></a>';
+            // $row[] = '<a href="' . base_url("purchase/view?id=$invoices->purchase_number") . '" class="btn btn-sm btn-success"><i class="fa fa-eye"></i></a> <a href="#" data-object-id="' . $invoices->purchase_number . '" class="btn btn-danger btn-sm delete-object"><span class="fa fa-trash"></span></a>';
             
-            // $row[] = '<a href="' . $link .'" class="btn btn-sm btn-secondary"  title="Print" target="_blank"><span class="fa fa-print"></span></a> <a href="#" data-object-id="' . $invoices->id . '" class="btn btn-secondary btn-sm delete-object" title="Delete"><span class="fa fa-trash"></span></a>';
+            // $row[] = '<a href="' . $link .'" class="btn btn-sm btn-secondary"  title="Print" target="_blank"><span class="fa fa-print"></span></a> <a href="#" data-object-id="' . $invoices->purchase_number . '" class="btn btn-secondary btn-sm delete-object" title="Delete"><span class="fa fa-trash"></span></a>';
 
             // $row[] = '<a href="' . $link .'" class="btn btn-sm btn-secondary"  title="Print" target="_blank"><span class="fa fa-print"></span></a>';
             $row[] = $actionbtn;
@@ -1593,7 +1587,7 @@ class Purchase extends CI_Controller
         $total_tax = rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc);
         
         
-        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount' => $total_discount, 'tax' => $total_tax, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'tax_status' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'multi' => $currency, 'purchase_type'=>$purchase_type, 'currency_id'=>$currency_id, 'approval_flag'=> $approval_flag);
+        $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount' => $total_discount, 'tax' => $total_tax, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'multi' => $currency, 'purchase_type'=>$purchase_type, 'currency_id'=>$currency_id, 'approval_flag'=> $approval_flag);
         $this->db->set($data);
         $this->db->where('id', $invocieno);
 
@@ -1870,7 +1864,7 @@ class Purchase extends CI_Controller
             $total_tax = rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc);
             
             
-            $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date,  'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount' => $total_discount, 'tax' => $total_tax, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'tax_status' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'multi' => $currency, 'purchase_type'=>$purchase_type, 'currency_id'=>$currency_id, 'approval_flag'=> $approval_flag);
+            $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date,  'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount' => $total_discount, 'tax' => $total_tax, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'multi' => $currency, 'purchase_type'=>$purchase_type, 'currency_id'=>$currency_id, 'approval_flag'=> $approval_flag);
             $this->db->set($data);
             $this->db->where('id', $invocieno);
 
@@ -1894,9 +1888,9 @@ class Purchase extends CI_Controller
     }
     public function send_po_action()
     {
-    //    ini_set('display_errors', 1);
-    //    ini_set('display_startup_errors', 1);
-    //    error_reporting(E_ALL);
+        //    ini_set('display_errors', 1);
+        //    ini_set('display_startup_errors', 1);
+        //    error_reporting(E_ALL);
         $changedProducts = [];
         $wholeProducts = [];            
         if (!empty($this->input->post('changedProducts'))) {
@@ -1990,7 +1984,7 @@ class Purchase extends CI_Controller
         }
         else{            
             $this->db->insert('authorization_history', $authdata);
-            $data_new = array('purchase_number' => $purchase_number, 'purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'));
+            $data_new = array('purchase_number' => $purchase_number, 'purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $this->aauth->get_user()->id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'loc' => $this->aauth->get_user()->loc, 'multi' => $currency, 'currency_id'=>$currency_id, 'purchase_type'=>$purchase_type, 'store_id'=>$store_id,'customer_reference' => $this->input->post('customer_reference_number'),'customer_contact_person' => $this->input->post('customer_contact_person'),'customer_contact_number' =>  $this->input->post('customer_contact_number'),'customer_contact_email' => $this->input->post('customer_contact_email'));
 
             $data_new["order_status"] = 'Sent';
             $data_new["sent_by"] = 'Sent';
@@ -2004,7 +1998,7 @@ class Purchase extends CI_Controller
             $data_new['created_date']   = date('Y-m-d H:i:s');
             $this->db->insert('cberp_purchase_orders', $data_new);
 
-            $invocieno = $this->db->insert_id();  
+            // $invocieno = $this->db->insert_id();  
             $authdata['function_type'] = 'Purchase Order';
             $authdata['function_id'] = $purchase_number;
             $authdata['requested_by'] = $this->session->userdata('id');
@@ -2081,7 +2075,7 @@ class Purchase extends CI_Controller
                     'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
                     'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
                     'account_code' => $account_code[$key],
-                    'unit' => $product_unit[$key],
+                    // 'unit' => $product_unit[$key],
                     'purchase_number' => $purchase_number,
                 );
 
@@ -2102,12 +2096,12 @@ class Purchase extends CI_Controller
                 $amt = numberClean($product_qty[$key]);
                 $itc += $amt;
 
-                if ($this->input->post('update_stock') == 'yes') {
-                    $amt = numberClean(@$product_qty[$key]) - numberClean(@$old_product_qty[$key]);
-                    $this->db->set('qty', "qty+$amt", FALSE);
-                    $this->db->where('pid', $product_id[$key]);
-                    $this->db->update('cberp_products');
-                }
+                // if ($this->input->post('update_stock') == 'yes') {
+                //     $amt = numberClean(@$product_qty[$key]) - numberClean(@$old_product_qty[$key]);
+                //     $this->db->set('qty', "qty+$amt", FALSE);
+                //     $this->db->where('pid', $product_id[$key]);
+                //     $this->db->update('cberp_products');
+                // }
                 $flag = true;
             }
 
@@ -2117,7 +2111,7 @@ class Purchase extends CI_Controller
             $total_tax = rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc);
             
            
-            $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount' => $total_discount, 'tax' => $total_tax, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'tax_status' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'multi' => $currency, 'purchase_type'=>$purchase_type, 'currency_id'=>$currency_id, 'approval_flag'=> 1,'sent_by' => $this->session->userdata('id'),'sent_date'=>date('Y-m-d H:i:s'),'order_status'=>'Sent','approved_by'=> $this->session->userdata('id'),'approved_date'=>date('Y-m-d H:i:s'),'assigned_to'=> $this->session->userdata('id'));
+            $data = array('purchase_order_date' => $bill_date, 'duedate' => $bill_due_date, 'shipping_charge' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount' => $total_discount, 'tax' => $total_tax, 'order_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'internal_reference' => $internal_reference, 'payment_terms' => $pterms, 'multi' => $currency, 'purchase_type'=>$purchase_type, 'currency_id'=>$currency_id, 'approval_flag'=> 1,'sent_by' => $this->session->userdata('id'),'sent_date'=>date('Y-m-d H:i:s'),'order_status'=>'Sent','assigned_to'=> $this->session->userdata('id'));
             $this->db->set($data);
             $this->db->where('purchase_number', $purchase_number);
             if ($flag) {
@@ -2207,7 +2201,6 @@ class Purchase extends CI_Controller
         $purchase_reciept_number = $this->input->get('id');
         $customerid = $this->input->get('customer_id');
         $data['invoice'] = $this->purchase->purchase_receipt_data($purchase_reciept_number);
-
         $this->load->model('accounts_model');
         $data['accountheaders'] = $this->accounts_model->load_coa_account_headers();
         $data['accounttypes'] = $this->accounts_model->load_coa_account_types();

@@ -1866,7 +1866,7 @@ class Products extends CI_Controller
     public function product_details()
     {
         $pid = $this->input->post('product_id');
-        $data = $this->products->get_product_details($pid);
+        $data = $this->products->product_details_for_item($pid);
         echo json_encode(array('status' => 'Success', 'data'=>$data));
 
     }
@@ -2177,6 +2177,110 @@ class Products extends CI_Controller
         }
         
         echo json_encode(array('status' => 'Success','data'=>$result));
+        // Output the response (You can process it further depending on the API response)
+        // echo $response;
+        die();
+    }
+
+
+    public function applogin()
+    {
+        // Get data from the POST request (you can pass these values from the form or URL)
+        // $actual_price = $this->input->post('product_price');
+        // $product_id = $this->input->post('product_id');
+        
+        // Prepare the URL with GET parameters
+        $url = "https://cloudbizerp.com/devapp4/api/login";
+
+        // Set your Basic Auth username and password
+        $username = 'Superadmin';  // Replace with your actual username
+        $password = 'AIAdmin123';  // Replace with your actual password
+
+        // Initialize cURL session
+        // $ch = curl_init();
+
+        // Set cURL options
+        $postData = [
+            'email'    => 'purchase@cloudbizerp.com',
+            'password' => 'Purchase@2025'
+        ];
+    
+        $curl= new Curl();
+
+                // $curl = curl_init(); // initialize curl
+	
+			curl_setopt($curl, CURLOPT_POST, 1);
+			
+			//curl_setopt($curl, CURLOPT_POSTFIELDS, "newdata=$data");
+			
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $postData);
+		
+			curl_setopt($curl, CURLOPT_URL, "$url");
+			
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	
+			$result = curl_exec($curl);//Curl execution 
+		
+			//echo 'error:' . curl_error($curl);
+			
+			curl_close($curl);//Close curl
+			
+			print_r($result);
+
+
+        die();
+        /**********************
+         * 
+         * 
+         * 
+         */
+        // $webservice_url=ws_url.'category/main';// Web service url
+            
+        // 	$jasoncode=json_encode($product_category);//encode order status array to json 
+            
+            
+        // 	if($flag==1)
+        // 	{
+        // 		$output['input']=$product_category;
+        // 	}
+		
+		//$formated=urlencode($jasoncode);// encoding for passing
+		
+		// $compressed=gzdeflate($jasoncode, 9);
+		
+		// $curl= new Curl();//Creating object for Curl class
+		
+		// $result =$curl->webservice($compressed,$webservice_url);//Function call for curl webserice
+
+	    // $result=json_decode($result);
+    // Set cURL options for POST
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
+        // Set Basic Authentication header
+        curl_setopt($ch, CURLOPT_USERPWD, "$username:$password"); // Basic auth credentials
+
+        // Execute the cURL request and get the response
+        $response = curl_exec($ch);
+
+        // Check if there was an error with the cURL request
+        if (curl_errno($ch)) {
+            echo 'cURL Error: ' . curl_error($ch);
+        }
+
+        // Close the cURL session
+        curl_close($ch);
+        // Decode the JSON response into a PHP array
+        $data = json_decode($response, true); // 'true' converts the JSON into an associative array
+
+        // Check if the 'Prediction' key exists in the response
+        // if (isset($data['Prediction'])) {
+        //     $prediction = $data['Prediction'][0]; // Get the first value from the Prediction array
+        //     $result = "Predicted Price: " . $prediction;  // Output the predicted price
+        // } else {  
+        //     $result = 'Prediction data for this product is not available.<br> <a href="' . base_url() . 'products/add?code=DOL647866">Click on DOL647866 to view the predicted price</a>';
+        // }
+        
+        // echo json_encode(array('status' => 'Success','data'=>$result));
         // Output the response (You can process it further depending on the API response)
         // echo $response;
         die();

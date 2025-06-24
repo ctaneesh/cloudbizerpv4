@@ -28,8 +28,7 @@
 
                 <div class="form-group row">
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                        <label class="col-form-label"
-                            for="product_catname"><?php echo $this->lang->line('Brand Name') ?><span class="compulsoryfld">*</span></label>
+                        <label class="col-form-label" for="product_catname"><?php echo $this->lang->line('Brand Name') ?><span class="compulsoryfld">*</span></label>
                             <input type="text" placeholder="Brand Name" class="form-control margin-bottom" name="brand_name" autocomplete="off">
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">

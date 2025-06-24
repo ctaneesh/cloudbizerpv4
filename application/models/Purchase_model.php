@@ -20,8 +20,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Purchase_model extends CI_Model
 {
     var $table = 'cberp_purchase_orders';
-    var $column_order = array(null, 'cberp_purchase_orders.purchase_number', 'cberp_suppliers.name', 'cberp_purchase_orders.purchase_order_date', 'cberp_purchase_orders.order_total', 'cberp_purchase_orders.order_status','cberp_employees.name','cberp_purchase_orders.approved_date','cberp_purchase_orders.receipt_status', null);
-    var $column_search = array('cberp_purchase_orders.purchase_number', 'cberp_suppliers.name', 'cberp_purchase_orders.purchase_order_date', 'cberp_purchase_orders.order_total','cberp_purchase_orders.order_status','cberp_employees.name','cberp_purchase_orders.approved_date','cberp_purchase_orders.receipt_status');
+    var $column_order = array(null, 'cberp_purchase_orders.purchase_number', 'cberp_suppliers.name', 'cberp_purchase_orders.purchase_order_date', 'cberp_purchase_orders.order_total', 'cberp_purchase_orders.order_status','cberp_employees.name','cberp_purchase_orders.receipt_status', null);
+    var $column_search = array('cberp_purchase_orders.purchase_number', 'cberp_suppliers.name', 'cberp_purchase_orders.purchase_order_date', 'cberp_purchase_orders.order_total','cberp_purchase_orders.order_status','cberp_employees.name','cberp_purchase_orders.receipt_status');
     var $order = array('cberp_purchase_orders.purchase_number' => 'desc');
 
     public function __construct()
@@ -82,7 +82,7 @@ class Purchase_model extends CI_Model
     public function purchase_details($purchase_number)
     {
 
-        $this->db->select('cberp_purchase_orders.*,cberp_purchase_orders.id AS iid,SUM(cberp_purchase_orders.shipping_charge + cberp_purchase_orders.shipping_tax) AS shipping,cberp_suppliers.*,cberp_suppliers.supplier_id AS cid,cberp_terms.id AS termid,cberp_terms.title AS termtit,cberp_terms.terms AS terms,cberp_country.name as countryname');
+        $this->db->select('cberp_purchase_orders.*,cberp_purchase_orders.purchase_number AS iid,SUM(cberp_purchase_orders.shipping_charge + cberp_purchase_orders.shipping_tax) AS shipping,cberp_suppliers.*,cberp_suppliers.supplier_id AS cid,cberp_terms.id AS termid,cberp_terms.title AS termtit,cberp_terms.terms AS terms,cberp_country.name as countryname,cberp_purchase_orders.discount as purchasediscount');
         $this->db->from($this->table);
         $this->db->where('cberp_purchase_orders.purchase_number', $purchase_number);
         $this->db->join('cberp_suppliers', 'cberp_purchase_orders.customer_id = cberp_suppliers.supplier_id', 'left');
@@ -148,7 +148,7 @@ class Purchase_model extends CI_Model
 
     private function _get_datatables_query()
     {
-        $this->db->select('cberp_purchase_orders.id,cberp_purchase_orders.order_status,cberp_purchase_orders.purchase_number,cberp_purchase_orders.purchase_order_date,cberp_purchase_orders.duedate,cberp_purchase_orders.order_total,cberp_purchase_orders.order_status,cberp_purchase_orders.approval_flag,cberp_suppliers.name,cberp_purchase_orders.assigned_to,cberp_employees.name as assigned_person,cberp_purchase_orders.approved_date,cberp_purchase_orders.purchase_type,cberp_purchase_orders.receipt_status');
+        $this->db->select('cberp_purchase_orders.purchase_number as id,cberp_purchase_orders.order_status,cberp_purchase_orders.purchase_number,cberp_purchase_orders.purchase_order_date,cberp_purchase_orders.duedate,cberp_purchase_orders.order_total,cberp_purchase_orders.order_status,cberp_purchase_orders.approval_flag,cberp_suppliers.name,cberp_purchase_orders.assigned_to,cberp_employees.name as assigned_person,cberp_purchase_orders.purchase_type,cberp_purchase_orders.receipt_status');
         $this->db->from($this->table);
         $this->db->join('cberp_suppliers', 'cberp_purchase_orders.customer_id=cberp_suppliers.supplier_id', 'left');
         $this->db->join('cberp_employees', 'cberp_employees.id=cberp_purchase_orders.assigned_to', 'left');
@@ -604,10 +604,12 @@ class Purchase_model extends CI_Model
      {
          $this->db->select('cberp_purchase_order_items.price');
          $this->db->from('cberp_purchase_order_items');
-         $this->db->where('product_code', $product_code);         
-         $this->db->order_by('cberp_purchase_order_items.id', 'DESC');
+         $this->db->join('cberp_purchase_orders','cberp_purchase_orders.purchase_number=cberp_purchase_order_items.purchase_number');
+         $this->db->where('cberp_purchase_order_items.product_code', $product_code);         
+         $this->db->where('cberp_purchase_orders.order_status !=', 'Dummy');         
+         $this->db->order_by('cberp_purchase_orders.created_by', 'DESC');
+         $this->db->limit(1);
          $query = $this->db->get();
-        //  return $query->result_array();
          if ($query->num_rows() > 0) {
             // $cberp_purchase_order_items = $query->row()->price;
             return($query->row()->price);

@@ -134,6 +134,7 @@ $pageNumber = 1;
 $totalPages = ceil(($totalItems + 1) / $rowsPerPage); // +1 because table header
 
 $isFirstPage = 1;
+$reciept = ($receipt_number) ? 'PAYMENT RECIEPT' : 'INVOICE';
 while ($currentItem < $totalItems):
     $isFirstPage = ($pageNumber == 1);
     $isLastPage = ($currentItem + ($isFirstPage ? $rowsFirstPage : $rowsPerPage) >= $totalItems);
@@ -142,20 +143,30 @@ while ($currentItem < $totalItems):
         <div class="header-class">
             <!-- <h1>Company Name</h1>
             <p>Address Line 1 | Address Line 2</p> -->
+          
         </div>
         
         <div class="content">
         <?php if ($bill_details=='First Page' && $pageNumber==1){
+                  
             ?>
             <div class="headersection">
-                <h2 class="text-center">INVOICE</h2>
+                <h2 class="text-center"><?=$reciept?></h2>
                 <table>
                     <tr>
                         <td>Customer: <?php echo $invoice['name']; ?></td>
-                        <td class="text-right">Invoice : <?php echo $invoice['invoice_number']; ?></td>
+                        <td class="text-right">Reciept No. : <?php echo $receipt_number; ?></td>
                     </tr>
                     <tr>
                         <td>Phone: <?php echo $invoice['phone']; ?></td>
+                        <td class="text-right">Reciept Date : <?php echo dateformat($receipt_details['created_date']); ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="text-right">Invoice : <?php echo $invoice['invoice_number']; ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
                         <td class="text-right">Date: <?php echo dateformat($invoice['invoicedate']); ?></td>
                     </tr>
                     <tr>
@@ -171,10 +182,19 @@ while ($currentItem < $totalItems):
             <?php }
             else if($bill_details!='First Page'){ ?>
              <div class="headersection">
-                <h2 class="text-center">INVOICE</h2>
+                <h2 class="text-center"><?=$reciept?></h2>
+                <?php echo $receipt_number; ?>
                 <table>
                     <tr>
                         <td>Customer: <?php echo $invoice['name']; ?></td>
+                        <td class="text-right">Reciept No. : <?php echo $receipt_number; ?></td>
+                    </tr>
+                    <tr>
+                        <td>Phone: <?php echo $invoice['phone']; ?></td>
+                        <td class="text-right">Reciept Date : <?php echo dateformat($receipt_details['created_date']); ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
                         <td class="text-right">Invoice : <?php echo $invoice['invoice_number']; ?></td>
                     </tr>
                     <tr>
@@ -221,8 +241,9 @@ while ($currentItem < $totalItems):
                     <?php 
                     $itemsThisPage = $isFirstPage ? $rowsFirstPage : $rowsPerPage;
                     $endItem = min($currentItem + $itemsThisPage, $totalItems);
-
+                    $subtotal =0;
                     for ($i = $currentItem; $i < $endItem; $i++): 
+                        $subtotal += $products[$i]['subtotal'];
                     ?>
                     <tr>
                         <td><?= $i+1 ?></td>
@@ -230,7 +251,7 @@ while ($currentItem < $totalItems):
                         <td><?= $products[$i]['unit'] ?></td>
                         <td class="text-center"><?= $products[$i]['qty'] ?></td>
                         <td class="text-right"><?= number_format($products[$i]['price'], 2) ?></td>
-                        <td class="text-right"><?= number_format($products[$i]['qty'] * $products[$i]['price'], 2) ?></td>
+                        <td class="text-right"><?= number_format($products[$i]['quantity'] * $products[$i]['price'], 2) ?></td>
                     </tr>
                     <?php 
                     endfor;
@@ -244,7 +265,7 @@ while ($currentItem < $totalItems):
                 <table>
                     <tr>
                         <td colspan="3" class="text-right">SubTotal:</td>
-                        <td class="text-right"><?= number_format($total, 2) ?></td>
+                        <td class="text-right"><?= number_format($subtotal, 2) ?></td>
                     </tr>
                     <?php if ($invoice['tax'] > 0): ?>
                     <tr>
@@ -260,8 +281,15 @@ while ($currentItem < $totalItems):
                     <?php endif; ?>
                     <tr>
                         <td colspan="3" class="text-right bold">Grand Total:</td>
-                        <td class="text-right bold"><?= number_format($invoice['total'], 2) ?></td>
+                        <td class="text-right bold"><?= number_format($invoice['grand_total'], 2) ?></td>
                     </tr>
+                    <?php
+                    if($receipt_details && $receipt_details['paid_amount']>0){ ?>
+                    <tr>
+                        <td colspan="3" class="text-right bold"><?php echo  "Receipt Amount"; ?></td>
+                        <td class="text-right bold"><?= number_format($receipt_details['paid_amount'], 2) ?></td>
+                    </tr>
+                    <?php } ?>
                 </table>
                 <p class="text-left margin-top">Goods return or exchange will be acceptable with in 15 days from the invoice date</p>
             </div>

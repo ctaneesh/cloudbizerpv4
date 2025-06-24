@@ -523,8 +523,8 @@ class Invoice_creditnotes_model extends CI_Model
     public function payment_method_details($invoiceid)
     {
         $this->db->select('*');
-        $this->db->from('transactions_ai');
-        $this->db->where('transactions_ai.invoice_id', $invoiceid); 
+        $this->db->from('cberp_payments');
+        $this->db->where('cberp_payments.invoice_id', $invoiceid); 
         $query = $this->db->get();         
         // die($this->db->last_query());
         return  $query->row_array();
@@ -548,8 +548,8 @@ class Invoice_creditnotes_model extends CI_Model
     public function transactions_ai_details($id)
     {
         $this->db->select('*');
-        $this->db->from('transactions_ai');
-        $this->db->where('transactions_ai.id', $id); 
+        $this->db->from('cberp_payments');
+        $this->db->where('cberp_payments.id', $id); 
         $query = $this->db->get();         
         return  $query->row_array();
     }
@@ -647,7 +647,7 @@ class Invoice_creditnotes_model extends CI_Model
     // erp2024 12-12-2024
     public function invoice_return_details($invoice_retutn_number)
     {
-        $this->db->select('cberp_stock_returns.*,cberp_stock_returns.invoice_retutn_number as returnid, cberp_customers.*,cberp_employees.name as employee,cberp_invoices.invoice_number,cberp_invoices.invoice_number as invoiceid,cberp_invoices.store_id,cberp_invoices.payment_type');
+        $this->db->select('cberp_stock_returns.*,cberp_stock_returns.invoice_retutn_number as returnid, cberp_customers.*,cberp_employees.name as employee,cberp_invoices.invoice_number,cberp_invoices.invoice_number as invoiceid,cberp_invoices.store_id');
         $this->db->from('cberp_stock_returns');        
         $this->db->join('cberp_customers', 'cberp_stock_returns.customer_id = cberp_customers.customer_id', 'left');
         $this->db->join('cberp_employees', 'cberp_employees.id = cberp_stock_returns.created_by');
@@ -903,5 +903,25 @@ class Invoice_creditnotes_model extends CI_Model
         return $query->row();
     }
 
+    public function payment_receipt_number($invoice_reurn_number)
+    {
+        $this->db->select('cberp_invoice_return_payments.receipt_number, cberp_stock_returns.invoice_retutn_number');
+        $this->db->from('cberp_stock_returns');
+        $this->db->join('cberp_payment_transaction_link', 'cberp_payment_transaction_link.trans_type_number = cberp_stock_returns.invoice_retutn_number');
+        $this->db->join('cberp_invoice_return_payments', 'cberp_invoice_return_payments.transaction_number = cberp_payment_transaction_link.transaction_number');
+        $this->db->where('cberp_stock_returns.invoice_retutn_number', $invoice_reurn_number);
+        $query = $this->db->get();   
+        return $query->result_array();
+    }
+    public function payment_receipt_details($invoice_reurn_number,$receipt_number)
+    {
+        $this->db->select('cberp_invoice_return_payments_details.*,cberp_invoice_return_payments.created_date');
+        $this->db->from('cberp_invoice_return_payments');
+        $this->db->join('cberp_invoice_return_payments_details', 'cberp_invoice_return_payments_details.receipt_number = cberp_invoice_return_payments.receipt_number');
+        $this->db->where('cberp_invoice_return_payments_details.invoice_reurn_number', $invoice_reurn_number);
+        $this->db->where('cberp_invoice_return_payments_details.receipt_number', $receipt_number);
+        $query = $this->db->get();   
+        return $query->row_array();
+    }
       
 }

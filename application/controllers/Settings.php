@@ -348,7 +348,10 @@ class Settings extends CI_Controller
             $salesorderprefix = $this->input->post('salesorderprefix', true);
             $t_suffix = $this->input->post('t_suffix', true);
             $recieptprefix = $this->input->post('recieptprefix', true);
-            $this->settings->update_prefix($invoiceprefix, $q_prefix, $p_prefix, $r_prefix, $s_prefix, $t_prefix, $o_prefix, $pos_prefix,$dnote_prefix,$dnote_return_prefix,$invoicereturnprefix,$leadprefix,$salesorderprefix,$t_suffix,$recieptprefix);
+            $invoice_receipt_prefix = $this->input->post('invoice_receipt_prefix', true);
+            $invoice_return_receipt_prefix = $this->input->post('invoice_return_receipt_prefix', true);
+            $purchase_payment_prefix = $this->input->post('purchase_payment_prefix', true);
+            $this->settings->update_prefix($invoiceprefix, $q_prefix, $p_prefix, $r_prefix, $s_prefix, $t_prefix, $o_prefix, $pos_prefix,$dnote_prefix,$dnote_return_prefix,$invoicereturnprefix,$leadprefix,$salesorderprefix,$t_suffix,$recieptprefix,$invoice_receipt_prefix,$invoice_return_receipt_prefix,$purchase_payment_prefix);
 
         } else {
 

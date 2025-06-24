@@ -870,10 +870,10 @@
                                        <i class="fa fa-bank"></i>
                                     </button></span>
                               <?php
-                              echo '</td><td><input type="text" data-product-code="'.$productcode.'" class="form-control req amnt text-right responsive-width-elements" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . intval($row['quantity']) . '" '. $frmelmentdisable.' title="'.$product_name_with_code.'Quantity" data-original-value="' . intval($row['quantity']) . '" '. $frmelmentdisable.'><input type="hidden" name="old_product_qty[]" value="' . intval($row['quantity']) . '"></td>';
+                              echo '</td><td><input type="text" data-product-code="'.$productcode.'" class="form-control req amnt text-right responsive-width-elements" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog(),discountWithTotal(' . $i . ')" autocomplete="off" value="' . intval($row['quantity']) . '" '. $frmelmentdisable.' title="'.$product_name_with_code.'Quantity" data-original-value="' . intval($row['quantity']) . '" '. $frmelmentdisable.'><input type="hidden" name="old_product_qty[]" value="' . intval($row['quantity']) . '"></td>';
 
                               echo '<td class="text-right"><span>'.$row['last_purchase_price'].'</span></td>';
-                              echo '<td><input type="text" data-product-code="'.$productcode.'" class="form-control text-right req prc responsive-width-elements" name="product_price[]" id="price-' . $i . '"  onkeypress="return isNumber(event)" onkeyup="checkCost(' . $i . '), rowTotal(' . $i . '), billUpyog()"  autocomplete="off" value="' . ($row['price']) . '" '. $frmelmentdisable.' title="'.$product_name_with_code.'Price" data-original-value="' . ($row['price']) . '" '. $frmelmentdisable.'></td>';
+                              echo '<td><input type="text" data-product-code="'.$productcode.'" class="form-control text-right req prc responsive-width-elements" name="product_price[]" id="price-' . $i . '"  onkeypress="return isNumber(event)" onkeyup="checkCost(' . $i . '),discountWithTotal(' . $i . '), rowTotal(' . $i . '), billUpyog()"  autocomplete="off" value="' . ($row['price']) . '" '. $frmelmentdisable.' title="'.$product_name_with_code.'Price" data-original-value="' . ($row['price']) . '" '. $frmelmentdisable.'></td>';
                               echo '<td class="text-right"><input type="text" data-product-code="'.$productcode.'" class="form-control text-right discount" name="product_discount[]" onkeypress="return isNumber(event)"  autocomplete="off" value="' . ($row['discount']) . '" data-original-value="' . ($row['discount']) . '" title="'.$product_name_with_code.'Discount" id="discount-' . $i . '" onkeyup="discountWithTotal(' . $i . ')"  autocomplete="off" value="' . ($row['totaldiscount']) . '"autocomplete="off" '. $frmelmentdisable.'></td>
                               <td></td>
                               <td class="text-right"><strong><span class="ttlText" id="result-' . $i . '">' . number_format($row['subtotal'],2) . '</span></strong>
@@ -895,7 +895,7 @@
                         ?>
                            <tr class="startRow">
                            <td class="text-center serial-number">1</td>
-                           <td><input type="text" placeholder="Search by Item No." class="form-control code" name="code[]" id="purchasecode-0" value=""><input type="hidden" class="form-control" name="hsn[]" id="hsn-0" value="" readonly><input type="hidden" class="form-control" name="expense_account_number[]" id="expense_account_number-0">
+                           <td><input type="text" placeholder="Search by Item No." class="form-control code" name="code[]" id="purchasecode-0" value="" ><input type="hidden" class="form-control" name="hsn[]" id="hsn-0" value="" readonly><input type="hidden" class="form-control" name="expense_account_number[]" id="expense_account_number-0">
                            </td>
                               <td><span class="d-flex"><input type="text" class="form-control" name="product_name[]"
                                  placeholder="<?php echo $this->lang->line('Enter Product name') ?>"
@@ -922,12 +922,10 @@
                               </td>
                               
                               <td><input type="text" class="form-control req amnt text-right responsive-width-elements" name="product_qty[]" id="amount-0"
-                                 onkeypress="return isNumber(event)" onkeyup="rowTotal('0'), billUpyog()"
+                                 onkeypress="return isNumber(event)" onkeyup="rowTotal('0'), billUpyog(),discountWithTotal('0')"
                                  autocomplete="off" value="0">
                               <td class="text-right"><span id="last_purchase_price_label-0"></span></td>  
-                              <td><input type="text" class="form-control text-right req prc responsive-width-elements" name="product_price[]" id="price-0"
-                                 onkeypress="return isNumber(event)" onkeyup="checkCost('0'), rowTotal('0'), billUpyog()"
-                                 autocomplete="off" value="0" ></td>
+                              <td><input type="text" class="form-control text-right req prc responsive-width-elements" name="product_price[]" id="price-0"  onkeypress="return isNumber(event)" onkeyup="checkCost('0'), rowTotal('0'), billUpyog(),discountWithTotal('0')"  autocomplete="off" value="0" ></td>
                               <td class="d-none"><input type="text" class="form-control vat " name="product_tax[]" id="vat-0"
                                  onkeypress="return isNumber(event)" onkeyup="rowTotal('0'), billUpyog()"
                                  autocomplete="off"></td>
@@ -2102,8 +2100,7 @@ $(".purchase-send-btn").on("click", function(e) {
                   processData: false,
                   success: function(response) {
                      dataid = response.data;
-                     //  window.location.href = baseurl + 'purchase/create?id='+dataid;
-                      window.location.href = baseurl + 'purchase';
+                     //  window.location.href = baseurl + 'purchase';
                   },
                   error: function(xhr, status, error) {
                         // Handle error

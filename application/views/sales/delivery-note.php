@@ -261,7 +261,10 @@
                                                     // echo '<a href="'.base_url('DeliveryNotes/convert_deliverynote_to_invoice?id='.$delivernoteid).'"  class="btn btn-sm btn-secondary mb-1"><i class="fa fa-exchange"></i> Convert to Invoice</a>';
                                                 
                                             }
+                                            if($action_type)
+                                            {
                                              echo ' <a href="'.base_url('Deliveryreturn/deliveryreturn?delivery='.$delivernoteid.'&type=new').'"  class="btn btn-sm btn-secondary mb-1 '.$disable_class_invoiced1.'" title="Delivery Return"><i class="fa fa-undo"></i> Delivery Return</a>';
+                                            }
                                             
                                             ?>
                                             <!-- erp2024 hide Update Inventory and refresh screen 18-06-2024 -->

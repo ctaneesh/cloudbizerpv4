@@ -203,39 +203,55 @@
 <div class="invoice-box" >
    <hr>
     <table class="toptable">
-    <thead>
-        <tr>
-            <?php
-                if($invoice['status']=='due')
-                {
-                    $reciept = 'INVOICE';
-                }
-                else{
-                    $reciept = 'Payment Reciept';
-                }   
-                $reciept = 'INVOICE';
-            ?>
-             <td colspan="3" style="text-align:center; vertical-align: middle;"><h2><?=$reciept?></h2></td>
-            </tr>
+        <thead>
+
             <tr>
-             <td>
                 <?php
-                    echo '<strong>' . $invoice['name'] . '</strong><br>';
-                    if ($invoice['company']) echo $invoice['company'] . '<br>';
-    
-                    echo $invoice['address'] . '<br>' . $invoice['city'] . ', ' . $invoice['region'];
-                    // if ($invoice['country']) echo '<br>' . $invoice['country'];
-                    if ($invoice['postbox']) echo ' - ' . $invoice['postbox'];
-                    if ($invoice['phone']) echo '<br>' . $this->lang->line('Phone') . ': ' . $invoice['phone'];
-                    if ($invoice['email']) echo '<br> ' . $this->lang->line('Email') . ': ' . $invoice['email'];
-                    if($refdetails['customer_reference_number'])
+                    // if($invoice['invoicestatus']=='due')
+                    // {
+                    //     $reciept = 'INVOICE';
+                    // }
+                    // else{
+                    //     $reciept = 'Payment Reciept';
+                    // }   
+                    if($receipt_number)
                     {
-                        echo 'Your Reference No : ' . $refdetails['customer_reference_number'].'<br>';
-                        echo 'Date : ' . date('d-m-Y',strtotime($refdetails['refdate']));
+                        $reciept = 'PAYMENT RECIEPT';
                     }
+                    else{
+                        $reciept = 'INVOICE';
+                    }   
+                    
+                    // $reciept = 'INVOICE';
                 ?>
-             </td>
-        
+                <td colspan="3" style="text-align:center; vertical-align: middle;"><h2><?=$reciept?></h2></td>
+                </tr>
+                <tr>
+                <td>
+                    <?php
+                        echo '<strong>' . $invoice['name'] . '</strong><br>';
+                        if ($invoice['company']) echo $invoice['company'] . '<br>';
+                        echo $invoice['address'] . '<br>' . $invoice['city'] . ', ' . $invoice['region'];
+                        // if ($invoice['country']) echo '<br>' . $invoice['country'];
+                        if ($invoice['postbox']) echo ' - ' . $invoice['postbox'];
+                        if ($invoice['phone']) echo '<br>' . $this->lang->line('Phone') . ': ' . $invoice['phone'];
+                        if ($invoice['email']) echo '<br> ' . $this->lang->line('Email') . ': ' . $invoice['email'];
+                        if($refdetails['customer_reference_number'])
+                        {
+                            echo 'Your Reference No : ' . $refdetails['customer_reference_number'].'<br>';
+                            echo 'Date : ' . date('d-m-Y',strtotime($refdetails['refdate']));
+                        }
+                    ?>
+                </td>
+            
+                <td style="text-align:right;">
+                    <?php if(($receipt_number)) {  echo '<strong>Reciept No. : '.$receipt_number.'</strong><br>'; } ?>
+                    <?php if(($receipt_number)) {  echo '<strong>Reciept Date : '.dateformat($receipt_details['created_date']).'</strong><br>'; } ?>
+                    <strong>Invoice No : <?= $invoice['invoice_number']?></strong><br> <strong>Invoice Date : <?= date('d-m-Y', strtotime($invoice['invoice_date']))?></strong><br>
+                <strong>Invoice Due Date : <?= date('d-m-Y', strtotime($invoice['due_date']))?></strong><br>
+                <strong>Currency : <?=currency($this->aauth->get_user()->loc)?></strong>
+            </td>
+            </tr>
             <td style="text-align:right;"><strong>Invoice No : <?= $invoice['invoice_number']?></strong><br> <strong>Invoice Date : <?= date('d-m-Y', strtotime($invoice['invoice_date']))?></strong><br>
             <strong>Invoice Due Date : <?= date('d-m-Y', strtotime($invoice['due_date']))?></strong><br>
             <strong>Currency : <?=currency($this->aauth->get_user()->loc)?></strong>
@@ -316,7 +332,38 @@
          <!-- erp2024 removed secion 06-06-2024  ends-->
         </tbody>
     </table>
-    <br>
+    <?php
+    if($receipt_number) { ?>
+       <table>
+        <tr>
+            <td>
+                <?php echo '<p>'. $this->lang->line('Status') . ' : <strong>'. $this->lang->line(ucwords($invoice['invoicestatus'])) . '</strong></p>';
+                 if($invoice['invoicestatus']=='post dated cheque')
+                {
+                    
+                    echo '<br>'.$this->lang->line('Cheque Date') . ' : <strong>' . date('d-m-Y',strtotime($checkdate['cheque_date'])).'</strong><br>';
+                }
+                ?>
+            </td>
+            <td>
+                <?php    echo '<p>' . $this->lang->line('Total Amount') . ' : <strong>' . number_format($invoice['grand_total'],2) . '</p>';
+                ?>
+            </td>
+            <td>
+                <?php   echo "Total ". $this->lang->line('Paid Amount') . ' : <strong>' . number_format($invoice['paid_amount'],2).'</strong><br>';
+                ?>
+            </td>
+           
+            <td>
+                <?php 
+                    $rming = $invoice['grand_total'] - $invoice['paid_amount'];
+                    echo  $this->lang->line('Balance Due') . ' : <strong>' . number_format($rming,2).'</strong><br>';
+                ?>
+            </td>
+        </tr>
+      </table>
+        <?php 
+    } ?>
     <table class="plist maintable" cellpadding="0" cellspacing="0">
         <tr class="heading1">
             <td style="width: 1rem;" style="text-align:center;">
@@ -423,9 +470,21 @@
         echo '<br>';
     }
     ?>
+ 
     <table class="subtotal">
-
-
+        <tr >
+            <td class="myco2" style="width:50%; " rowspan="<?php echo $sub_t_col ?>">
+                <br>
+                <?php if($invoice['invoicestatus']=='Due' && empty($receipt_number))
+                { ?>
+                <p><?php echo $this->lang->line('Payment Method') . ' : <strong>' . $this->lang->line(ucwords($invoice['pmethod'])) . '</strong></p>'?> <br>
+                <?php  } 
+                    if(empty($receipt_number)) {
+                        ?>
+                    
+                        <p><?php echo $this->lang->line('Status') . ' : <strong>'. $this->lang->line(ucwords($invoice['invoicestatus'])) . '</strong></p>';
+                    }
+                    if($invoice['invoicestatus']=='post dated cheque' && empty($receipt_number))
         <tr>
             <td class="myco2" style="width:50%;" rowspan="<?php echo $sub_t_col ?>"><br>
             <?php if($invoice['status']=='Due')
@@ -440,19 +499,21 @@
                         echo '<br>'.$this->lang->line('Cheque Date') . ' : <strong>' . date('d-m-Y',strtotime($checkdate['cheque_date'])).'</strong><br>';
                     }
                     if (!$general['t_type']) {
-                        echo '<br><p>' . $this->lang->line('Total Amount') . ' : <strong>' . number_format($invoice['total'],2) . '</p><br><p>';
-                        // echo '<br><p>' . $this->lang->line('Total Amount') . ': ' . amountExchange($invoice['total'], $invoice['multi'], $invoice['loc']) . '</p><br><p>';
-                        // echo '<br><p>' . $this->lang->line('Total Amount') . ': ' . amountExchange($invoice['total'], $invoice['multi'], $invoice['loc']) . '</p><br><p>';
-                        if (@$round_off['other']) {
-                            $final_amount = round($invoice['total'], $round_off['active'], constant($round_off['other']));
-                            echo '<p>' . $this->lang->line('Round Off') . ' ' . $this->lang->line('Amount') . ': ' . $final_amount . '</strong></p><br><p>';
-                            // $final_amount = round($invoice['total'], $round_off['active'], constant($round_off['other']));
-                            // echo '<p>' . $this->lang->line('Round Off') . ' ' . $this->lang->line('Amount') . ': ' . amountExchange($final_amount, $invoice['multi'], $invoice['loc']) . '</p><br><p>';
-                        }
+                       if(empty($receipt_number)) {
+                            echo '<br><p>' . $this->lang->line('Total Amount') . ' : <strong>' . number_format($invoice['grand_total'],2) . '</p><br><p>';
+                            // echo '<br><p>' . $this->lang->line('Total Amount') . ': ' . amountExchange($invoice['grand_total'], $invoice['multi'], $invoice['loc']) . '</p><br><p>';
+                            // echo '<br><p>' . $this->lang->line('Total Amount') . ': ' . amountExchange($invoice['grand_total'], $invoice['multi'], $invoice['loc']) . '</p><br><p>';
+                            if (@$round_off['other']) {
+                                $final_amount = round($invoice['grand_total'], $round_off['active'], constant($round_off['other']));
+                                echo '<p>' . $this->lang->line('Round Off') . ' ' . $this->lang->line('Amount') . ': ' . $final_amount . '</strong></p><br><p>';
+                                // $final_amount = round($invoice['grand_total'], $round_off['active'], constant($round_off['other']));
+                                // echo '<p>' . $this->lang->line('Round Off') . ' ' . $this->lang->line('Amount') . ': ' . amountExchange($final_amount, $invoice['multi'], $invoice['loc']) . '</p><br><p>';
+                            }
 
-                       
-                        // echo $this->lang->line('Paid Amount') . ': ' . amountExchange($invoice['pamnt'], $invoice['multi'], $invoice['loc']);
-                        echo $this->lang->line('Paid Amount') . ' : <strong>' . number_format($invoice['paid_amount'],2).'</strong><br>';
+                        
+                            // echo $this->lang->line('Paid Amount') . ': ' . amountExchange($invoice['pamnt'], $invoice['multi'], $invoice['loc']);
+                            echo $this->lang->line('Paid Amount') . ' : <strong>' . number_format($invoice['paid_amount'],2).'</strong><br>';
+                        }
                     }
 
                     // if ($general['t_type'] == 1) {
@@ -495,26 +556,33 @@
         }
         else{
             echo '<tr>';
-            echo '<td></td>';
+            echo '<td style="border-top: none !important;"></td>';
             echo '<td>' . $this->lang->line('Shipping') . '</td>
             <td style="text-align:right">' . number_format($invoice['shipping'],2) . '</td>
         </tr>';
         }
         ?>
         <tr> <?php
-        // if ($invoice['order_discount'] > 0 || $invoice['shipping'] > 0)
-        // {
-            echo '<td></td>';
-        // }?>
-            <td><?php echo $this->lang->line('Balance Due') ?></td>
-            <td style="text-align:right"><strong><?php $rming = $invoice['total'] - $invoice['paid_amount'];
+
+            // if ($invoice['order_discount'] > 0 || $invoice['shipping'] > 0)
+            // {
+                echo '<td></td>';
+            // }
+            $balance_caption = (empty($receipt_number)) ? $this->lang->line('Balance Due') :  $this->lang->line('Received Amount'); 
+            $rming = $invoice['grand_total'] - $invoice['paid_amount'];
+            $paid_amount = (empty($receipt_number)) ? $rming: $receipt_details['paid_amount'];
+           ?>
+            <td><?php echo $balance_caption; ?></td>
+            <td style="text-align:right"><strong><?php 
+
                 if ($rming < 0) {
                     $rming = 0;
                 }
                 if (@$round_off['other']) {
                     $rming = round($rming, $round_off['active'], constant($round_off['other']));
                 }
-                echo number_format($rming,2);
+                // echo number_format($rming,2);
+                echo number_format($paid_amount,2);
                 // echo amountExchange($rming, $invoice['multi'], $invoice['loc']);
                 echo '</strong></td>
 		</tr>

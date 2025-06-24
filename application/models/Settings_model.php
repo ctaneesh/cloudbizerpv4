@@ -119,10 +119,18 @@ class Settings_model extends CI_Model
         $result1 = $query1->row_array();
         $result['returns'] = $query1->row_array();
 
+        $this->db->select('*');
+        $this->db->from('univarsal_api');
+        $this->db->where('id', 73);
+        $query1 = $this->db->get();
+        $result1 = $query1->row_array();
+        $result['receipts'] = $query1->row_array();
+
         return $result;
     }
 
-    public function update_prefix($invoiceprefix, $q_prefix, $p_prefix, $r_prefix, $s_prefix, $t_prefix, $o_prefix, $pos_prefix,$dnote_prefix,$dnote_return_prefix,$invoicereturnprefix,$leadprefix,$salesorderprefix,$t_suffix,$recieptprefix)
+    
+    public function update_prefix($invoiceprefix, $q_prefix, $p_prefix, $r_prefix, $s_prefix, $t_prefix, $o_prefix, $pos_prefix,$dnote_prefix,$dnote_return_prefix,$invoicereturnprefix,$leadprefix,$salesorderprefix,$t_suffix,$recieptprefix,$invoice_receipt_prefix,$invoice_return_receipt_prefix,$purchase_payment_prefix)
     {
         $data = array(
             'name' => $q_prefix,
@@ -143,6 +151,17 @@ class Settings_model extends CI_Model
             'other' => $salesorderprefix,
             'suffix' => $t_suffix,
         );
+
+         $receiptdata = array(
+            'key1' => $invoice_receipt_prefix,
+            'key2' => $invoice_return_receipt_prefix,
+            'url' => $purchase_payment_prefix,
+        );
+        $this->db->set($receiptdata);
+        $this->db->where('id', 73);
+        $this->db->update('univarsal_api');
+
+
         $this->db->set($dnotdata);
         $this->db->where('id', 72);
         $this->db->update('univarsal_api');

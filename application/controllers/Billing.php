@@ -200,7 +200,7 @@ class Billing extends CI_Controller
         }
     }
 
- public function printinvoice()
+    public function printinvoice()
     {
         if (!$this->input->get()) {
             exit();
@@ -209,19 +209,29 @@ class Billing extends CI_Controller
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL); 
         $invoice_number = ($this->input->get('id'));
+        $receipt_number = ($this->input->get('receipt_number'));
         $token = $this->input->get('token');
         $validtoken = hash_hmac('ripemd160', $invoice_number, $this->config->item('encryption_key'));
+        $data['receipt_details'] = "";
+        
         if (hash_equals($token, $validtoken)) {
             $data['id'] = $invoice_number;
+            $data['receipt_number'] = $receipt_number;
             $data['invoice'] = $this->invocies->invoice_details($invoice_number);
+            if($receipt_number)
+            {  
+                 $data['receipt_details'] = $this->invocies->payment_receipt_details($invoice_number,$receipt_number);
+            }     
+                   
             $data['refdetails'] = $this->invocies->sales_reference_bydelnoteid($data['invoice']['delivery_note_number']);
-            // echo "<pre>"; print_r($data['invoice']); die();
+            
             // if($data['invoice']['status']=="post dated cheque"){
             //     $data['checkdate'] = $this->invocies->payment_method_details($data['invoice']['iid']);
             // }
            
             $data['title'] = "Invoice " . $data['invoice']['invoice_number'];
             $data['products'] = $this->invocies->invoice_products($invoice_number);
+            // echo "<pre>"; print_r($data['products']); die();
             $data['employee'] = $this->invocies->employee($data['invoice']['created_by']);
             if (CUSTOM) {
                 $data['c_custom_fields'] = $this->custom->view_fields_data($data['invoice']['customer_id'], 1, 1);
@@ -414,7 +424,8 @@ class Billing extends CI_Controller
             $data['title'] = "Invoice $tid";
             $data['invoice'] = $this->purchase->purchase_details($tid);
             $data['products'] = $this->purchase->purchase_products($tid);
-            $data['employee'] = $this->purchase->employee($data['invoice']['assign_to']);
+            $preparedby = ($data['invoice']['assign_to']) ? $data['invoice']['assign_to'] : $data['invoice']['created_by'];
+            $data['employee'] = $this->purchase->employee($preparedby);
             $data['round_off'] = $this->custom->api_config(4);
             $data['prefix'] = get_prefix();  
             $data['general'] = array('title' => $this->lang->line('Purchase Order'), 'person' => $this->lang->line('Supplier'), 'prefix' => prefix(2), 't_type' => 0);
@@ -1142,7 +1153,7 @@ class Billing extends CI_Controller
             $gateway_data = $this->billing->gateway($gid);
             $salt = $gateway_data['key2'];
 
-// Salt should be same Post Request
+            // Salt should be same Post Request
 
             if ($this->input->post('additionalCharges', true)) {
                 $additionalCharges = $this->input->post("additionalCharges", true);
@@ -1385,10 +1396,14 @@ class Billing extends CI_Controller
     
     public function printporeciept()
     {
+        //    ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         if (!$this->input->get()) {
             exit();
         }
         $id = intval($this->input->get('id'));
+        $tid = intval($this->input->get('id'));
         $token = $this->input->get('token');
 
         $validtoken = hash_hmac('ripemd160', 'p' . $tid, $this->config->item('encryption_key'));
@@ -1468,9 +1483,7 @@ class Billing extends CI_Controller
 
     function bank_transaction_pdf()
     {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+      
         // ini_set('memory_limit', '64M');
 
         $display_fields = ['Name', 'Email', 'Phone', 'Address'];
@@ -1546,6 +1559,7 @@ class Billing extends CI_Controller
     // 26-04-2025
     public function pre_print_invoice1()
     {
+  
         if (!$this->input->get()) {
             exit();
         }
@@ -1634,40 +1648,49 @@ class Billing extends CI_Controller
     }
 
     public function pre_print_invoice()
-{
-    if (!$this->input->get()) {
-        exit();
-    }
-    $tid = intval($this->input->get('id'));
-    $token = $this->input->get('token');
-    $validtoken = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
-    $data['print_settings'] = print_settings_details('Pre-Print');
-    
-    if (hash_equals($token, $validtoken)) {
-        $data['id'] = $tid;
-        $header_height = convertToMillimeters($data['print_settings']['header_height'], $data['print_settings']['measurement_unit']);
-        $footer_height = convertToMillimeters($data['print_settings']['footer_height'], $data['print_settings']['measurement_unit']);
-        $margin_left = convertToMillimeters($data['print_settings']['margin_left'], $data['print_settings']['measurement_unit']);
-        $margin_right = convertToMillimeters($data['print_settings']['margin_right'], $data['print_settings']['measurement_unit']);
-        $data['page_width'] = convertToMillimeters($data['print_settings']['page_width'], $data['print_settings']['measurement_unit']);
-        $data['page_height'] = convertToMillimeters($data['print_settings']['page_height'], $data['print_settings']['measurement_unit']);
-        $data['row_height'] = convertToMillimeters($data['print_settings']['row_height'], $data['print_settings']['measurement_unit']);
-        $data['bill_details_height'] = convertToMillimeters($data['print_settings']['bill_details_height'], $data['print_settings']['measurement_unit']);
-        $data['bill_details'] = $data['print_settings']['bill_details'];
-        $data['display_item_labels'] = $data['print_settings']['display_item_labels'];
+    {
+        //         ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        if (!$this->input->get()) {
+            exit();
+        }
+        $tid = ($this->input->get('id'));
+        $token = $this->input->get('token');        
+        $receipt_number = ($this->input->get('receipt_number'));
+        $data['receipt_details'] = "";
+        $validtoken = hash_hmac('ripemd160', $tid, $this->config->item('encryption_key'));
+        $data['print_settings'] = print_settings_details('Pre-Print'); 
+        if (hash_equals($token, $validtoken)) {
+            $data['id'] = $tid;
+            $data['receipt_number'] = $receipt_number;
+            if($receipt_number)
+            {  
+                 $data['receipt_details'] = $this->invocies->payment_receipt_details($tid,$receipt_number);
+            }                       
+            $header_height = convertToMillimeters($data['print_settings']['header_height'], $data['print_settings']['measurement_unit']);
+            $footer_height = convertToMillimeters($data['print_settings']['footer_height'], $data['print_settings']['measurement_unit']);
+            $margin_left = convertToMillimeters($data['print_settings']['margin_left'], $data['print_settings']['measurement_unit']);
+            $margin_right = convertToMillimeters($data['print_settings']['margin_right'], $data['print_settings']['measurement_unit']);
+            $data['page_width'] = convertToMillimeters($data['print_settings']['page_width'], $data['print_settings']['measurement_unit']);
+            $data['page_height'] = convertToMillimeters($data['print_settings']['page_height'], $data['print_settings']['measurement_unit']);
+            $data['row_height'] = convertToMillimeters($data['print_settings']['row_height'], $data['print_settings']['measurement_unit']);
+            $data['bill_details_height'] = convertToMillimeters($data['print_settings']['bill_details_height'], $data['print_settings']['measurement_unit']);
+            $data['bill_details'] = $data['print_settings']['bill_details'];
+            $data['display_item_labels'] = $data['print_settings']['display_item_labels'];
 
-        $data['header_height'] = $header_height;
-        $data['footer_height'] = $footer_height;
-        $data['margin_left'] = $margin_left;
-        $data['margin_right'] = $margin_right;
+            $data['header_height'] = $header_height;
+            $data['footer_height'] = $footer_height;
+            $data['margin_left'] = $margin_left;
+            $data['margin_right'] = $margin_right;
 
-        $data['invoice'] = $this->invocies->invoice_details($tid);
-        $data['products'] = $this->invocies->invoice_products($tid);
-        $data['employee'] = $this->invocies->employee($data['invoice']['eid']);
-        $data['round_off'] = $this->custom->api_config(4);        
-        $this->load->view('print_files/invoice_dotmatrix', $data); // NEW VIEW
+            $data['invoice'] = $this->invocies->invoice_details($tid);
+            $data['products'] = $this->invocies->invoice_products($tid);
+            $data['employee'] = $this->invocies->employee($data['invoice']['employee_id']);
+            $data['round_off'] = $this->custom->api_config(4);        
+            $this->load->view('print_files/invoice_dotmatrix', $data); 
+        }
     }
-}
 
 
 }

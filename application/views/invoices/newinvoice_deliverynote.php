@@ -279,7 +279,10 @@
          <div class="card-body">
             <form method="post" id="data_form" enctype="multipart/form-data">               
                <input type="hidden" name="function_number" class="function_number" value="<?=$function_number?>">
-               <input type="hidden" name="invoice_type" class="invoice_type" value="<?=$invoice['invoice_type']?>">
+               <?php
+                  $invoice_type = ($invoice['invoice_type']) ? $invoice['invoice_type'] : 'Direct';
+               ?>
+               <input type="hidden" name="invoice_type" class="invoice_type" value="<?=$invoice_type?>">
                <input type="hidden" name="invoice_action_type" value="<?=$invoice_action_type?>">
                <div class="title-action row"> 
                   <div class="col-lg-4 col-md-8 col-sm-12 col-xs-12 <?=$topbuttons_class?>">                  
@@ -403,6 +406,31 @@
                   <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-left text-xs-left <?=$topbuttons_class?>">
                      <a href="<?php echo $link; ?>" class="btn btn-sm btn-secondary mb-1 d-none"  target="_blank"><i class="fa fa-globe"></i> <?php echo $this->lang->line('Preview') ?>
                      </a>
+                     <?php
+                     if($receipt_numbers)
+                     {
+                        ?>
+                        <div class="btn-group ">
+                           <button type="button" class="btn btn-sm btn-secondary dropdown-toggle mb-1"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                           class="fa fa-print"></i> <?php echo $this->lang->line('Receipts') ?>
+                           </button>
+                           <div class="dropdown-menu">
+                              <?php
+                              foreach($receipt_numbers as $receipt_number)
+                              { 
+                                 $receipt_number = $receipt_number['receipt_number'];
+                                 ?>
+                                  <a class="dropdown-item <?=$regular_print_class?>" href="<?= base_url('billing/printinvoice?id=' . $invoice['iid'] . '&token=' . $validtoken. '&receipt_number=' . $receipt_number); ?>" target="_blank"><?php echo $receipt_number; ?></a>
+                                  <a class="dropdown-item <?=$dotmatrix_print_class?>" href="<?= base_url('billing/pre_print_invoice?id=' . $invoice['iid'] . '&token=' . $validtoken.'&receipt_number=' . $receipt_number); ?>" target="_blank"><?php echo $receipt_number; ?></a>
+                                 <div class="dropdown-divider <?=$regular_print_class?>"></div>
+                                 <?php
+                              }
+                              ?>
+                           </div>
+                        </div>
+                        <?php
+                     } ?>
                      <div class="btn-group ">
                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle mb-1"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
@@ -505,17 +533,17 @@
                                     <div class="item-class text-center">
                                        <h4><?php echo $this->lang->line('Paid'); ?></h4>
                                        <?php 
-                                       echo "<p>".number_format($master['payment_recieved_amount'],2)."</p>";?>
+                                       echo "<p>".number_format($master['paid_amount'],2)."</p>";?>
                                     </div>
                                     <div class="item-class text-center">
                                        <h4><?php echo $this->lang->line('Due'); ?></h4>
                                        <?php 
-                                       $dueAmt = $master['total'] - $master['payment_recieved_amount'];
+                                       $dueAmt = $master['grand_total'] - $master['paid_amount'];
                                        echo "<p>".number_format($dueAmt,2)."</p>";?>
                                     </div>
                                     <div class="item-class text-center">
                                        <h4><?php echo $this->lang->line('Total'); ?></h4>
-                                       <?php echo "<p>".number_format($master['total'],2)."</p>";?>
+                                       <?php echo "<p>".number_format($master['grand_total'],2)."</p>";?>
                                     </div>
                                  </div>
                         </div>
@@ -1184,7 +1212,7 @@
                                           <i class="fa fa-plus-square"></i> <?php echo $this->lang->line('Add Row') ?>
                                           </button>
                                        <?php } ?>
-                                       <div class="btn-group ml-1 mt-1" class="creditlimit-check"></div>
+                                       <div class="btn-group ml-1 mt-1 creditlimit-check"></div>
                                     </td>
                                  </tr>
                                  <tr class="sub_c" style="display: table-row;">
@@ -2199,9 +2227,10 @@
                                 if (typeof response === "string") {
                                     response = JSON.parse(response);
                                 }
-                              //   window.open(baseurl + 'invoices'); 
-                                window.location.href = baseurl + 'invoices';                              
-                              //   window.location.href = response.link;                              
+                              //   window.open(baseurl + 'invoices');                            
+                              //   window.location.href = response.link;    
+                              ///orgurl    
+                                window.location.href = baseurl + 'invoices';                         
                             },
                             error: function(xhr, status, error) {
                                 Swal.fire('Error', 'An error occurred while generating the lead', 'error');

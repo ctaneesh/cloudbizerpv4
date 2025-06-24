@@ -167,7 +167,7 @@ div.inset {border:1px solid black;
 </head>
 
 <body>
-<div class="invoice-box inset" >
+<div class="invoice-box inset1" >
     <!-- <table>
         <tr>
             <td class="myco">
@@ -211,17 +211,23 @@ div.inset {border:1px solid black;
     </table>
     <hr>
    <?php 
-    // echo "<pre>";
-    // print_r($products);
-    // die();
+
+    $caption = ($receipt_details) ? 'Credit Note Payment Receipt ' : 'Credit Note';
+    $receipt_amount = ($receipt_details) ? "<br>Reciept Amount. : ". $receipt_details['paid_amount']:"";
+    $receipt_details = ($receipt_details) ? "<strong>Reciept No. : ". $receipt_details['receipt_number']." <br>Reciept Date : ".dateformat($receipt_details['created_date'])."</strong><br>":"";
+
    ?>
-   
     <table>
-    <thead>
+    <thead >
         <tr>
-            <td> <strong>Credit Note : <?= $delevery_return_id?></strong>
-            <br><strong>Invoice Number : <?= $products[0]['invoice_number']?></strong></td>
-            <td><strong>Credit Note Date : <?= date('d-m-Y H:i:s',strtotime($products[0]['created_date']))?></strong></td>
+                
+                <td colspan="2" style="text-align:center; vertical-align: middle;"><h2><?=$caption?></h2></td>
+                </tr>
+        <tr>
+            <td> <strong>Credit Note : <?= $invoice_retutn_number?></strong><br>
+            <strong>Credit Note Date : <?= dateformat($products[0]['created_date'])?></strong>
+            </td>
+            <td style="text-align:right"><?php echo  $receipt_details; ?><strong>Invoice Number : <?= $products[0]['invoice_number']?></strong><br><strong>Currency : <?php echo "<b>".currency($this->aauth->get_user()->loc); ?></strong></td>
         </tr>
         </thead>
         <tbody>
@@ -238,7 +244,7 @@ div.inset {border:1px solid black;
             </td>
             
         </tr>
-        <tr><td>Currency : <?php echo "<b>".currency($this->aauth->get_user()->loc)."</b>"; ?></td></tr>
+        
         </tbody>
     </table>
     <br>
@@ -308,6 +314,7 @@ div.inset {border:1px solid black;
         <!-- Total Tax : <?=$totaltax?><br> -->
         <!-- // erp2024 removed section 07-06-2024 -->
         Grand Total : <?php echo number_format(($subtotal+$totaltax), 2); ?>
+        <?php echo  $receipt_amount; ?>
         <!-- Grand Total : <?php echo ($subtotal+$totaltax)-$totaldiscount; ?> -->
         </h6>
      </div>

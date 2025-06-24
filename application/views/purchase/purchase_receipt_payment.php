@@ -774,7 +774,7 @@ $(document).ready(function(){
                               
                               var data = JSON.parse(response);
                               
-                              window.location.href = baseurl + 'Invoices/stockreciepts';
+                              // window.location.href = baseurl + 'Invoices/stockreciepts';
                            },
                            error: function(xhr, status, error) {
                               Swal.fire('Error', 'An error occurred while generating the material request', 'error');

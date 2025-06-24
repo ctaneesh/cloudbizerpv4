@@ -24,6 +24,7 @@ class Transactions_model extends CI_Model
     var $column_search = array('id', 'account', 'payer'); // Columns for search
     var $order = array('date' => 'desc'); // Default order
     var $opt = ''; // Option for type filtering
+    
 
     private function _get_datatables_query()
     {
@@ -112,6 +113,8 @@ class Transactions_model extends CI_Model
 
         return $this->db->count_all_results();
     }
+
+
 
     public function categories()
     {
@@ -491,8 +494,8 @@ class Transactions_model extends CI_Model
     public function transactions_ai_details($id)
     {
         $this->db->select('*');
-        $this->db->from('transactions_ai');
-        $this->db->where('transactions_ai.id', $id); 
+        $this->db->from('cberp_payments');
+        $this->db->where('cberp_payments.id', $id); 
         $query = $this->db->get();         
         return  $query->row_array();
     }
@@ -636,9 +639,9 @@ class Transactions_model extends CI_Model
     // public function get_transaction_ai_details($invoice_id, $trans_num)
     {
         $this->db->select('*');
-        $this->db->from('transactions_ai');
-        // $this->db->where('transactions_ai.invoice_id', $invoice_id);
-        $this->db->where('transactions_ai.trans_num', $trans_num);
+        $this->db->from('cberp_payments');
+        // $this->db->where('cberp_payments.invoice_id', $invoice_id);
+        $this->db->where('cberp_payments.trans_num', $trans_num);
         $query = $this->db->get();
         return $query->row_array();
     }
@@ -915,5 +918,71 @@ class Transactions_model extends CI_Model
         $query = $this->db->get();
         // die($this->db->last_query());
         return $query->row_array();
+    }
+
+    
+    public function last_invoice_payment_receipt_number()
+    {
+        // $this->configurations = $this->session->userdata('configurations');
+        // $prefix = $this->configurations['invoiceprefix']; 
+        $prefix =  get_prefix_73();
+        $prefix = $prefix['invoicereceipt_prefix'];
+        $this->db->select('receipt_number');
+        $this->db->from('cberp_invoice_payments');
+        $this->db->order_by('created_date', 'DESC');
+        $this->db->limit(1);
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $last_invoice_number = $query->row()->receipt_number;
+            $parts = explode('/', $last_invoice_number);
+            $last_number = (int)end($parts); 
+            $next_number = $last_number + 1;
+            return $prefix.$next_number;
+        } else {
+            return $prefix.'1001';
+        }
+    }
+    public function last_invoice_return_receipt_number()
+    {
+        // $this->configurations = $this->session->userdata('configurations');
+        // $prefix = $this->configurations['invoiceprefix']; 
+        $prefix =  get_prefix_73();
+        $prefix = $prefix['invoicereturnreceipt_prefix'];
+        $this->db->select('receipt_number');
+        $this->db->from('cberp_invoice_return_payments');
+        $this->db->order_by('created_date', 'DESC');
+        $this->db->limit(1);
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $last_invoice_number = $query->row()->receipt_number;
+            $parts = explode('/', $last_invoice_number);
+            $last_number = (int)end($parts); 
+            $next_number = $last_number + 1;
+            return $prefix.$next_number;
+        } else {
+            return $prefix.'1001';
+        }
+    }
+
+     public function last_purchase_payment_receipt_number()
+    {
+        // $this->configurations = $this->session->userdata('configurations');
+        // $prefix = $this->configurations['invoiceprefix']; 
+        $prefix =  get_prefix_73();
+        $prefix = $prefix['purcahepayment_prefix'];
+        $this->db->select('receipt_number');
+        $this->db->from('cberp_purchase_receipt_payments');
+        $this->db->order_by('created_date', 'DESC');
+        $this->db->limit(1);
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $last_invoice_number = $query->row()->receipt_number;
+            $parts = explode('/', $last_invoice_number);
+            $last_number = (int)end($parts); 
+            $next_number = $last_number + 1;
+            return $prefix.$next_number;
+        } else {
+            return $prefix.'1001';
+        }
     }
 }

@@ -291,44 +291,6 @@
                         
                      <?php
                     
-// (
-//     [0] => Array
-//         (
-//             [salesorder_number] => TC/SO/1003
-//             [product_code] => PRD2020
-//             [quantity] => 3.00
-//             [price] => 1200.00
-//             [tax] => 0.00
-//             [discount] => 1.00
-//             [total_tax] => 0.00
-//             [total_discount] => 36.00
-//             [total_amount] => 3564.00
-//             [status] => 
-//             [inventory_adjusted] => 0
-//             [discount_type] => Perctype
-//             [lowest_price] => 1100.00
-//             [maximum_discount_rate] => 0.00
-//             [remaining_quantity] => 3
-//             [delivered_quantity] => 0
-//             [transfered_quantity] => 0
-//             [ordered_quantity] => 3
-//             [product_status] => 0
-//             [deliverynote_remaining_quantity] => 0
-//             [deliverynote_delivered_quantity] => 0
-//             [deliverynote_transfered_quantity] => 0
-//             [write_off_quantity] => 
-//             [write_off_by] => 
-//             [write_off_date] => 
-//             [write_off_time] => 
-//             [product_cost] => 1100.00
-//             [product_name] => Prd NAme
-//             [onhandqty] => 210
-//             [unit] => Each
-//             [minprice] => 1100.00
-//             [maximumdiscount] => 1.00
-//             [income_account_number] => 460
-//             [expense_account_number] => 512
-//         )
                                 $i=0;
                                 if(!empty($products))
                                 {

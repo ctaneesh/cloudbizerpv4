@@ -308,7 +308,7 @@
                 <?php echo $this->lang->line('Quantity') ?>
             </td>
             <?php if ($invoice['tax'] > 0) echo '<td style="text-align:center;">' . $this->lang->line('Tax') . '</td>';
-            if ($invoice['discount'] > 0) echo '<td style="text-align:center;">' . $this->lang->line('Discount') . '</td>'; ?>
+            if ($invoice['purchasediscount'] > 0) echo '<td style="text-align:center;">' . $this->lang->line('Discount') . '</td>'; ?>
             <td class="right-align">
                 <?php echo $this->lang->line('SubTotal') ?>
             </td>
@@ -337,9 +337,9 @@
                 $cols++;
                 echo '<td style="width:16%;">' . $row['totaltax'] . ' <span class="tax">(' . amountFormat_s($row['tax']) . '%)</span></td>';
             }
-            if ($invoice['discount'] > 0) {
+            if ($invoice['purchasediscount'] > 0) {
                 $cols++;
-                echo ' <td style="width:12%;text-align:center;">' . number_format($row['discount'],2) . '</td>';
+                echo ' <td style="width:12%;text-align:right;">' . number_format($row['discount'],2) . '</td>';
             }
             echo '<td style="text-align:right;">' . number_format($row['subtotal'],2) . '</td></tr>';
 
@@ -377,7 +377,7 @@
         if ($invoice['tax'] > 0) {
             $sub_t_col++;
         }
-        if ($invoice['discount'] > 0) {
+        if ($invoice['purchasediscount'] > 0) {
             $sub_t_col++;
         }
         ?>
@@ -438,10 +438,10 @@
             <td style="text-align:right">' .number_format($invoice['tax'],2) . '</td>
         </tr>';
         }
-        if ($invoice['discount'] > 0) {
+        if ($invoice['purchasediscount'] > 0) {
             echo '<tr>
             <td>' . $this->lang->line('Total Discount') . '</td>
-            <td style="text-align:right">' . number_format($invoice['discount'],2) . '</td>
+            <td style="text-align:right">' . number_format($invoice['purchasediscount'],2) . '</td>
         </tr>';
         }
         if ($invoice['shipping'] > 0) {
