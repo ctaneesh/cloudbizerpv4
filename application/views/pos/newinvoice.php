@@ -217,20 +217,18 @@
                                 </div>
                                 <div class="tab-pane" id="tab4" role="tabpanel" aria-labelledby="base-tab4">
                                     <div class="form-group row">
-                                        <div class="col-sm-3"><label for="invocieno"
-                                                                     class="caption"><?php echo $this->lang->line('Invoice Number') ?></label>
+                                        <!--<div class="col-sm-3">-->
+											<label for="invocieno" class="caption"><?php echo $this->lang->line('Invoice Number') ?></label>
 
                                             <div class="input-group">
                                                 <div class="input-group-addon"><span class="icon-file-text-o"
                                                                                      aria-hidden="true"></span>
                                                 </div>
-                                                <input type="text" class="form-control" placeholder="Invoice #"
-                                                       name="invocieno" id="invocieno"
-                                                       value="<?php echo $lastinvoice ?>"><!--last+1-->
+                                                <input type="hidden" class="form-control" placeholder="Invoice #" name="invocieno" id="invocieno" value="<?php echo $lastinvoice ?>"><!--last+1-->
                                             </div>
-                                        </div>
-                                        <div class="col-sm-3"><label for="invocieno"
-                                                                     class="caption"><?php echo $this->lang->line('Reference') ?></label>
+                                        <!--</div>-->
+                                        <!--<div class="col-sm-3">-->
+											<label for="invocieno" class="caption"><?php echo $this->lang->line('Reference') ?></label>
 
                                             <div class="input-group">
                                                 <div class="input-group-addon"><span class="icon-bookmark-o"
@@ -240,7 +238,7 @@
                                                        placeholder="Reference #"
                                                        name="refer">
                                             </div>
-                                        </div>
+                                        <!--</div>-->
 
 
                                         <div class="col-sm-3"><label for="invociedate"

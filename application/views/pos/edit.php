@@ -18,7 +18,7 @@
                 <div id="customer" class="col-md-12 ml-3">
                     <div class="clientinfo">
                         <input type="hidden" name="customer_id" id="customer_id"
-                               value="<?= $invoice['csd'] ?>">
+                               value="<?= $invoice['customer_id'] ?>">
                         <div id="customer_name"><strong><?= $invoice['name'] ?></strong></div>
                     </div>
                 </div>
@@ -49,8 +49,8 @@
                         <tbody id="pos_items">
                         <?php $i = 0;
                         foreach ($products as $row) {
-                            echo '<tr id="ppid-' . $i . '"><td colspan="7"><input type="text" class="form-control text-center" name="product_name[]" placeholder="Enter Product name or Code" id="productname-' . $i . '"  value="' . $row['product'] . '"></td></tr>';
-                            echo '    <tr><td><input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['qty']) . '" ><input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['qty']) . '" ></td> <td><input type="text" class="form-control p-mobile req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '"></td><td> <input type="text" class="form-control p-mobile vat" name="product_tax[]" id="vat-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['tax']) . '"></td>  <td><input type="text" class="form-control p-mobile discount pos_w" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' . $i . '" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['discount']) . '"></td> <td><span class="currenty">' . $this->config->item('currency') . '</span> <strong><span class="ttlText" id="result-' . $i . '">' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '</span></strong></td> <td class="text-center"><button type="button" data-rowid="' . $i . '" class="btn btn-danger removeItem" title="Remove"> <i class="fa fa-minus-square"></i> </button> </td><input type="hidden" name="taxa[]" id="taxa-' . $i . '" value="' . amountExchange_s($row['totaltax'], $invoice['multi'], $this->aauth->get_user()->loc) . '"><input type="hidden" name="disca[]" id="disca-' . $i . '" value="' . amountExchange_s($row['totaldiscount'], $invoice['multi'], $this->aauth->get_user()->loc) . '"><input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' . $i . '" value="' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '"> <input type="hidden" class="pdIn" name="pid[]" id="pid-' . $i . '" value="' . $row['pid'] . '"> <input type="hidden" name="unit[]" id="unit-' . $i . '" value="' . $row['unit'] . '"> <input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['code'] . '"> </tr>';
+                            echo '<tr id="ppid-' . $i . '"><td colspan="7"><input type="text" class="form-control text-center" name="product_name[]" placeholder="Enter Product name or Code" id="productname-' . $i . '"  value="' . $row['product_name'] . '"></td></tr>';
+                            echo '    <tr><td><input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['quantity']) . '" ><input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['quantity']) . '" ></td> <td><input type="text" class="form-control p-mobile req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '"></td><td> <input type="text" class="form-control p-mobile vat" name="product_tax[]" id="vat-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['tax']) . '"></td>  <td><input type="text" class="form-control p-mobile discount pos_w" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' . $i . '" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['discount']) . '"></td> <td><span class="currenty">' . $this->config->item('currency') . '</span> <strong><span class="ttlText" id="result-' . $i . '">' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '</span></strong></td> <td class="text-center"><button type="button" data-rowid="' . $i . '" class="btn btn-danger removeItem" title="Remove"> <i class="fa fa-minus-square"></i> </button> </td><input type="hidden" name="taxa[]" id="taxa-' . $i . '" value="' . amountExchange_s($row['total_tax'], $invoice['multi'], $this->aauth->get_user()->loc) . '"><input type="hidden" name="disca[]" id="disca-' . $i . '" value="' . amountExchange_s($row['total_discount'], $invoice['multi'], $this->aauth->get_user()->loc) . '"><input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' . $i . '" value="' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '"> <input type="hidden" class="pdIn" name="pid[]" id="pid-' . $i . '" value="' . $row['product_code'] . '"> <input type="hidden" name="unit[]" id="unit-' . $i . '" value="' . $row['unit'] . '"> <input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['code'] . '"> </tr>';
                             $i++;
                         } ?>
                         </tbody>
@@ -192,7 +192,7 @@
                                 </div>
                                 <input type="text" class="form-control" placeholder="Invoice #"
                                        name="invocieno" id="invocieno"
-                                       value="<?php echo $invoice['tid']; ?>" readonly>
+                                       value="<?php echo $invoice['invoice_number']; ?>" readonly>
                                 <input type="hidden" name="iid"
                                        value="<?php echo $invoice['iid']; ?>">
                             </div>
@@ -222,7 +222,7 @@
                                        placeholder="Billing Date" name="invoicedate"
                                        data-toggle="datepicker"
                                        autocomplete="false"
-                                       value="<?php echo dateformat($invoice['invoicedate']) ?>">
+                                       value="<?php echo dateformat($invoice['invoice_date']) ?>">
                             </div>
                         </div>
                         <div class="col-sm-3"><label for="invocieduedate"
@@ -236,7 +236,7 @@
                                        name="invocieduedate"
                                        placeholder="Due Date" data-toggle="datepicker"
                                        autocomplete="false"
-                                       value="<?php echo dateformat($invoice['invoiceduedate']) ?>">
+                                       value="<?php echo dateformat($invoice['due_date']) ?>">
                             </div>
                         </div>
                     </div>
@@ -294,7 +294,7 @@
                     <select
                             id="warehouses"
                             class="selectpicker form-control teal">
-                        <?php echo $this->common->default_warehouse();
+                        <?php //echo $this->common->default_warehouse();
                         echo '<option value="0">' . $this->lang->line('All') ?></option><?php foreach ($warehouse as $row) {
                             echo '<option value="' . $row['id'] . '">' . $row['title'] . '</option>';
                         } ?>
@@ -528,6 +528,17 @@
                                             </select></div>
                                     </div>
 
+
+									
+
+
+
+
+
+
+
+
+
                                 </div>
                                 <div class="form-group">
 
@@ -555,6 +566,24 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+						<div class="col">
+								<div class="form-group text-bold-600 text-g">
+											<label for="account_p">Account</label>
+
+											<select name="p_account" id="p_account" class="form-control">
+												<!-- <option value="">-- Select Account --</option> -->
+												<?php foreach ($acc_list as $acc): ?>
+													<option value="<?= $acc['id']; ?>">
+														<?= $acc['holder'] . ' / ' . $acc['acn']; ?>
+													</option>
+												<?php endforeach; ?>
+
+											</select>
+
+										</div>
+						            </div>
+						</div>
                         <div class="row">
                             <div class="col">
                                 <button class="btn btn-success btn-lg btn-block"
@@ -774,14 +803,31 @@
         $('#card_total').val(new_pay);
     });
 
-    $(".possubmit3").on("click", function (e) {
+    // $(".possubmit3").on("click", function (e) {
+    //     e.preventDefault();
+    //     var old_p = accounting.unformat($('#old_invoiceyoghtml').val(), accounting.settings.number.decimal);
+    //     var new_p = accounting.unformat($('#invoiceyoghtml').val(), accounting.settings.number.decimal);
+    //     var new_pay = (+new_p) - (+old_p);
+    //     if (new_pay < 0) new_pay = 0;
+    //     $('#b_total').html(accounting.formatNumber(new_pay));
+    //     $('#p_amount').val(accounting.formatNumber(new_pay));
+
+    // });
+
+	$(".possubmit3").on("click", function (e) {
         e.preventDefault();
-        var old_p = accounting.unformat($('#old_invoiceyoghtml').val(), accounting.settings.number.decimal);
-        var new_p = accounting.unformat($('#invoiceyoghtml').val(), accounting.settings.number.decimal);
-        var new_pay = (+new_p) - (+old_p);
-        if (new_pay < 0) new_pay = 0;
-        $('#b_total').html(accounting.formatNumber(new_pay));
-        $('#p_amount').val(accounting.formatNumber(new_pay));
+        var roundoff = parseFloat(accounting.unformat($('#invoiceyoghtml').val(), accounting.settings.number.decimal)).toFixed(two_fixed);
+
+        <?php
+        $round_off = $this->custom->api_config(4);
+        if ($round_off['other'] == 'PHP_ROUND_HALF_UP') {
+            echo ' roundoff=Math.ceil(roundoff);';
+        } elseif ($round_off['other'] == 'PHP_ROUND_HALF_DOWN') {
+            echo ' roundoff=Math.floor(roundoff);';
+        }
+        ?>
+        $('#b_total').html(' <?= $this->config->item('currency'); ?> ' + accounting.formatNumber(roundoff));
+        $('#p_amount').val(accounting.formatNumber(roundoff));
 
     });
 
@@ -825,7 +871,8 @@
         $("#notify .message").html("<strong>Processing</strong>: .....");
         $("#notify").removeClass("alert-danger").addClass("alert-primary").fadeIn();
         $("html, body").animate({scrollTop: $('#notify').offset().top - 100}, 1000);
-        var o_data = $("#data_form").serialize() + '&p_amount=' + $("#p_amount").val() + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type');
+        //var o_data = $("#data_form").serialize() + '&p_amount=' + $("#p_amount").val() + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type');
+		var o_data = $("#data_form").serialize() + '&p_amount=' + accounting.unformat($('#p_amount').val(), accounting.settings.number.decimal) + '&p_method=' + $("#p_method option:selected").val() + '&type=' + $(this).attr('data-type') + '&account=' + $("#p_account option:selected").val() + '&employee=' + $("#employee option:selected").val();
         var action_url = $('#action-url').val();
         addObject(o_data, action_url);
 
@@ -836,6 +883,9 @@
 
 
     });
+
+	//////////new code///////
+	
 </script> <?php
 /*
 The MIT License (MIT)

@@ -18,7 +18,7 @@
 				<div id="customer" class="col-md-12 ml-3">
 					<div class="clientinfo">
 						<input type="hidden" name="customer_id" id="customer_id"
-							   value="<?= $invoice['csd'] ?>">
+							   value="<?= $invoice['customer_id'] ?>">
 						<div id="customer_name"><strong><?= $invoice['name'] ?></strong></div>
 					</div>
 				</div>
@@ -208,23 +208,22 @@
 
 				<div class="tab-pane" id="tab4" role="tabpanel" aria-labelledby="base-tab4">
 					<div class="form-group row">
-						<div class="col-sm-3"><label for="invocieno"
-													 class="caption"><?php echo $this->lang->line('Invoice Number') ?></label>
+						<!--<div class="col-sm-3">-->
+							<label for="invocieno" class="caption"><?php echo $this->lang->line('Invoice Number') ?></label>
 
 							<div class="input-group">
 								<div class="input-group-addon"><span class="icon-file-text-o"
 																	 aria-hidden="true"></span>
 								</div>
-								<input type="text" class="form-control" placeholder="Invoice #"
-									   name="invocieno" id="invocieno"
-									   value="<?php echo $lastinvoice; ?>" >
+								<input type="hidden" class="form-control" placeholder="Invoice #" name="invocieno" id="invocieno" value="<?php echo $lastinvoice; ?>" >
 								<input type="hidden" name="iid"
 									   value="<?php echo $invoice['iid']; ?>">
 								<input type="hidden" name="draft_id"
 									   value="<?php echo $invoice['iid']; ?>">
 							</div>
-						</div>
-						<div class="col-sm-3"><label for="invocieno"
+						<!--</div>-->
+						<!--<div class="col-sm-3">-->
+							<label for="invocieno"
 													 class="caption"><?php echo $this->lang->line('Reference') ?></label>
 
 							<div class="input-group">
@@ -235,7 +234,7 @@
 									   placeholder="Reference #"
 									   name="refer" value="<?php echo $invoice['refer'] ?>">
 							</div>
-						</div>
+						<!--</div>-->
 
 
 						<div class="col-sm-3"><label for="invociedate"

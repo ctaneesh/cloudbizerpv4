@@ -214,7 +214,7 @@ class Pos_invoices extends CI_Controller
         $data['terms'] = $this->invocies->billingterms();
         $data['currency'] = $this->invocies->currencies();
         $data['invoice'] = $this->invocies->invoice_details($tid, $this->limited);
-        if ($data['invoice']['id']) $data['products'] = $this->invocies->invoice_products($tid);
+        if ($data['invoice']['invoice_number']) $data['products'] = $this->invocies->invoice_products($tid);
         $head['title'] = "Edit Invoice #$tid";
         $head['usernm'] = $this->aauth->get_user()->username;
         $data['warehouse'] = $this->invocies->warehouses();
@@ -223,8 +223,10 @@ class Pos_invoices extends CI_Controller
         $data['cat'] = $this->categories_model->category_list();
         $this->load->library("Common");
         $data['taxlist'] = $this->common->taxlist_edit($data['invoice']['taxstatus']);
+		$data['acc_list'] = $this->invocies->accountslist();
+		//print_r($data['acc_list']);exit();
         $this->load->view('fixed/header-pos', $head);
-        if ($data['invoice']['id']) $this->load->view('pos/edit', $data);
+        if ($data['invoice']['invoice_number']) $this->load->view('pos/edit', $data);
         $this->load->view('fixed/footer-pos');
 
     }
@@ -2515,6 +2517,13 @@ class Pos_invoices extends CI_Controller
             $pterms = $this->input->post('pterms');
             //edit
             $diff = $total - $old_total;
+
+			// echo json_encode([
+			// 	'total' => $total,
+			// 	'old_total' => $old_total,
+			// 	'diff' => $diff
+			// ]);
+			// exit();
             $c_amt = $p_amount - $diff;
             if ($c_amt < 0) {
                 $c_amt = 0;
@@ -2522,7 +2531,7 @@ class Pos_invoices extends CI_Controller
             $i = 0;
             if ($this->limited) {
                 $employee = $this->invocies->invoice_details($invocieno, $this->limited);
-                if ($this->aauth->get_user()->id != $employee['eid']) exit();
+                if ($this->aauth->get_user()->id != $employee['employee_id']) exit();
             }
             if ($discountFormat == '0') {
                 $discstatus = 0;
@@ -2552,16 +2561,17 @@ class Pos_invoices extends CI_Controller
                     $total_discount += $amount;
                 }
             }
-            $data = array('invoicedate' => $bill_date, 'invoiceduedate' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'ship_tax' => $shipping_tax, 'ship_tax_type' => $ship_taxtype, 'total' => $total, 'notes' => $notes, 'csd' => $customer_id, 'taxstatus' => $tax, 'discstatus' => $discstatus, 'format_discount' => $discountFormat, 'refer' => $refer, 'term' => $pterms, 'multi' => $currency);
+            $data = array('invoice_date' => $bill_date, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency);
+			
             $this->db->set($data);
-            $this->db->where('id', $invocieno);
+            $this->db->where('invoice_number', $invocieno);
             if ($this->db->update('cberp_invoices', $data)) {
                 //Product Data
                 $pid = $this->input->post('pid');
                 $productlist = array();
                 $prodindex = 0;
                 $itc = 0;
-                $this->db->delete('cberp_invoice_items', array('tid' => $invocieno));
+                $this->db->delete('cberp_invoice_items', array('invoice_number' => $invocieno));
                 $product_id = $this->input->post('pid');
                 $product_name1 = $this->input->post('product_name', true);
                 $product_qty = $this->input->post('product_qty');
@@ -2581,18 +2591,18 @@ class Pos_invoices extends CI_Controller
                     $total_discount += numberClean(@$ptotal_disc[$key]);
                     $total_tax += numberClean($ptotal_tax[$key]);
                     $data = array(
-                        'tid' => $invocieno,
-                        'pid' => $product_id[$key],
-                        'product' => $product_name1[$key],
-                        'code' => $product_hsn[$key],
-                        'qty' => numberClean($product_qty[$key]),
+                        'invoice_number' => $invocieno,
+                        'product_code' => $product_id[$key],
+                        //'product' => $product_name1[$key],
+                        //'code' => $product_hsn[$key],
+                        'quantity' => numberClean($product_qty[$key]),
                         'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
                         'tax' => numberClean($product_tax[$key]),
                         'discount' => numberClean($product_discount[$key]),
                         'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
-                        'totaltax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
-                        'totaldiscount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
-                        'product_des' => $product_des[$key] ?? null,
+                        'total_tax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
+                        'total_discount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
+                        //'product_des' => $product_des[$key] ?? null,
                         'i_class' => 1,
                         'unit' => $product_unit[$key],
                         'serial' => $product_serial[$key] ?? null
@@ -2604,8 +2614,8 @@ class Pos_invoices extends CI_Controller
                     $amt = numberClean($product_qty[$key]) - @numberClean($old_product_qty[$key]);
 
                     if ($product_id[$key] > 0) {
-                        $this->db->set('qty', "qty-$amt", FALSE);
-                        $this->db->where('pid', $product_id[$key]);
+                        $this->db->set('kg_quantity', "kg_quantity-$amt", FALSE);
+                        $this->db->where('product_code', $product_id[$key]);
                         $this->db->update('cberp_products');
                     }
                     $itc += $amt;
@@ -2613,8 +2623,9 @@ class Pos_invoices extends CI_Controller
                 if ($prodindex > 0) {
 
                     $this->db->insert_batch('cberp_invoice_items', $productlist);
-                    $this->db->set(array('discount' => rev_amountExchange_s(amountFormat_general($total_discount), $currency, $this->aauth->get_user()->loc), 'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc), 'items' => $itc));
-                    $this->db->where('id', $invocieno);
+                    //$this->db->set(array('discount' => rev_amountExchange_s(amountFormat_general($total_discount), $currency, $this->aauth->get_user()->loc), 'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc), 'items' => $itc));
+					$this->db->set(array('discount' => rev_amountExchange_s(amountFormat_general($total_discount), $currency, $this->aauth->get_user()->loc), 'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc)));
+                    $this->db->where('invoice_number', $invocieno);
                     $this->db->update('cberp_invoices');
                     if ($product_serial AND count($product_serial) > 0) {
                         $this->db->set('status', 1);
@@ -2626,7 +2637,7 @@ class Pos_invoices extends CI_Controller
                         "Please add at least one product in invoice"));
                     $transok = false;
                 }
-                echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice has  been updated') . " <a href='view?id=$invocieno' class='btn btn-info btn-sm'><span class='icon-file-text2' aria-hidden='true'></span> " . $this->lang->line('View') . " </a> "));
+               // echo json_encode(array('status' => 'Success', 'message' => $this->lang->line('Invoice has  been updated') . " <a href='view?id=$invocieno' class='btn btn-info btn-sm'><span class='icon-file-text2' aria-hidden='true'></span> " . $this->lang->line('View') . " </a> "));
 
                 $this->load->model('billing_model', 'billing');
                 $tnote = '#' . $invocieno_n . '-' . $pmethod;
@@ -2652,7 +2663,20 @@ class Pos_invoices extends CI_Controller
 						$r_amt3 = $diff;
 						break;
                 }
-                $this->billing->paynow($invocieno, $diff, $tnote, $pmethod, $this->aauth->get_user()->loc, 0, $account);
+
+				$paynow_data = [
+				$invocieno,
+				$diff,
+				$tnote,
+				$pmethod,
+				$this->aauth->get_user()->loc,
+				0,
+				$account
+			];
+
+			//echo json_encode($paynow_data);exit();
+                $res = $this->billing->paynow($invocieno, $diff, $tnote, $pmethod, $this->aauth->get_user()->loc, 0, $account);
+				
                 $this->registerlog->update($this->aauth->get_user()->id, $r_amt1, $r_amt2, $r_amt3, 0, $c_amt);
                 if ($promo_flag) {
                     $cqty = $result_c['available'] - 1;
