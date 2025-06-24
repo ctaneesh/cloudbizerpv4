@@ -652,13 +652,15 @@ class Invoicecreditnotes extends CI_Controller
 
         $invoice_retutn_number = ($this->input->get('iid'));
         $data['action_type']="";
+        $data['receipt_numbers']  = "";
         if($invoice_retutn_number)
         {
             $data['action_type']="Edit";
             $data['invoice_retutn_number'] =$invoice_retutn_number;
             $this->load->model('invoice_creditnotes_model', 'invocies_creditnote');
-            $data['notemaster'] = $this->invocies_creditnote->invoice_return_details($invoice_retutn_number); 
-            
+            $data['notemaster'] = $this->invocies_creditnote->invoice_return_details($invoice_retutn_number);             
+            $data['receipt_numbers']  = $this->invocies_creditnote->payment_receipt_number($invoice_retutn_number);
+            // print_r($data['receipt_numbers']); die();
             if($data['notemaster']['created_by'])
             {
                 $data['created_employee'] = employee_details_by_id($data['notemaster']['created_by']);          

@@ -158,12 +158,38 @@
                         <?php
                         if($notemaster['returnid'])
                         {
+                            
+                            
+                            if($receipt_numbers)
+                            {
+                                ?>
+                                <div class="btn-group ">
+                                <button type="button" class="btn btn-sm btn-secondary dropdown-toggle"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                                class="fa fa-print"></i> <?php echo $this->lang->line('Receipts') ?>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <?php
+                                    foreach($receipt_numbers as $receipt_number)
+                                    { 
+                                        $receipt_number = $receipt_number['receipt_number'];
+                                        ?>
+                                        <a class="dropdown-item" href="<?= base_url("invoices/invoicereturn_print?delivery=" . $returnid . "&cust=" . $customerid. '&receipt_number=' . $receipt_number); ?>" target="_blank"><?php echo $receipt_number; ?></a>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                                </div>
+                                <?php
+                            } 
+
                             echo '<a href="' . base_url("invoices/invoicereturn_print?delivery=" . $returnid . "&cust=" . $customerid) . '" class="btn btn-sm btn-secondary" target="_blank"><span class="fa fa-print"></span> Print</a>';
 
-                        } ?>
+                        } 
+                        
+                        ?>
                     </div>
                 </div>
-                
                 <!-- <input type="hidden" value="DeliveryNotes/delivery_return_action" id="action-url"> -->
                    <!-- ========================================================================= -->
 

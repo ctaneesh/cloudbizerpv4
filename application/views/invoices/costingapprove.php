@@ -382,6 +382,7 @@
                             <div class="form-row">
                             
                                 <input type="hidden" name="purchase_id" id="purchase_id" value="<?=$purchasemasterdata['purchase_id']?>">
+                                <input type="hidden" name="action_type" id="action_type" value="<?=$action_type?>">
                                 <input type="hidden" name="purchase_number" id="purchase_number" value="<?=$purchasemasterdata['purchase_number']?>">
                                 <input type="hidden" name="preparedflg" id="preparedflg" value="<?=$purchasemasterdata['prepared_flg']?>">
                                 <input type="hidden" name="token" id="token" value="<?=$token?>">
@@ -493,7 +494,7 @@
                                 </div>  
                                 <!-- ================== ends ===================== -->                                 
                                 <!-- ================== starts ===================== -->
-                                <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12">
+                                <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12 d-none">
                                         <label class="col-form-label"><?php echo 'Purchase Receipt No.'; ?><span class="compulsoryfld">*</span></label>
                                         <div class="frmSearch1">
                                             <input type="text" class="form-control customer_name" name="srv" id="srv" autocomplete="off" value="<?php echo $srvNumber; ?>" required readonly/>
@@ -1326,9 +1327,6 @@
 </div>
 
 <script>
-$(document).ready(function() {
-
-});
 
 
 
@@ -2058,7 +2056,7 @@ $(document).ready(function() {
                            if (typeof response === "string") {
                               response = JSON.parse(response);
                            } 
-                           window.location.href = baseurl + 'Invoices/stockreciepts';
+                        //    window.location.href = baseurl + 'Invoices/stockreciepts';
                            
                         },
                         error: function(xhr, status, error) {

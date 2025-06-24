@@ -842,9 +842,9 @@ $('#addpurchaseproduct').on('click', function () {
     data += '&nbsp;<button type="button" title="change account" class="btn btn-sm btn-secondary" id="btnclk-' + cvalue + '" data-toggle="popover" onclick="loadPopover(' + cvalue +')" data-html="true" data-content=\'<form id="popoverForm-' + cvalue + '"><div class="form-group"><label for="accountList-' + cvalue + '">Select Account</label><select class="form-control" id="accountList-' + cvalue + '"></select></div><div class="text-right"><button type="button" onclick="cancelPopover(' + cvalue + ')" class="btn btn-secondary btn-sm">Cancel</button>&nbsp;<button type="button" onclick="change_product_account(' + cvalue + ')" class="btn btn-primary btn-sm">Change</button></div></form>\'><i class="fa fa-bank"></i></span></button></td>';
 
 
-     data += '</td><td><input type="number" class="form-control req amnt text-right responsive-width-elements" name="product_qty[]" id="amount-' + cvalue + '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' + functionNum + '), billUpyog(), save_changed_values_for_history()" autocomplete="off" value="0"  inputmode="numeric" data-original-value="0"><input type="hidden" id="alert-' + cvalue + '" value=""  name="alert[]"> </td>';
+     data += '</td><td><input type="number" class="form-control req amnt text-right responsive-width-elements" name="product_qty[]" id="amount-' + cvalue + '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' + functionNum + '), billUpyog(), save_changed_values_for_history(),discountWithTotal(' + functionNum + ')" autocomplete="off" value="0"  inputmode="numeric" data-original-value="0"><input type="hidden" id="alert-' + cvalue + '" value=""  name="alert[]"> </td>';
      data += '<td class="text-right"><span id="last_purchase_price_label-' + cvalue + '"></span></td>';
-     data += '<td><input type="text" class="form-control  text-right req prc responsive-width-elements" name="product_price[]" id="price-' + cvalue + '" onkeypress="return isNumber(event)" onkeyup="checkCost(' + functionNum + '), rowTotal(' + functionNum + '), billUpyog(), save_changed_values_for_history()" data-original-value="0" autocomplete="off" inputmode="numeric" ></td><td class="d-none"> <input type="text" class="form-control vat" name="product_tax[]" id="vat-' + cvalue + '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' + functionNum + '), billUpyog()" autocomplete="off" inputmode="numeric"></td> <td id="texttaxa-' + cvalue + '" class="text-center d-none">0</td> <td><input type="text" class="form-control text-right discount" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' + cvalue + '" onkeyup="discountWithTotal(' + functionNum + '),save_changed_values_for_history()" autocomplete="off" data-original-value="0"></td> <td><input type="hidden" class="form-control" name="foc[]" onkeypress="return isNumber(event)" id="foc-' + cvalue + '" ></td> <td class="text-right"><strong><span class=\'ttlText\' id="result-' + cvalue + '">0</span></strong> <div class="costvaluation_section" id="costvaluation_section-' + cvalue + '"><strong class="text-danger" id="cost_warning_val-' + cvalue + '"></strong></div></td> <td class="text-center"><button onclick="single_product_details(' + cvalue + ')" type="button" class="btn btn-sm btn-secondary" title="Product Informations"><i class="fa fa-info"></i></button> <button type="button" data-rowid="' + cvalue + '" class="btn btn-sm btn-secondary removeProd" title="Remove" > <i class="fa fa-trash"></i> </button> </td><input type="hidden" name="taxa[]" id="taxa-' + cvalue + '" value="0"><input type="hidden" name="disca[]" id="disca-' + cvalue + '" value="0"><input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' + cvalue + '" value="0"> <input type="hidden" class="pdIn" name="pid[]" id="pid-' + cvalue + '" value="0"> <input type="hidden" name="unit[]" id="unit-' + cvalue + '" value=""> <input type="hidden" name="serial[]" id="serial-' + cvalue + '" value=""></tr>';
+     data += '<td><input type="text" class="form-control  text-right req prc responsive-width-elements" name="product_price[]" id="price-' + cvalue + '" onkeypress="return isNumber(event)" onkeyup="checkCost(' + functionNum + '), rowTotal(' + functionNum + '), billUpyog(), save_changed_values_for_history(),discountWithTotal(' + functionNum + ')" data-original-value="0" autocomplete="off" inputmode="numeric" ></td><td class="d-none"> <input type="text" class="form-control vat" name="product_tax[]" id="vat-' + cvalue + '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' + functionNum + '), billUpyog()" autocomplete="off" inputmode="numeric"></td> <td id="texttaxa-' + cvalue + '" class="text-center d-none">0</td> <td><input type="text" class="form-control text-right discount" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' + cvalue + '" onkeyup="discountWithTotal(' + functionNum + '),save_changed_values_for_history()" autocomplete="off" data-original-value="0"></td> <td><input type="hidden" class="form-control" name="foc[]" onkeypress="return isNumber(event)" id="foc-' + cvalue + '" ></td> <td class="text-right"><strong><span class=\'ttlText\' id="result-' + cvalue + '">0</span></strong> <div class="costvaluation_section" id="costvaluation_section-' + cvalue + '"><strong class="text-danger" id="cost_warning_val-' + cvalue + '"></strong></div></td> <td class="text-center"><button onclick="single_product_details(' + cvalue + ')" type="button" class="btn btn-sm btn-secondary" title="Product Informations"><i class="fa fa-info"></i></button> <button type="button" data-rowid="' + cvalue + '" class="btn btn-sm btn-secondary removeProd" title="Remove" > <i class="fa fa-trash"></i> </button> </td><input type="hidden" name="taxa[]" id="taxa-' + cvalue + '" value="0"><input type="hidden" name="disca[]" id="disca-' + cvalue + '" value="0"><input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' + cvalue + '" value="0"> <input type="hidden" class="pdIn" name="pid[]" id="pid-' + cvalue + '" value="0"> <input type="hidden" name="unit[]" id="unit-' + cvalue + '" value=""> <input type="hidden" name="serial[]" id="serial-' + cvalue + '" value=""></tr>';
 
    
     //ajax request
@@ -4085,7 +4085,8 @@ function producthistory(id){
 }
 
 function single_product_details(id){
-    var product_id1 = $("#code-" + id).val();
+    var product_id1 = ($("#code-" + id).val()) ? $("#code-" + id).val() : $("#purchasecode-" + id).val();
+
     $.ajax({
         url: baseurl + 'products/product_details',
         dataType: "json",
@@ -4103,16 +4104,16 @@ function single_product_details(id){
                 var tableContent = '<table class="table">';
                 // var tableContent = '<table class="table"><thead><tr><th>Date</th></tr></thead><tbody>';
                 tableContent += '<tr><td class="text-left">Arabic Name</td><td class="text-left">' + data.arabic_name + '</td></tr>';
-                tableContent += '<tr><td class="text-left">Description</td><td class="text-left">' + data.product_des + '</td></tr>';
+                tableContent += '<tr><td class="text-left">Description</td><td class="text-left">' + data.product_name + '</td></tr>';
                 tableContent += '<tr><td class="text-left">Cost</td><td class="text-left">' + data.product_cost + '</td></tr>';
                 tableContent += '<tr><td class="text-left">Selling Price</td><td class="text-left">' + data.product_price + '</td></tr>';
                 tableContent += '<tr><td class="text-left">Web Price</td><td class="text-left">' + data.web_price + '</td></tr>';
                 tableContent += '<tr><td class="text-left">Wholesale Price</td><td class="text-left">' + data.wholesale_price + '</td></tr>';
-                tableContent += '<tr><td class="text-left">Lowest Price</td><td class="text-left">' + data.min_price + '</td></tr>';
-                tableContent += '<tr><td class="text-left">Category</td><td class="text-left">' + data.category + '</td></tr>';
+                tableContent += '<tr><td class="text-left">Lowest Price</td><td class="text-left">' + data.minimum_price + '</td></tr>';
+                // tableContent += '<tr><td class="text-left">Category</td><td class="text-left">' + data.category + '</td></tr>';
                 tableContent += '<tr><td class="text-left">Supplier</td><td class="text-left">' + data.supplier + '</td></tr>';
                 tableContent += '<tr><td class="text-left">Made In</td><td class="text-left">' + data.madein + '</td></tr>';
-                itemtitle = data.product_name+"("+data.product_code+")";
+                itemtitle = data.product_name+"("+product_id1+")";
                 tableContent += '</tbody></table>';
                 fulldata = "<h4><b>"+itemtitle+"</b></h4>"+tableContent;
             }
@@ -4159,7 +4160,7 @@ function single_product_direct_details(id){
                 tableContent += '<tr><td>Web Price</td><td>' + data.web_price + '</td></tr>';
                 tableContent += '<tr><td>Wholesale Price</td><td>' + data.wholesale_price + '</td></tr>';
                 tableContent += '<tr><td>Lowest Price</td><td>' + data.min_price + '</td></tr>';
-                tableContent += '<tr><td>Category</td><td>' + data.category + '</td></tr>';
+                // tableContent += '<tr><td>Category</td><td>' + data.category + '</td></tr>';
                 tableContent += '<tr><td>Supplier</td><td>' + data.supplier + '</td></tr>';
                 tableContent += '<tr><td>Made In</td><td>' + data.madein + '</td></tr>';
                 itemtitle = data.product_name+"("+data.product_code+")";

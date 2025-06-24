@@ -903,6 +903,7 @@ function get_latest_journal_number()
     return $query->row_array();
 
  }
+
  //newly added erp2024 19-11-2024
  function insert_transaction($type, $cat, $amount, $coa_account_id, $transaction_number, $invoice_number,$payerid="") {
     $ci =& get_instance();
@@ -1036,9 +1037,9 @@ function insert_return_payment_transaction_link($trans_type,$invoice_number, $tr
 }
 function update_invoice($invoice_number, $pmethod, $paid_amount, $payment_status) {
     $ci =& get_instance();
-    $ci->db->set('payment_method', $pmethod);
-    $ci->db->set('payment_recieved_date', date('Y-m-d'));
-    $ci->db->set('payment_recieved_amount', $paid_amount);
+    // $ci->db->set('payment_method', $pmethod);
+    // $ci->db->set('payment_recieved_date', date('Y-m-d'));
+    $ci->db->set('paid_amount', $paid_amount);
     $ci->db->set('status', $payment_status);
     $ci->db->where('invoice_number', $invoice_number);
     $ci->db->update('cberp_invoices');
@@ -2371,7 +2372,7 @@ function convertToMillimeters($value, $unit = 'mm', $dpi = 96) {
 function get_prefix_73()
 {  
    $ci =& get_instance();
-   $ci->db->select('name AS default_invoice_print');
+   $ci->db->select('name AS default_invoice_print,key1 AS invoicereceipt_prefix, key2 AS invoicereturnreceipt_prefix,  url AS purcahepayment_prefix');
    $ci->db->from('univarsal_api');
    $ci->db->where('id', 73);
    $query = $ci->db->get();

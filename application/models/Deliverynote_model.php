@@ -293,7 +293,7 @@ class Deliverynote_model extends CI_Model
     public function check_customer_is_same($selectedIds) {
         $this->db->select('DISTINCT(customer_id), store_id');
         $this->db->from('cberp_delivery_notes');
-        $this->db->where_in('delevery_note_id', $selectedIds);
+        $this->db->where_in('delivery_note_number', $selectedIds);
         $query = $this->db->get();
         // die($this->db->last_query());
         $result = $query->result_array();
@@ -331,47 +331,43 @@ class Deliverynote_model extends CI_Model
     {
         $this->db->select('
             cberp_delivery_notes.store_id as store_id,
-            cberp_delivery_notes.refer as refer, 
+            cberp_delivery_notes.reference as refer, 
             cberp_delivery_notes.order_discount, 
-            cberp_delivery_notes.term as term,
+            cberp_delivery_notes.payment_term as term,
             cberp_delivery_notes.customer_id,
-            cberp_delivery_notes.delnote_number as delnote_number,
+            cberp_delivery_notes.delivery_note_number as delnote_number,
             cberp_delivery_notes.delivery_note_number,
-            cberp_delivery_notes.eid as employeeid,
+            cberp_delivery_notes.created_by as employeeid,
             cberp_delivery_notes.transaction_number,
-            cberp_delivery_note_items.delevery_note_id,
-            cberp_delivery_note_items.salesorder_id,
-            cberp_delivery_note_items.product_id,
-            cberp_delivery_note_items.product,
-            cberp_delivery_note_items.product_qty, 
+            cberp_delivery_note_items.salesorder_number as salesorder_id,
+            cberp_delivery_note_items.product_code,
+            cberp_delivery_note_items.quantity as product_qty, 
             cberp_delivery_note_items.product_price,
             cberp_delivery_note_items.product_tax,
             cberp_delivery_note_items.product_discount,
             cberp_delivery_note_items.discount_type,
-            cberp_delivery_note_items.product_code,
             cberp_delivery_note_items.subtotal,
-            cberp_delivery_note_items.totaldiscount,
-            cberp_delivery_note_items.totaltax,
-            cberp_delivery_note_items.unit,
-            cberp_delivery_note_items.salesorder_product_qty,
-            cberp_delivery_note_items.delivery_returned_qty,
-            cberp_delivery_note_items.discount_type AS delnote_discounttype,
+            cberp_delivery_note_items.total_discount,
+            cberp_delivery_note_items.total_tax,
+            cberp_products.unit,
+            cberp_delivery_note_items.salesorder_product_quantity as salesorder_product_qty,
+            cberp_delivery_note_items.delivery_returned_quantity as delivery_returned_qty,
             cberp_delivery_note_items.status,
-            cberp_delivery_note_items.product_cost,cberp_delivery_note_items.totaldiscount AS deliverytotaldiscount,
-            cberp_products.product_name AS product_name, cberp_products.alert_quantity, cberp_products.product_code, cberp_products.unit, cberp_product_ai.min_price as minprice,cberp_product_ai.max_disrate as maximumdiscount,cberp_product_ai.income_account_number,cberp_product_ai.expense_account_number,cberp_products.onhand_quantity AS totalQty,cberp_delivery_note_items.subtotal AS deliverysubtotal, cberp_delivery_note_items.totaltax AS deliverytaxtotal'
+            cberp_delivery_note_items.product_cost,cberp_delivery_note_items.total_discount AS deliverytotaldiscount,
+            cberp_product_description.product_name AS product_name, cberp_products.alert_quantity, cberp_products.product_code, cberp_products.unit, cberp_product_pricing.minimum_price as minprice,cberp_products.maximum_discount_rate as maximumdiscount,cberp_products.income_account_number,cberp_products.expense_account_number,cberp_products.onhand_quantity AS totalQty,cberp_delivery_note_items.subtotal AS deliverysubtotal, cberp_delivery_note_items.total_tax AS deliverytaxtotal'
             
         );
 
         
         $this->db->from('cberp_delivery_notes');
-        $this->db->join('cberp_delivery_note_items', 'cberp_delivery_note_items.delevery_note_id = cberp_delivery_notes.delevery_note_id');
-        $this->db->join('cberp_store', 'cberp_store.id = cberp_delivery_notes.store_id');
-        $this->db->join('cberp_products', 'cberp_products.pid = cberp_delivery_note_items.product_id', 'left');
-        $this->db->join('cberp_product_ai', 'cberp_product_ai.product_id = cberp_products.pid', 'left');
-        $this->db->where_in('cberp_delivery_notes.delevery_note_id', $id);
+        $this->db->join('cberp_delivery_note_items', 'cberp_delivery_note_items.delivery_note_number = cberp_delivery_notes.delivery_note_number');
+        $this->db->join('cberp_store', 'cberp_store.store_id = cberp_delivery_notes.store_id');
+        $this->db->join('cberp_products', 'cberp_products.product_code = cberp_delivery_note_items.product_code');
+        $this->db->join('cberp_product_description', 'cberp_product_description.product_code = cberp_products.product_code');
+        $this->db->join('cberp_product_pricing', 'cberp_product_pricing.product_code = cberp_products.product_code', 'left');
+        $this->db->where_in('cberp_delivery_notes.delivery_note_number', $id);
 
         $query = $this->db->get();
-    //   die($this->db->last_query());
         $result = $query->result_array();
         return $result;
 
@@ -492,7 +488,7 @@ class Deliverynote_model extends CI_Model
     }
     public function order_amount_total_by_delivery_note_ids($delivery_note_ids){
         $this->db->select_sum('order_discount');
-        $this->db->where_in('delevery_note_id', $delivery_note_ids);
+        $this->db->where_in('delivery_note_number', $delivery_note_ids);
         $query = $this->db->get('cberp_delivery_notes');
         $result = $query->row();
         $order_discount_sum = $result->order_discount;

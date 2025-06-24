@@ -722,8 +722,8 @@ $(document).ready(function(){
          $('.paymentrequired').prop('required', false); // No required fields for Cash
       } 
       else if (selectedValue == 'Card') {
-         $('.cardtype').removeClass('d-none'); // Show card section
-         $('.cardrequired').prop('required', true); // Make card fields required
+         // $('.cardtype').removeClass('d-none'); // Show card section
+         // $('.cardrequired').prop('required', true); // Make card fields required
       } 
       else if (selectedValue == 'Cheque') {
          $('.chequetype').removeClass('d-none'); // Show cheque section

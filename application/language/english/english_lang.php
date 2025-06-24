@@ -1939,4 +1939,9 @@ $lang['Second Level'] = "Second Level";
 $lang['Third Level'] = "Third Level";
 $lang['All approvals are not completed'] = "All approvals are not completed";
 $lang['Sent Date'] = "Sent Date";
+$lang['Receipts'] = "Receipts";
+$lang['Invoice Receipt Prefix'] = "Invoice Receipt Prefix";
+$lang['Invoice Return Receipt Prefix'] = "Invoice Return Receipt Prefix";
+$lang['Purchase Payment Receipt Prefix'] = "Purchase Payment Receipt Prefix";
 $lang[''] = "--";
+

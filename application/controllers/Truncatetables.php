@@ -68,7 +68,7 @@ class Truncatetables extends CI_Controller
             'cberp_purchase_return_logs',
             'cberp_stock_returns',
             'cberp_stock_returns_items',
-            'transactions_ai',
+            'cberp_payments',
             'cberp_transactions',
             'cberp_delivery_returns',
             'cberp_delivery_return_items',
@@ -95,6 +95,8 @@ class Truncatetables extends CI_Controller
             'cberp_purchase_reciept_returns',
             'cberp_purchase_reciept_returns_items',
             'cberp_approval',
+            'cberp_invoice_payments',
+            'cberp_invoice_payments_details',
         ];
         foreach ($tables as $table) {
             $this->db->truncate($table);

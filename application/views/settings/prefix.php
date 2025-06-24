@@ -19,17 +19,19 @@
                 <div class="message"></div>
             </div>
             <div class="card-body">
-                <form method="post" id="product_action" class="form-horizontal">
+                <form method="post" id="prefix_form" class="form-horizontal">
 
 
                     <input type="hidden" name="id" value="<?php echo $company['id'] ?>">
                     <div class="form-group row">
                         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
-                            <label class="col-form-label"
-                               for="invoiceprefix"><?php echo $this->lang->line('Invoice Prefix') ?><span class="compulsoryfld">*</span></label>
-                            <input type="text" placeholder="invoiceprefix"
-                                   class="form-control margin-bottom  required" name="invoiceprefix"
-                                   value="<?php echo $company['prefix'] ?>" maxlength="15">
+                            <label class="col-form-label" for="invoiceprefix"><?php echo $this->lang->line('Invoice Prefix') ?><span class="compulsoryfld">*</span></label>
+                            <input type="text" placeholder="invoiceprefix" class="form-control margin-bottom  required" name="invoiceprefix"  value="<?php echo $company['prefix'] ?>" maxlength="15">
+                        </div>
+             
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                            <label class="col-form-label" for="invoiceprefix"><?php echo $this->lang->line('Invoice Receipt Prefix') ?><span class="compulsoryfld">*</span></label>
+                            <input type="text" placeholder="invoice_receipt_prefix" class="form-control margin-bottom  required" name="invoice_receipt_prefix"  value="<?php echo $prefix['receipts']['key1'] ?>" maxlength="15">
                         </div>
                         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
                             <label class="col-form-label"
@@ -39,8 +41,11 @@
                                    value="<?php echo $prefix['returns']['url'] ?>" maxlength="15">
                         </div>
                         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
-                            <label class="col-form-label"
-                               for="invoiceprefix">POS <?php echo $this->lang->line('Invoice Prefix') ?><span class="compulsoryfld">*</span></label>
+                            <label class="col-form-label" for="invoiceprefix"><?php echo $this->lang->line('Invoice Return Receipt Prefix') ?><span class="compulsoryfld">*</span></label>
+                            <input type="text" placeholder="invoice_return_receipt_prefix" class="form-control margin-bottom  required" name="invoice_return_receipt_prefix"  value="<?php echo $prefix['receipts']['key2'] ?>" maxlength="15">
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                            <label class="col-form-label"  for="invoiceprefix">POS <?php echo $this->lang->line('Invoice Prefix') ?><span class="compulsoryfld">*</span></label>
                             <input type="text" placeholder="pos_prefix"
                                    class="form-control margin-bottom  required" name="pos_prefix"
                                    value="<?php echo $prefix['pos'] ?>" maxlength="15">
@@ -94,6 +99,11 @@
                             <label class="col-form-label"
                                for="invoiceprefix"><?php echo $this->lang->line('Purchase Receipt') . ' ' . $this->lang->line('Prefix') ?><span class="compulsoryfld">*</span></label>
                                 <input type="text" class="form-control margin-bottom  required" name="recieptprefix" value="<?php echo $prefix['suffix'] ?>" maxlength="15">
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                            <label class="col-form-label"
+                               for="invoiceprefix"><?php echo $this->lang->line('Purchase Payment Receipt Prefix')  ?><span class="compulsoryfld">*</span></label>
+                                <input type="text" class="form-control margin-bottom  required" name="purchase_payment_prefix" value="<?php echo $prefix['receipts']['url'] ?>" maxlength="15">
                         </div>
                         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-xs-12">
                             <label class="col-form-label"
@@ -155,10 +165,79 @@
     </div>
 </div>
 <script type="text/javascript">
-    $("#billing_update").click(function (e) {
+$(document).ready(function() {
+
+    // erp2024 newly added 14-06-2024 for detailed history log ends 
+    $("#prefix_form").validate($.extend(true, {}, globalValidationExpandLevel,{
+        ignore: [], // Important: Do not ignore hidden fields (used by summernote)
+        rules: {               
+            invoiceprefix: { required: true },
+            // bill_number: { required: true },
+            // srv: { required: true },
+            // bill_amount: { required: true },
+            // srvdate: { required: true },
+            // bill_date: { required: true },
+            
+        },
+        messages: {
+            invoiceprefix: "Invoice Prefix",
+            // bill_number: "Enter Bill No.",
+            // srv: "Purchase Receipt Voucher No. required",
+            // bill_amount: "Enter Bill Amount equal to the Purchase Order Amount",
+            // srvdate: "Enter Purchase Receipt Date",
+            // bill_date: "Enter Bill Date",
+        }
+    }));    
+
+});
+    // $("#billing_update").click(function (e) {
+    //     e.preventDefault();
+    //     var actionurl = baseurl + 'settings/prefix';
+    //     actionProduct(actionurl);
+    // });
+
+    $("#billing_update").on("click", function(e) {
+
         e.preventDefault();
-        var actionurl = baseurl + 'settings/prefix';
-        actionProduct(actionurl);
+        $('#billing_update').prop('disabled', true);
+        if ($("#prefix_form").valid()) {
+            
+            Swal.fire({
+                    title: "Are you sure?",
+                    "text":"Do you want to Update Prefix?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, proceed!',
+                    cancelButtonText: "No - Cancel",
+                    reverseButtons: true,
+                    focusCancel: true
+            }).then((result) => {
+                    if (result.isConfirmed) {
+                    var formData = $("#prefix_form").serialize(); 
+                    $.ajax({
+                        type: 'POST',
+                        url: baseurl +'settings/prefix',
+                        data: formData,
+                        success: function(response) {
+                            location.reload();
+                        },
+                        error: function(xhr, status, error) {
+                                // Handle error
+                                console.error(xhr.responseText);
+                        }
+                    });
+                    }
+                    else{
+                    $('#billing_update').prop('disabled', false);
+                    }
+            });
+        }
+        else{
+                $('.page-header-data-section').css('display','block');
+                $('#billing_update').prop('disabled', false);
+            }
     });
 </script>
 

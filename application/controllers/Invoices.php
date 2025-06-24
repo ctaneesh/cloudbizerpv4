@@ -51,10 +51,7 @@ class Invoices extends CI_Controller
 
     public function costing()
     {
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
-
+        
         //purchaseitemsdata
         $id = $this->input->get('pid', true);
         $token = $this->input->get('token', true);  
@@ -62,13 +59,13 @@ class Invoices extends CI_Controller
         $this->load->model('plugins_model', 'plugins');
         $this->load->library("Common");            
         
-        
+        $data['action_type'] ="";
         $this->load->model('employee_model', 'employee');
         if(isset($id) || !empty($id)) 
         {
             // ini_set('display_errors', 1);
             // ini_set('display_startup_errors', 1);
-            // error_reporting(E_ALL);
+            // error_reporting(E_ALL); 
             $data['trackingdata'] = tracking_details('purchase_order_number',$id);
             $data['purchasemasterdata'] = $this->costingcalculation->purchase_details($id);
             $data['purchaseitemsdata'] = $this->costingcalculation->purchase_item_details($id);
@@ -78,9 +75,8 @@ class Invoices extends CI_Controller
             $data['purchasemasterdata']['salepoint_name'] = $data['default_warehouse']['store_name'];
             $data['purchase_number'] = $id;
             $data['purchaseid'] = $id;           
-            $srvData = $this->costingcalculation->lastsrvNumber($id);
-            $data['srvNumber'] = $srvData['srv'];
-            $data['srvFlg'] = $srvData['srvflg'];           
+            $data['srvNumber'] = $this->costingcalculation->lastsrvNumber($id);
+            $data['srvFlg'] =1;           
             $data['purchaseexpensesdata'] = [];            
             $data['purchaserecipts'] = $this->costingcalculation->get_purchase_receipt_by_srvNumber($data['srvNumber']);    
             $data['custom_fields_c'] = $this->custom->add_fields(1);
@@ -97,7 +93,7 @@ class Invoices extends CI_Controller
             // ini_set('display_errors', 1);
             // ini_set('display_startup_errors', 1);
             // error_reporting(E_ALL);
-          
+            $data['action_type'] ="Edit";
             $purchase_reciept_number = $this->input->get('id', true);
             $data['trackingdata'] = tracking_details('purchase_reciept_number',$purchase_reciept_number);  
             $data['purchaseorderdata'] = $this->costingcalculation->purchase_order_by_srv($purchase_reciept_number);
@@ -210,30 +206,31 @@ class Invoices extends CI_Controller
     }
 
     //stock recipt insert action cberp_transaction_tracking
-    public function dataoperation(){
-        //  ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+    public function dataoperation()
+    {
+         ini_set('display_errors', 1);
+         ini_set('display_startup_errors', 1);
+         error_reporting(E_ALL);
+
         $purchase_id = $this->input->post('purchase_id', true);
         $purchase_number = $this->input->post('purchase_number', true);
         $costfactor = $this->input->post('cost_factor', true);
         $receipt_id = $this->input->post('receipt_id', true);
-        $purchase_reciept_number = $this->input->post('srv', true);
+        $action_type = $this->input->post('action_type', true);
+        $purchase_reciept_number = ($action_type) ? $this->input->post('srv', true) : $this->costingcalculation->lastsrvNumber($receipt_id);
         $master_data = [
-            "salepoint_name" => $this->input->post('salepoint_name', true),
             "salepoint_id" => $this->input->post('salepoint_id', true),
             "purchase_number" => $purchase_number,
             "supplier_id" => $this->input->post('supplier_id', true),
-            "party_name" => $this->input->post('party_name', true),
             "damageclaim_account_id" => $this->input->post('damageclaim_ac', true),
-            "damageclaim_ac_name" => $this->input->post('damageclaim_ac_name', true),
+            // "damageclaim_ac_name" => $this->input->post('damageclaim_ac_name', true),
             "bill_number" => $this->input->post('bill_number', true),
             "bill_date" => datefordatabase($this->input->post('bill_date', true)),
             "currency_id" => $this->input->post('currency_id', true),
             "currency_rate" => $this->input->post('currency_rate', true),
             "bill_description" => $this->input->post('bill_description', true),
             "purchase_type" => $this->input->post('doctype', true),
-            "purchase_reciept_number" => $this->input->post('srv', true),
+            "purchase_reciept_number" => $purchase_reciept_number,
             "purchase_receipt_date" => date("Y-m-d"),
             "purchase_amount" => numberClean($this->input->post('purchase_amount', true)),
             "cost_factor" => $costfactor,
@@ -252,15 +249,15 @@ class Invoices extends CI_Controller
         if($employee)
         {
             $master_data['assign_to'] = $employee;
-            $master_data['approved_by'] = $this->session->userdata('id');
-            $master_data['approved_dt'] = date("Y-m-d H:i:s");
-            $master_data['approval_flag'] = '1';
+            // $master_data['approved_by'] = $this->session->userdata('id');
+            // $master_data['approved_dt'] = date("Y-m-d H:i:s");
+            // $master_data['approval_flag'] = '1';
             $master_data['reciept_status'] = 'Assigned';
         }
         $stockreciptid = "";
         $changedFields = $_POST['changedFields'];
         if(!empty($master_data) && !empty($this->input->post('salepoint_name', true)) && !empty( $this->input->post('bill_number', true))){
-            $query = $this->db->select('id,purchase_reciept_number')
+            $query = $this->db->select('purchase_reciept_number')
             ->from('cberp_purchase_receipts')
             ->where('purchase_number', $purchase_number)
             ->where('purchase_reciept_number', $purchase_reciept_number)
@@ -271,16 +268,18 @@ class Invoices extends CI_Controller
                 $this->db->update('cberp_purchase_receipts', $master_data);
                 // die($this->db->last_query());
                 
-                $stockreciptid = $existing_row['id'];
+                $stockreciptid = $existing_row['purchase_reciept_number'];
                 detailed_log_history('Purchasereceipt',$purchase_reciept_number,'Purchase Receipt Updated',$changedFields);
             } 
             else 
             {
-                $srvData = $this->costingcalculation->lastsrvNumber($id);
-                $master_data['purchase_reciept_number'] = $srvData['srv']; 
+                // $srvData = $this->costingcalculation->lastsrvNumber($purchase_reciept_number);
+                $srvData = $purchase_reciept_number;
+                $master_data['purchase_reciept_number'] = $srvData; 
                 $purchase_reciept_number = $master_data['purchase_reciept_number'];             
                 $this->db->insert('cberp_purchase_receipts', $master_data);
-                $stockreciptid = $this->db->insert_id();
+                die($this->db->last_query());
+                $stockreciptid = $purchase_reciept_number;
                  //erp2024 06-01-2025 detailed history log starts                
                 detailed_log_history('Purchaseorder',$purchase_number,'Purchase Receipt Created', $changedFields);
                 detailed_log_history('Purchasereceipt',$purchase_reciept_number,'Purchase Receipt Created','');
@@ -328,7 +327,6 @@ class Invoices extends CI_Controller
                     'product_code'             => $product_code[$key],
                     'ordered_quantity'         => $product_qty[$key],
                     'product_quantity_recieved' => $product_qty_recieved[$key],
-                    'product_foc'            => numberClean($product_foc[$key]),
                     'damaged_quantity'        => $damage[$key],
                     'price'                  => numberClean($price[$key]),
                     'saleprice'              => numberClean($saleprice[$key]),
@@ -336,7 +334,6 @@ class Invoices extends CI_Controller
                     'discountperc'           => $discountperc[$key],
                     'discountamount'         => $discountamount[$key],
                     'netamount'              => numberClean($netamount[$key]),
-                    'description'            => $description[$key],
                     'qaramount'              => numberClean($qaramount[$key]),
                     'account_code'           => $account_code[$key],
                     'created_date'           => date("Y-m-d H:i:s"),
@@ -836,12 +833,14 @@ class Invoices extends CI_Controller
         $data['default_print'] = $default_print['default_invoice_print'];
         $invoice_type="";
         $data['invoice_action_type']="";
+        $data['receipt_numbers'] = "";
         if($invoice_number)
         {
             $invoice_type="edit";
             $data['invoice_action_type']="edit";
             $data['trackingdata'] = tracking_details('invoice_number',$invoice_number);
             $data['paymentmethod_details'] = $this->invocies->payment_method_details($invoice_number);
+            $data['receipt_numbers']  = $this->invocies->payment_receipt_number($invoice_number);
             if($this->module_number)
             {
                 $data['approved_levels'] = function_approved_levels($this->module_number,$invoice_number);
@@ -932,9 +931,7 @@ class Invoices extends CI_Controller
         $data['convert_type']="";
         if($delivery_note_number)
         {
-            // ini_set('display_errors', 1);
-            // ini_set('display_startup_errors', 1);
-            // error_reporting(E_ALL);
+          
             $data['master'] = $this->deliverynote->deliverynoteby_number($delivery_note_number);
             $data['convert_type'] = "Single";
             $data['products'] = $this->deliverynote->deliverynote_products($delivery_note_number);
@@ -947,6 +944,9 @@ class Invoices extends CI_Controller
         }
         else if($delivery_note_numbers)
         {
+            //   ini_set('display_errors', 1);
+            // ini_set('display_startup_errors', 1);
+            // error_reporting(E_ALL);
             $data['convert_type'] = "Multiple";
             $selected_delivery_notes =  $this->session->userdata('selecteddelnoteids');
             // $data['master'] = $this->deliverynote->deliverynoteby_number($delivery_note_number);
@@ -1969,7 +1969,6 @@ class Invoices extends CI_Controller
     //invoices list
     public function index()
     {
-       
         // $dates =  getCommonDateRanges(); echo "<pre>"; print_r($dates); die();
         $data['permissions'] = load_permissions('Accounts','Invoices','Manage Invoices1','List');
         $head['title'] = "Manage Invoices";
@@ -2004,6 +2003,8 @@ class Invoices extends CI_Controller
             $row[] = $no;
             $disablecls="";
             $checkedres="";
+            $receipt_number = $this->invocies->payment_receipt_number($invoices->invoice_number);
+            $receipt_number = ($receipt_number) ? $receipt_number[0]['receipt_number'] :"" ;
             $checkedres = $this->invocies->check_delivered_and_return_qty_equal($invoices->invoice_number);
             $invoicetid = (!empty($invoices->invoice_number)) ? $invoices->invoice_number :$invoices->invoice_number;
             $targeturl = '<a href="' . base_url("invoices/create?id=$invoices->invoice_number") . '">' . $invoicetid . '</a>' ;
@@ -2018,11 +2019,12 @@ class Invoices extends CI_Controller
             $row[] = '<b style="color:'.$colorcode.'">'.$dudate.'</b>';
 
             // $row[] = dateformat($invoices->due_date);
-            $row[] = $invoices->total; 
+            $row[] = $invoices->grand_total; 
             // $row[] = !empty($invoices->payment_recieved_date) ? dateformat($invoices->payment_recieved_date):""; 
-            $paymentdate = !empty($invoices->payment_recieved_date) ? dateformat($invoices->payment_recieved_date):"";
-            $paidamount = ($invoices->payment_recieved_amount>0) ? number_format($invoices->payment_recieved_amount,2) : "";
-            $row[] = "<b>". ($paidamount)."</b><br>".$paymentdate;
+            // $paymentdate = !empty($invoices->payment_recieved_date) ? dateformat($invoices->payment_recieved_date):"";
+            $paidamount = ($invoices->paid_amount>0) ? number_format($invoices->paid_amount,2) : "";
+            $row[] = "<b>". ($paidamount)."</b>";
+            // $row[] = "<b>". ($paidamount)."</b><br>".$paymentdate;
            
             $pending_invoice = $this->invocies->payment_pending_invoice($invoices->customer_id);
             switch ($invoices->status) {
@@ -2042,7 +2044,7 @@ class Invoices extends CI_Controller
                     break;
                 case 'partial':
                     if ($pending_invoice == 1) {
-                        $makepaymentbtn = '<a href="' . base_url("invoices/customer_payment?id=$invoices->invoice_number&csd=$invoices->customer_id") . '" class="btn btn-secondary btn-sm"><span class="fa fa-money"></span> Make Payment</a>';
+                        $makepaymentbtn = ' <a href="' . base_url("invoices/customer_payment?id=$invoices->invoice_number&csd=$invoices->customer_id") . '" class="btn btn-secondary btn-sm"><span class="fa fa-money"></span> Make Payment</a>';
                     } else {
                         $makepaymentbtn = '';
                     }
@@ -2086,6 +2088,8 @@ class Invoices extends CI_Controller
             $validtoken = hash_hmac('ripemd160', $invoices->invoice_number, $this->config->item('encryption_key'));                     
             $editbtn = ($invoices->payment_recieved_amount<=0) ? '<a href="' . base_url("invoices/edit?id=$invoices->invoice_number") . '" class="btn btn-secondary btn-sm "><span class="fa fa-pencil"></span></a>&nbsp;':'';
 
+          
+
             $printbtn = ($default_print_type=='Dot Matrix Print') ? '<a href="' . base_url("billing/pre_print_invoice?id=" . $invoices->invoice_number . "&token=" . $validtoken) . '" class="btn btn-secondary btn-sm" title="Print Invoice" target="_blank"><span class="fa fa-print"></span></a>' : '<a href="' . base_url("billing/printinvoice?id=" . $invoices->invoice_number . "&token=" . $validtoken) . '" class="btn btn-secondary btn-sm" title="Print Invoice" target="_blank"><span class="fa fa-print"></span></a>';
             $actionbtn = ($invoices->status == 'Draft') ? '' : $printbtn . $makepaymentbtn . ' ' . $creditnoteBtn;
         
@@ -2111,15 +2115,13 @@ class Invoices extends CI_Controller
     public function action()
     {
 
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+  
         $convert_type = $this->input->post('convert_type');
         $delevery_note_id = $this->input->post('delevery_note_number');
         $invoice_type =  "Deliverynote";
         if (empty($delevery_note_id[0])) {
             $delevery_note_id = [];
-            $invoice_type = "POS";
+            $invoice_type = "Direct";
         }
 
         
@@ -2169,7 +2171,7 @@ class Invoices extends CI_Controller
         $discountFormat = $this->input->post('discountFormat');
         $pterms = $this->input->post('pterms', true);
         $payment_type = $this->input->post('payment_type', true);
-        $invoice_type = $this->input->post('invoice_type', true);
+        // $invoice_type = $this->input->post('invoice_type', true);
         
         // $total = $total - $order_discount; changedFields cberp_product_to_store
 
@@ -2205,29 +2207,11 @@ class Invoices extends CI_Controller
         $transok = true;
         $st_c = 0;
         $this->load->library("Common");
-        // $this->db->trans_start();
+        $this->db->trans_start();
         //Invoice Data get_transnumber
         $bill_date = datefordatabase($invoicedate);
         $bill_due_date = datefordatabase($invocieduedate);
 
-        // $this->db->select('invoice_number');
-        // $this->db->from('cberp_invoices');
-        // $this->db->order_by('invoice_date', 'DESC');
-        // $this->db->limit(1);
-        // $this->db->where('invoice_number', $invocieno);
-        // $query = $this->db->get();
-        // if(@$query->row()->invoice_number){
-        //     $this->db->select('invoice_number');
-        //     $this->db->from('cberp_invoices');
-        //     $this->db->order_by('invoice_date', 'DESC');
-        //     $this->db->limit(1);
-        //     $query = $this->db->get();
-        //     $last_invoice_number = $query->row()->invoice_number;
-        //     $parts = explode('/', $last_invoice_number);
-        //     $last_number = (int)end($parts); 
-        //     $next_number = $last_number + 1;
-        //     $invocieno=$next_number;
-        // }
 
         //erp2024 new item 11-11-2024
         $status = ($this->input->post('status', true)=='Draft') ? 'due' : $this->input->post('status', true);
@@ -2236,10 +2220,12 @@ class Invoices extends CI_Controller
             $status ='paid';
         }
         
-        $data = array('invoice_number'=>$invoice_number, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $emp, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'loc' => $this->aauth->get_user()->loc,'order_discount'=>$order_discount,'store_id'=>$store_id,'transaction_number'=>$transaction_number,'status'=>$status,'payment_type'=>$payment_type,'invoice_type'=>$invoice_type);
-        // if ($convert_type) {
-        //     $data['delevery_note_id'] = is_array($delevery_note_id) ? implode(',', $delevery_note_id) : $delevery_note_id;
-        // }
+        $data = array('invoice_number'=>$invoice_number, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'grand_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $emp, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'loc' => $this->aauth->get_user()->loc,'order_discount'=>$order_discount,'store_id'=>$store_id,'transaction_number'=>$transaction_number,'status'=>$status,'invoice_type'=>$invoice_type);
+
+       //delevery_note_number
+        if ($convert_type) {
+            $data['delevery_note_number'] = is_array($delevery_note_id) ? implode(',', $delevery_note_id) : $delevery_note_id;
+        }
       
         $invocieno2 = $invocieno;
 		//$data['status']='due'; 
@@ -2355,6 +2341,7 @@ class Invoices extends CI_Controller
                     $data = array(
                         'invoice_number' => $invoice_number,
                         'product_code' => $product_hsn[$key],
+                        'account_number' => $income_account_number[$key],
                         'product_cost' => $product_cost[$key],
                         'quantity' => numberClean($product_qty[$key]),
                         'price' => rev_amountExchange_s($product_price[$key], $currency, $this->aauth->get_user()->loc),
@@ -2364,11 +2351,11 @@ class Invoices extends CI_Controller
                         'subtotal' => rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc),
                         'total_tax' => rev_amountExchange_s($ptotal_tax[$key], $currency, $this->aauth->get_user()->loc),
                         'total_discount' => rev_amountExchange_s($ptotal_disc[$key], $currency, $this->aauth->get_user()->loc),
-                        'account_number' => $income_account_number[$key],
                     );
 
+
+                    // $data['delevery_note_number'] = (($delevery_note_id) && count($delevery_note_id) > 0) ? $delevery_note_id[$key] : "";
                     
-                    $data['delevery_note_number'] = (($delevery_note_id) && count($delevery_note_id) > 0) ? $delevery_note_id[$key] : "";
                     // $productcoaaccount = coa_account_against_productid($product_id[$key]);
                     $productamount = rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc);                
                     $grandtotal += numberClean($product_subtotal[$key]); 
@@ -2615,6 +2602,7 @@ class Invoices extends CI_Controller
                 $this->db->set(array('total_discount' => $total_discount, 'tax' => rev_amountExchange_s(amountFormat_general($total_tax), $currency, $this->aauth->get_user()->loc), 'order_discount_percentage'=>$order_discount_percentage,'shipping_percentage'=>$shipping_percentage));
                 $this->db->where('invoice_number', $invoice_number);
                 $this->db->update('cberp_invoices');
+
                 //check the invoice coming from salesorder
                 // $salesorder_id = $this->input->post('salesorder_id', true);
                 // if($salesorder_id)
@@ -3199,7 +3187,9 @@ class Invoices extends CI_Controller
         //Invoice Data
         $bill_date = datefordatabase($invoicedate);
         $bill_due_date = datefordatabase($invocieduedate);
-        $data = array('invoice_number'=>$invoice_number, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $emp, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'loc' => $this->aauth->get_user()->loc,'order_discount'=>$order_discount,'store_id'=>$store_id,'transaction_number'=>$transaction_number,'status'=>$status,'payment_type'=>$payment_type,'invoice_type'=>$invoice_type,'status'=>'Draft');
+        $data = array('invoice_number'=>$invoice_number, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'grand_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $emp, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'loc' => $this->aauth->get_user()->loc,'order_discount'=>$order_discount,'store_id'=>$store_id,'transaction_number'=>$transaction_number,'status'=>$status,'invoice_type'=>$invoice_type,'status'=>'Draft');
+
+
         $invocieno2 = $invocieno;
 		//$data['status']='due';
         $preview_or_cancel  = $this->input->post('stage');
@@ -3271,7 +3261,7 @@ class Invoices extends CI_Controller
                         'account_number' => $income_account_number[$key],
                     );
                     
-                    $data['delevery_note_number'] = (($delevery_note_id) && count($delevery_note_id) > 0) ? $delevery_note_id[$key] : "";
+                    // $data['delevery_note_number'] = (($delevery_note_id) && count($delevery_note_id) > 0) ? $delevery_note_id[$key] : "";
                     // $productcoaaccount = coa_account_against_productid($product_id[$key]);
                     $productamount = rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc);                
                     $grandtotal += numberClean($product_subtotal[$key]); 
@@ -4430,10 +4420,9 @@ class Invoices extends CI_Controller
     // customer payment #erp2024 09-09-2024
     public function customer_payment()
     {
-        //         ini_set('display_errors', 1);
+        // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
-        // //dew_invoices_by_customerid
         $this->load->model('accounts_model');
         $data['acclist'] = $this->accounts_model->accountslist((integer)$this->aauth->get_user()->loc);
         $tid = $this->input->get('id');
@@ -4441,10 +4430,10 @@ class Invoices extends CI_Controller
         $data['invoice'] = $this->invocies->invoice_details($tid, $this->limited);
         $data['attach'] = $this->invocies->attach($tid);
         $head['usernm'] = $this->aauth->get_user()->username;
-        $head['title'] = "Customer Payment for Invoice -  " . $data['invoice']['tid'];
+        $head['title'] = "Customer Payment for Invoice -  " . $data['invoice']['invoice_number'];
         $this->load->view('fixed/header', $head);
         $data['dew_invoices'] = $this->invocies->dew_invoices_by_customerid($customerid);
-        if ($data['invoice']['id']) $data['activity'] = $this->invocies->invoice_transactions($tid);
+        if ($data['invoice']['invoice_number']) $data['activity'] = $this->invocies->invoice_transactions($tid);
         // $data['employee'] = $this->invocies->employee($data['invoice']['eid']);
         $data['custom_fields'] = $this->custom->view_fields_data($tid, 2);        
         $data['accountheaders'] = $this->accounts_model->load_coa_account_headers();
@@ -4756,7 +4745,7 @@ class Invoices extends CI_Controller
                 $master_data["prepared_date"] = date("Y-m-d H:i:s");
                 $master_data["prepared_flag"] = '1';
                 $srvData = $this->costingcalculation->lastsrvNumber($purchase_number);
-                $master_data['purchase_reciept_number'] = $srvData['srv'];                     
+                $master_data['purchase_reciept_number'] = $srvData;                     
                 $purchase_reciept_number = $master_data['purchase_reciept_number'];   
                 $this->db->insert('cberp_purchase_receipts', $master_data);
                 $stockreciptid = $this->db->insert_id();
@@ -5476,7 +5465,9 @@ class Invoices extends CI_Controller
     // customer payment #erp2024 09-09-2024
     public function payment_return_to_customer()
     {
-        
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $this->load->model('accounts_model');
         $data['acclist'] = $this->accounts_model->accountslist((integer)$this->aauth->get_user()->loc);
         $tid = $this->input->get('id');
@@ -5516,9 +5507,17 @@ class Invoices extends CI_Controller
         // error_reporting(E_ALL); 
         $data['prefix'] = get_prefix_72();
         $invoice_retutn_number = $this->input->get('delivery', true);
+        $receipt_number = $this->input->get('receipt_number', true);
         $customer_id = $this->input->get('cust', true);
-        $data["delevery_note_id"] = $invoice_retutn_number;
+        $data["invoice_retutn_number"] = $invoice_retutn_number;
         $client = "";
+        $data['receipt_details']="";
+        if($receipt_number)
+        {        
+                $this->load->model('invoice_creditnotes_model', 'invocies_creditnote');
+                $data['receipt_details'] = $this->invocies_creditnote->payment_receipt_details($invoice_retutn_number,$receipt_number);
+        }
+
         $data['CustDetails'] = get_customer_details($customer_id);
         if(!empty($data['CustDetails'])){ 
             $client = '' . $data['CustDetails'][0]['name'] . '<br>' . $data['CustDetails'][0]['address'] . ','. $data['CustDetails'][0]['city'] .' <br>' . $data['CustDetails'][0]['phone'] . '<br>' .$data['CustDetails'][0]['email'] ;
@@ -6104,7 +6103,7 @@ class Invoices extends CI_Controller
         //Invoice Data
         $bill_date = datefordatabase($invoicedate);
         $bill_due_date = datefordatabase($invocieduedate);
-        $data = array('invoice_number'=>$invoice_number, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $emp, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'loc' => $this->aauth->get_user()->loc,'order_discount'=>$order_discount,'store_id'=>$store_id,'status'=>$status,'payment_type'=>$payment_type,'invoice_type'=>$invoice_type,'status'=>'Draft');
+        $data = array('invoice_number'=>$invoice_number, 'due_date' => $bill_due_date, 'subtotal' => $subtotal, 'shipping' => $shipping, 'shipping_tax' => $shipping_tax, 'shipping_tax_type' => $ship_taxtype, 'discount_rate' => $disc_val, 'grand_total' => $total, 'notes' => $notes, 'customer_id' => $customer_id, 'employee_id' => $emp, 'tax_status' => $tax, 'discount_status' => $discstatus, 'format_discount' => $discountFormat, 'reference' => $refer, 'payment_terms' => $pterms, 'multi' => $currency, 'loc' => $this->aauth->get_user()->loc,'order_discount'=>$order_discount,'store_id'=>$store_id,'status'=>$status,'invoice_type'=>$invoice_type,'status'=>'Draft');
         $invocieno2 = $invocieno;
         //$data['status']='due';
         $preview_or_cancel  = $this->input->post('stage');
@@ -6203,7 +6202,7 @@ class Invoices extends CI_Controller
                     );
 
                     
-                    $data['delevery_note_number'] = (($delevery_note_id) && count($delevery_note_id) > 0) ? $delevery_note_id[$key] : "";
+                    // $data['delevery_note_number'] = (($delevery_note_id) && count($delevery_note_id) > 0) ? $delevery_note_id[$key] : "";
                     // $productcoaaccount = coa_account_against_productid($product_id[$key]);
                     $productamount = rev_amountExchange_s($product_subtotal[$key], $currency, $this->aauth->get_user()->loc);                
                     $grandtotal += numberClean($product_subtotal[$key]); 

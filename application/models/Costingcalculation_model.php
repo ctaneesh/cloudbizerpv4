@@ -105,72 +105,30 @@ class Costingcalculation_model extends CI_Model
     //     }
     // }
 
-    public function lastsrvNumber($purchase_number)
+    public function lastsrvNumber($var="")
     {
+        $this->configurations = $this->session->userdata('configurations');
         $prefixlist = get_prefix();
         $prefix = $prefixlist['receipt_prefix'];
-        $this->db->select('purchase_reciept_number, purchase_number');
-        $this->db->from("cberp_purchase_receipts");
-        $this->db->order_by('id', 'DESC');
-        $this->db->group_start();
-        $this->db->where('purchase_reciept_number !=', NULL);
-        $this->db->or_where('purchase_reciept_number !=', '');
-        $this->db->group_end();
+        $this->db->select('purchase_reciept_number');
+        $this->db->from('cberp_purchase_receipts');
+        $this->db->order_by('created_date', 'DESC');
         $this->db->limit(1);
-
         $query = $this->db->get();
+       
         if ($query->num_rows() > 0) {
-            $latest_srv = $query->row()->purchase_reciept_number;
-            if ($query->row()->purchase_reciept_number) {
-                $numeric_part = intval(substr($latest_srv, strlen($prefix)));   
-                if($numeric_part==0)
-                {
-                    $numeric_part = $numeric_part+1000;
-                }
-                // Increment the number
-                $new_srv = $prefix . ($numeric_part + 1);
-
-                $srvdata = [
-                    "srv" => $new_srv,
-                    "srvflg" => 0
-                ];
-                // $srvdata = [
-                //     "srv" => $latest_srv,
-                //     "srvflg" => 1
-                // ];
-                return $srvdata;
-            } else {
-               
-              
-                // Extract the numeric part from the latest srv  
-                $numeric_part = intval(substr($latest_srv, strlen($prefix)));
-                return $numeric_part;
-                if($numeric_part==0)
-                {
-                    $numeric_part = 1000;
-                }
-                // Increment the number
-                $new_srv = $prefix . ($numeric_part + 1);
-
-                $srvdata = [
-                    "srv" => $new_srv,
-                    "srvflg" => 0
-                ];
-                return $srvdata;
-            }
-        } 
-        else {
-            // If no srv exists, start with the initial number
-            $srvdata = [
-                "srv" => $prefix . "1001",
-                "srvflg" => 0
-            ];
-            return $srvdata;
+            $last_invoice_number = $query->row()->purchase_reciept_number;
+            $parts = explode('/', $last_invoice_number);
+            $last_number = (int)end($parts); 
+            $next_number = $last_number + 1;
+            return $prefix.$next_number;
+        } else {
+            return $prefix.'1001';
         }
     }
 
     public function purchase_details($purchase_number){
-        $query = $this->db->select('cberp_purchase_orders.*,cberp_purchase_orders.id AS purchase_id,cberp_purchase_orders.purchase_type AS doctype, cberp_purchase_orders.order_total AS purchase_amount,cberp_purchase_orders.order_total AS bill_amount, cberp_purchase_orders.notes AS bill_description, cberp_suppliers.name AS supplier_name, cberp_suppliers.supplier_id AS supplier_id, cberp_suppliers.name AS party_name, cberp_store.store_name AS salepoint_name, cberp_store.store_id  AS salepoint_id, cberp_currencies.code AS currency_id, cberp_currencies.rate AS currency_rate')
+        $query = $this->db->select('cberp_purchase_orders.*,cberp_purchase_orders.purchase_number AS purchase_id,cberp_purchase_orders.purchase_type AS doctype, cberp_purchase_orders.order_total AS purchase_amount,cberp_purchase_orders.order_total AS bill_amount, cberp_purchase_orders.notes AS bill_description, cberp_suppliers.name AS supplier_name, cberp_suppliers.supplier_id AS supplier_id, cberp_suppliers.name AS party_name, cberp_store.store_name AS salepoint_name, cberp_store.store_id  AS salepoint_id, cberp_currencies.code AS currency_id, cberp_currencies.rate AS currency_rate')
         ->from('cberp_purchase_orders')
         ->join('cberp_suppliers', 'cberp_suppliers.supplier_id = cberp_purchase_orders.customer_id')
         ->join('cberp_store', 'cberp_store.store_id = cberp_purchase_orders.store_id', 'left')
@@ -234,7 +192,7 @@ class Costingcalculation_model extends CI_Model
     public function purchase_item_details($purchase_number){
         // $query = $this->db->query("SELECT * FROM cberp_purchase_order_items WHERE tid = '$id'");
         // cberp_purchase_order_items.*
-        $this->db->select('cberp_purchase_order_items.*,cberp_purchase_order_items.unit AS product_unit, cberp_purchase_order_items.quantity AS product_qty,cberp_purchase_order_items.quantity AS ordered_quantity,cberp_purchase_order_items.received_quantity AS product_qty_recieved,cberp_purchase_order_items.discount AS discountamount,cberp_purchase_order_items.subtotal AS netamount,cberp_purchase_order_items.product_code, cberp_product_description.product_name,cberp_products.product_code,cberp_products.product_cost as cost,cberp_products.unit AS product_unit');
+        $this->db->select('cberp_purchase_order_items.*, cberp_purchase_order_items.quantity AS product_qty,cberp_purchase_order_items.quantity AS ordered_quantity,cberp_purchase_order_items.received_quantity AS product_qty_recieved,cberp_purchase_order_items.discount AS discountamount,cberp_purchase_order_items.subtotal AS netamount,cberp_purchase_order_items.product_code, cberp_product_description.product_name,cberp_products.product_code,cberp_products.product_cost as cost,cberp_products.unit AS product_unit');
         $this->db->from('cberp_purchase_order_items');
         $this->db->where('cberp_purchase_order_items.purchase_number', $purchase_number);
         $this->db->join('cberp_products', 'cberp_products.product_code = cberp_purchase_order_items.product_code');
@@ -407,7 +365,7 @@ class Costingcalculation_model extends CI_Model
     }
     public function supplier_details($id)
     {
-        $this->db->select('cberp_suppliers.name, cberp_suppliers.email, cberp_suppliers.phone, cberp_suppliers.shipping_email, cberp_suppliers.shipping_phone, cberp_suppliers.company,cberp_suppliers.address,cberp_suppliers.city, cberp_country.name as countryname, cberp_suppliers.region,cberp_suppliers.postbox');
+        $this->db->select('cberp_suppliers.name, cberp_suppliers.email, cberp_suppliers.phone, cberp_suppliers.email as shipping_email, cberp_suppliers.phone as shipping_phone, cberp_suppliers.company,cberp_suppliers.address,cberp_suppliers.city, cberp_country.name as countryname, cberp_suppliers.region,cberp_suppliers.postbox');
         $this->db->from('cberp_suppliers');
         $this->db->join('cberp_country', 'cberp_country.id = cberp_suppliers.country', 'left');
         $this->db->where('cberp_suppliers.supplier_id', $id);

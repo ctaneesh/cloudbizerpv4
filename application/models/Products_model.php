@@ -1703,5 +1703,22 @@ class Products_model extends CI_Model
         return $query->row_array(); 
 
     }
+    public function product_details_for_item($product_code)
+    {
+        $this->db->select('cberp_products.*,cberp_products.product_code AS productcode, cberp_product_pricing.*, cberp_product_locations.*, cberp_product_description.*, cberp_product_barcode.*,cberp_country.name as madein,cberp_suppliers.company as supplier');
+        $this->db->from('cberp_products');
+        $this->db->join('cberp_product_pricing', 'cberp_product_pricing.product_code = cberp_products.product_code');
+        $this->db->join('cberp_product_locations', 'cberp_product_locations.product_code = cberp_products.product_code');
+        $this->db->join('cberp_product_description', 'cberp_product_description.product_code = cberp_products.product_code');
+        $this->db->join('cberp_product_barcode', 'cberp_product_barcode.product_code = cberp_products.product_code','left');
+        $this->db->join('cberp_country', 'cberp_country.id = cberp_products.made_in','left');
+        $this->db->join('cberp_suppliers', 'cberp_suppliers.supplier_id = cberp_products.prefered_vendor','left');
+        // $this->db->join('cberp_product_to_category', 'cberp_product_to_category.category_id = cberp_products.product_code','left');
+        $this->db->where('cberp_products.product_code', $product_code);
+        $query = $this->db->get();
+        // die($this->db->last_query());
+        return $query->row_array(); 
+
+    }
     
 }

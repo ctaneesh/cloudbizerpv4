@@ -19,10 +19,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Invoices_model extends CI_Model
 {
+    
     var $table = 'cberp_invoices';
-    var $column_order = array(null, 'cberp_invoices.invoice_number','cberp_invoices.invoice_type','cberp_invoices.payment_type', 'cberp_customers.name', 'cberp_invoices.invoice_date', 'cberp_invoices.due_date','cberp_invoices.total', 'cberp_invoices.status', null);
-    var $column_search = array('cberp_invoices.invoice_number','cberp_invoices.invoice_type','cberp_invoices.payment_type', 'cberp_customers.name', 'cberp_invoices.invoice_date', 'cberp_invoices.due_date', 'cberp_invoices.total','cberp_invoices.status');
-    var $order = array('cberp_invoices.invoice_date' => 'desc');
+    var $column_order = array(null, 'cberp_invoices.invoice_number','cberp_invoices.invoice_type', 'cberp_customers.name', 'cberp_invoices.invoice_date', 'cberp_invoices.due_date','cberp_invoices.grand_total', 'cberp_invoices.status', null);
+    var $column_search = array('cberp_invoices.invoice_number','cberp_invoices.invoice_type', 'cberp_customers.name', 'cberp_invoices.invoice_date', 'cberp_invoices.due_date', 'cberp_invoices.grand_total','cberp_invoices.status');
+    var $order = array('cberp_invoices.invoice_date' => 'asc');
 
     public function __construct()
     {
@@ -38,7 +39,7 @@ class Invoices_model extends CI_Model
         $this->db->order_by('invoice_date', 'DESC');
         $this->db->limit(1);
         $query = $this->db->get();
-        // die($this->db->last_query());
+       
         if ($query->num_rows() > 0) {
             $last_invoice_number = $query->row()->invoice_number;
             $parts = explode('/', $last_invoice_number);
@@ -49,6 +50,7 @@ class Invoices_model extends CI_Model
             return $prefix.'1001';
         }
     }
+
     
     public function lastenquiry()
     {
@@ -265,7 +267,8 @@ class Invoices_model extends CI_Model
 
     private function _get_datatables_query($opt = '')
     {
-        $this->db->select('cberp_invoices.invoice_number,cberp_invoices.payment_type,cberp_invoices.payment_recieved_date,cberp_invoices.payment_recieved_amount,cberp_invoices.invoice_date,cberp_invoices.due_date,cberp_invoices.total,cberp_invoices.status,cberp_customers.name,cberp_invoices.customer_id,cberp_invoices.invoice_type');
+
+        $this->db->select('cberp_invoices.invoice_number,cberp_invoices.invoice_date,cberp_invoices.due_date,cberp_invoices.grand_total,cberp_invoices.status,cberp_customers.name,cberp_invoices.customer_id,cberp_invoices.invoice_type,cberp_invoices.paid_amount');
         $this->db->from($this->table);
         $this->db->join('cberp_customers', 'cberp_invoices.customer_id=cberp_customers.customer_id', 'left');
 
@@ -308,6 +311,7 @@ class Invoices_model extends CI_Model
         if ($_POST['length'] != -1)
             $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
+        // die($this->db->last_query());
         return $query->result();
     }
 
@@ -577,7 +581,7 @@ class Invoices_model extends CI_Model
 
     public function dew_invoices_by_customerid($customerid)
     {
-        $this->db->select('cberp_invoices.invoice_number AS invoiceid,cberp_invoices.invoice_number AS invoiceumber,cberp_invoices.invoice_number, cberp_invoices.invoice_date, cberp_invoices.due_date, cberp_invoices.subtotal, cberp_invoices.total, cberp_invoices.status,cberp_invoices.payment_recieved_amount');
+        $this->db->select('cberp_invoices.invoice_number AS invoiceid,cberp_invoices.invoice_number AS invoiceumber,cberp_invoices.invoice_number, cberp_invoices.invoice_date, cberp_invoices.due_date, cberp_invoices.subtotal, cberp_invoices.grand_total as total, cberp_invoices.status,cberp_invoices.paid_amount as payment_recieved_amount');
         $this->db->from('cberp_invoices');
         
         $this->db->where('cberp_invoices.customer_id', $customerid); 
@@ -586,16 +590,17 @@ class Invoices_model extends CI_Model
         $this->db->or_where('cberp_invoices.status', 'partial');
         $this->db->group_end();
         $query = $this->db->get();
+        //  die($this->db->last_query());
         $result = $query->result_array(); 
-        // die($this->db->last_query());
+       
         return $result;
     }
 
     public function payment_method_details($invoice_number)
     {
         $this->db->select('*');
-        $this->db->from('transactions_ai');
-        $this->db->where('transactions_ai.invoice_number', $invoice_number); 
+        $this->db->from('cberp_payments');
+        $this->db->where('cberp_payments.invoice_number', $invoice_number); 
         $query = $this->db->get();         
         // die($this->db->last_query());
         return  $query->row_array();
@@ -619,8 +624,8 @@ class Invoices_model extends CI_Model
     public function transactions_ai_details($id)
     {
         $this->db->select('*');
-        $this->db->from('transactions_ai');
-        $this->db->where('transactions_ai.id', $id); 
+        $this->db->from('cberp_payments');
+        $this->db->where('cberp_payments.id', $id); 
         $query = $this->db->get();         
         return  $query->row_array();
     }
@@ -1023,7 +1028,7 @@ class Invoices_model extends CI_Model
 
     public function invoice_credit_note_master_details_by_id($invoice_retutn_number)
     { 
-        $this->db->select('cberp_stock_returns.invoice_retutn_number as returnid,cberp_stock_returns.transaction_number as transaction_number,cberp_stock_returns.invoice_retutn_number as tid,cberp_stock_returns.invoice_retutn_number,cberp_stock_returns.total AS returnamount, cberp_stock_returns.created_date, cberp_invoices.invoice_number,cberp_invoices.invoice_number as invoicenumber, cberp_invoices.total AS invoiceamount, cberp_employees.name AS employee,cberp_customers.*,cberp_customers.customer_id as cid');
+        $this->db->select('cberp_stock_returns.invoice_retutn_number as returnid,cberp_stock_returns.transaction_number as transaction_number,cberp_stock_returns.invoice_retutn_number as tid,cberp_stock_returns.invoice_retutn_number,cberp_stock_returns.total AS returnamount, cberp_stock_returns.created_date, cberp_invoices.invoice_number,cberp_invoices.invoice_number as invoicenumber, cberp_invoices.grand_total AS invoiceamount, cberp_employees.name AS employee,cberp_customers.*,cberp_customers.customer_id as cid');
         $this->db->from('cberp_stock_returns');
         $this->db->join('cberp_invoices', 'cberp_invoices.invoice_number = cberp_stock_returns.invoice_number');
         $this->db->join('cberp_employees', 'cberp_employees.id = cberp_stock_returns.created_by');
@@ -1285,7 +1290,7 @@ class Invoices_model extends CI_Model
 
        $query = $this->db->query("
             SELECT 
-                -- Total invoice counts
+                -- grand_total invoice counts
                 SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startYear' AND '$today' THEN 1 ELSE 0 END) AS yearly_count,
                 SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startQuarter' AND '$today' THEN 1 ELSE 0 END) AS quarterly_count,
                 SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startMonth' AND '$today' THEN 1 ELSE 0 END) AS monthly_count,
@@ -1306,15 +1311,15 @@ class Invoices_model extends CI_Model
                 SUM(CASE WHEN status = 'draft' AND DATE(invoice_date) BETWEEN '$startWeek' AND '$today' THEN 1 ELSE 0 END) AS weekly_draft_count,
                 SUM(CASE WHEN status = 'draft' AND DATE(invoice_date) = '$today' THEN 1 ELSE 0 END) AS daily_draft_count,
 
-                -- Totals (sum of 'total' column)
-                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startYear' AND '$today' THEN total ELSE 0 END) AS yearly_total,
-                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startQuarter' AND '$today' THEN total ELSE 0 END) AS quarterly_total,
-                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startMonth' AND '$today' THEN total ELSE 0 END) AS monthly_total,
-                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startWeek' AND '$today' THEN total ELSE 0 END) AS weekly_total,
-                SUM(CASE WHEN DATE(invoice_date) = '$today' THEN total ELSE 0 END) AS daily_total
+                -- grand_totals (sum of 'grand_total' column)
+                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startYear' AND '$today' THEN grand_total ELSE 0 END) AS yearly_grand_total,
+                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startQuarter' AND '$today' THEN grand_total ELSE 0 END) AS quarterly_grand_total,
+                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startMonth' AND '$today' THEN grand_total ELSE 0 END) AS monthly_grand_total,
+                SUM(CASE WHEN DATE(invoice_date) BETWEEN '$startWeek' AND '$today' THEN grand_total ELSE 0 END) AS weekly_grand_total,
+                SUM(CASE WHEN DATE(invoice_date) = '$today' THEN grand_total ELSE 0 END) AS daily_grand_total
             FROM cberp_invoices
         ");
-
+      
         return $query->row();
     }
 
@@ -1368,5 +1373,27 @@ class Invoices_model extends CI_Model
         }
     }
 
+
+    public function payment_receipt_number($invoice_number)
+    {
+        $this->db->select('cberp_invoice_payments.receipt_number, cberp_invoices.invoice_number');
+        $this->db->from('cberp_invoices');
+        $this->db->join('cberp_payment_transaction_link', 'cberp_payment_transaction_link.trans_type_number = cberp_invoices.invoice_number');
+        $this->db->join('cberp_invoice_payments', 'cberp_invoice_payments.transaction_number = cberp_payment_transaction_link.transaction_number');
+        $this->db->where('cberp_invoices.invoice_number', $invoice_number);
+        $query = $this->db->get();   
+        return $query->result_array();
+    }
+    public function payment_receipt_details($invoice_number,$receipt_number)
+    {
+        $this->db->select('cberp_invoice_payments_details.*,cberp_invoice_payments.created_date');
+        $this->db->from('cberp_invoice_payments');
+        $this->db->join('cberp_invoice_payments_details', 'cberp_invoice_payments_details.receipt_number = cberp_invoice_payments.receipt_number');
+        $this->db->where('cberp_invoice_payments_details.invoice_number', $invoice_number);
+        $this->db->where('cberp_invoice_payments_details.receipt_number', $receipt_number);
+        $query = $this->db->get();   
+        // die($this->db->last_query());
+        return $query->row_array();
+    }
 
 }
