@@ -403,72 +403,177 @@ class Search_products extends CI_Controller
 
 	}
 
-	public function pos_search()
-	{
+	// public function pos_search()//commented 23-06-25- Anjana
+	// {
+	// 	$out = '';
+	// 	$this->load->model('plugins_model', 'plugins');
+	// 	$billing_settings = $this->plugins->universal_api(67);
+	// 	$name = (string)$this->input->post('name', true);
+	// 	$cid = $this->input->post('cid', true);
+	// 	$wid = $this->input->post('wid', true);
+	// 	$qw = '';
+	// 	if ($wid > 0) {
+	// 		$qw .= "(cberp_products.warehouse='$wid') AND ";
+	// 	}
+	// 	if ($billing_settings['key2']) $qw .= "(cberp_products.expiry IS NULL OR DATE (cberp_products.expiry)<" . date('Y-m-d') . ") AND ";
+	// 	if ($cid > 0) {
+	// 		$qw .= "(cberp_products.pcat='$cid') AND ";
+	// 	}
+	// 	$join = '';
+	// 	if ($this->aauth->get_user()->loc) {
+	// 		$join = 'LEFT JOIN cberp_store ON cberp_store.id=cberp_products.warehouse';
+	// 		if (BDATA) $qw .= '(cberp_store.loc=' . $this->aauth->get_user()->loc . ' OR cberp_store.loc=0) AND '; else $qw .= '(cberp_store.loc=' . $this->aauth->get_user()->loc . ' ) AND ';
+	// 	} elseif (!BDATA) {
+	// 		$join = 'LEFT JOIN cberp_store ON cberp_store.id=cberp_products.warehouse';
+	// 		$qw .= '(cberp_store.loc=0) AND ';
+	// 	}
+
+	// 	$e = '';
+	// 	if ($billing_settings['key1'] == 1) {
+	// 		$e .= ',cberp_product_serials.serial';
+	// 		$join .= 'LEFT JOIN cberp_product_serials ON cberp_product_serials.product_id=cberp_products.pid ';
+	// 		$qw .= '(cberp_product_serials.status=0) AND  ';
+	// 	}
+
+
+	// 	$bar = '';
+	// 	if (is_numeric($name)) {
+	// 		$b = array('-', '-', '-');
+	// 		$c = array(3, 4, 11);
+	// 		$barcode = $name;
+	// 		for ($i = count($c) - 1; $i >= 0; $i--) {
+	// 			$barcode = substr_replace($barcode, $b[$i], $c[$i], 0);
+	// 		}
+
+	// 		$bar = " OR (cberp_products.barcode LIKE '" . (substr($barcode, 0, -1)) . "%' OR cberp_products.barcode LIKE '" . $name . "%')";
+	// 	}
+	// 	if ($billing_settings['key1'] == 2) {
+
+	// 		$query = "SELECT cberp_products.*,cberp_product_serials.serial FROM cberp_product_serials  LEFT JOIN cberp_products  ON cberp_products.pid=cberp_product_serials.product_id $join WHERE " . $qw . "cberp_product_serials.serial LIKE '" . strtoupper($name) . "%'  AND (cberp_products.onhand_quantity>0) LIMIT 16";
+
+
+	// 	} else {
+	// 		$query = "SELECT cberp_products.* $e FROM cberp_products $join WHERE " . $qw . "(UPPER(cberp_product_description.product_name) LIKE '%" . strtoupper($name) . "%' $bar OR cberp_products.product_code LIKE '" . strtoupper($name) . "%') AND (cberp_products.onhand_quantity>0) LIMIT 16";
+
+	// 	}
+
+
+	// 	$query = $this->db->query($query);
+	// 	$result = $query->result_array();
+	// 	$i = 0;
+	// 	echo '<div class="row match-height">';
+	// 	foreach ($result as $row) {
+
+	// 		$out .= '<div class="col-3 border mb-1 "><div class="rounded">
+    //                              <a   id="posp' . $i . '"  class="select_pos_item btn btn-outline-light-blue round breaklink"   data-name="' . $row['product_name'] . '"  data-price="' . amountExchange_s($row['product_price'], 0, $this->aauth->get_user()->loc) . '"  data-tax="' . amountFormat_general($row['tax_rate']) . '"  data-discount="' . amountFormat_general($row['discount_rate']) . '"   data-pcode="' . $row['product_code'] . '"   data-pid="' . $row['pid'] . '"  data-stock="' . amountFormat_general($row['onhand_quantity']) . '" data-unit="' . $row['unit'] . '" data-serial="' . @$row['serial'] . '">
+    //                                     <img class="round"
+    //                                          src="' . base_url('userfiles/product/' . $row['image']) . '"  style="max-height: 100%;max-width: 100%">
+    //                                     <div class="text-xs-center text">
+                                       
+    //                                         <small style="white-space: pre-wrap;">' . $row['product_name'] . '</small>
+
+                                            
+    //                                     </div></a>
+                                  
+    //                             </div></div>';
+
+	// 		$i++;
+	// 		//   if ($i % 4 == 0) $out .= '</div><div class="row">';
+	// 	}
+
+	// 	echo $out;
+
+	// }
+
+	public function pos_search(){
+
 		$out = '';
 		$this->load->model('plugins_model', 'plugins');
 		$billing_settings = $this->plugins->universal_api(67);
 		$name = (string)$this->input->post('name', true);
-		$cid = $this->input->post('cid', true);
-		$wid = $this->input->post('wid', true);
+		$cid = (int)$this->input->post('cid', true);
+		$wid = (int)$this->input->post('wid', true);
+		$enable_bar = (string)$this->input->post('bar', true);
+		$flag_p = false;
+		$join = '';
 		$qw = '';
+
 		if ($wid > 0) {
-			$qw .= "(cberp_products.warehouse='$wid') AND ";
+			$qw .= "(cberp_product_to_store.store_id='$wid') AND ";
+			$join .= 'JOIN cberp_product_to_store ON cberp_product_to_store.product_code=cberp_products.product_code ';
 		}
 		if ($billing_settings['key2']) $qw .= "(cberp_products.expiry IS NULL OR DATE (cberp_products.expiry)<" . date('Y-m-d') . ") AND ";
+
 		if ($cid > 0) {
-			$qw .= "(cberp_products.pcat='$cid') AND ";
+			//$qw .= "(cberp_products.pcat = '$cid' OR cberp_product_to_category.category_id = '$cid') AND ";
+			$qw .= "(cberp_product_to_category.category_id = '$cid') AND ";
+			$join .= 'LEFT JOIN cberp_product_to_category ON cberp_product_to_category.product_code = cberp_products.product_code ';
 		}
-		$join = '';
-		if ($this->aauth->get_user()->loc) {
-			$join = 'LEFT JOIN cberp_store ON cberp_store.id=cberp_products.warehouse';
-			if (BDATA) $qw .= '(cberp_store.loc=' . $this->aauth->get_user()->loc . ' OR cberp_store.loc=0) AND '; else $qw .= '(cberp_store.loc=' . $this->aauth->get_user()->loc . ' ) AND ';
-		} elseif (!BDATA) {
-			$join = 'LEFT JOIN cberp_store ON cberp_store.id=cberp_products.warehouse';
-			$qw .= '(cberp_store.loc=0) AND ';
-		}
+		
+		
+
+		// if ($this->aauth->get_user()->loc) {
+		// 	$join = 'LEFT JOIN cberp_store ON cberp_store.id=cberp_products.warehouse';
+		// 	if (BDATA) $qw .= '(cberp_store.loc=' . $this->aauth->get_user()->loc . ' OR cberp_store.loc=0) AND '; else $qw .= '(cberp_store.loc=' . $this->aauth->get_user()->loc . ' ) AND ';
+		// } elseif (!BDATA) {
+		// 	$join = 'LEFT JOIN cberp_store ON cberp_store.id=cberp_products.warehouse';
+		// 	$qw .= '(cberp_store.loc=0) AND ';
+		// }
 
 		$e = '';
 		if ($billing_settings['key1'] == 1) {
 			$e .= ',cberp_product_serials.serial';
-			$join .= 'LEFT JOIN cberp_product_serials ON cberp_product_serials.product_id=cberp_products.pid ';
+			$join .= 'LEFT JOIN cberp_product_serials ON cberp_product_serials.product_id=cberp_products.product_code ';
 			$qw .= '(cberp_product_serials.status=0) AND  ';
 		}
 
+		$join .= 'LEFT JOIN cberp_product_description ON cberp_product_description.product_code = cberp_products.product_code ';
 
 		$bar = '';
-		if (is_numeric($name)) {
-			$b = array('-', '-', '-');
-			$c = array(3, 4, 11);
-			$barcode = $name;
-			for ($i = count($c) - 1; $i >= 0; $i--) {
-				$barcode = substr_replace($barcode, $b[$i], $c[$i], 0);
+		$p_class = 'v2_select_pos_item';
+		if ($enable_bar == 'true' and is_numeric($name) and strlen($name) >= 8) {
+			$flag_p = true;
+			$bar = " (cberp_products.barcode = '" . (substr($name, 0, -1)) . "' OR cberp_products.barcode LIKE '" . $name . "%')";
+
+			$query = "SELECT cberp_products.* , cberp_product_description.product_name FROM cberp_products $join WHERE " . $qw . "$bar AND (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 6";
+			$p_class = 'v2_select_pos_item_bar';
+
+		} elseif ($enable_bar == 'false' or !$enable_bar) {
+			$flag_p = true;
+			if ($billing_settings['key1'] == 2) {
+
+				$query = "SELECT cberp_products.*,cberp_product_description.product_name,cberp_product_serials.serial FROM cberp_product_serials  LEFT JOIN cberp_products  ON cberp_products.product_code=cberp_product_serials.product_id $join WHERE " . $qw . "cberp_product_serials.serial LIKE '" . strtoupper($name) . "%'  AND (cberp_products.onhand_quantity>0) LIMIT 18";
+
+			} else {
+
+				if(!empty($name))
+				{
+					$query = "SELECT cberp_products.*, cberp_product_description.product_name $e FROM cberp_products $join WHERE " . $qw . "(UPPER(cberp_product_description.product_name) LIKE '%" . strtoupper($name) . "%' $bar OR cberp_products.product_code LIKE '" . strtoupper($name) . "%') AND (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 18";
+				}
+				else{
+					$query = "SELECT cberp_products.*, cberp_product_description.product_name $e FROM cberp_products $join  WHERE  " . $qw . " (cberp_products.onhand_quantity>0) ORDER BY cberp_product_description.product_name LIMIT 18";
+				}
+				
 			}
 
-			$bar = " OR (cberp_products.barcode LIKE '" . (substr($barcode, 0, -1)) . "%' OR cberp_products.barcode LIKE '" . $name . "%')";
-		}
-		if ($billing_settings['key1'] == 2) {
-
-			$query = "SELECT cberp_products.*,cberp_product_serials.serial FROM cberp_product_serials  LEFT JOIN cberp_products  ON cberp_products.pid=cberp_product_serials.product_id $join WHERE " . $qw . "cberp_product_serials.serial LIKE '" . strtoupper($name) . "%'  AND (cberp_products.onhand_quantity>0) LIMIT 16";
-
-
-		} else {
-			$query = "SELECT cberp_products.* $e FROM cberp_products $join WHERE " . $qw . "(UPPER(cberp_product_description.product_name) LIKE '%" . strtoupper($name) . "%' $bar OR cberp_products.product_code LIKE '" . strtoupper($name) . "%') AND (cberp_products.onhand_quantity>0) LIMIT 16";
 
 		}
+		
 
-
-		$query = $this->db->query($query);
-		$result = $query->result_array();
-		$i = 0;
-		echo '<div class="row match-height">';
-		foreach ($result as $row) {
-
-			$out .= '<div class="col-3 border mb-1 "><div class="rounded">
-                                 <a   id="posp' . $i . '"  class="select_pos_item btn btn-outline-light-blue round breaklink"   data-name="' . $row['product_name'] . '"  data-price="' . amountExchange_s($row['product_price'], 0, $this->aauth->get_user()->loc) . '"  data-tax="' . amountFormat_general($row['tax_rate']) . '"  data-discount="' . amountFormat_general($row['discount_rate']) . '"   data-pcode="' . $row['product_code'] . '"   data-pid="' . $row['pid'] . '"  data-stock="' . amountFormat_general($row['onhand_quantity']) . '" data-unit="' . $row['unit'] . '" data-serial="' . @$row['serial'] . '">
+		 
+		if ($flag_p) {	
+			$query = $this->db->query($query);
+			
+			$result = $query->result_array();
+			$i = 0;
+			$out = '<div class="row match-height">';
+			foreach ($result as $row) {
+				if ($bar) $bar = $row['barcode'];
+				$out .= '    <div class="col-2 border mb-1"  ><div class=" rounded" >
+                                 <a  id="posp' . $i . '"  class="' . $p_class . ' round breaklink"   data-name="' . $row['product_name'] . '"  data-price="' . amountExchange_s($row['product_price'], 0, $this->aauth->get_user()->loc) . '"  data-tax="' . amountFormat_general($row['tax_rate']) . '"  data-discount="' . amountFormat_general($row['discount_rate']) . '" data-pcode="' . $row['product_code'] . '"   data-pid="' . $row['product_code'] . '"  data-stock="' . amountFormat_general($row['onhand_quantity']) . '" data-unit="' . $row['unit'] . '" data-serial="' . @$row['serial'] . '" data-bar="' . $bar . '">
                                         <img class="round"
                                              src="' . base_url('userfiles/product/' . $row['image']) . '"  style="max-height: 100%;max-width: 100%">
-                                        <div class="text-xs-center text">
+                                        <div class="text-center" style="margin-top: 4px;">
                                        
                                             <small style="white-space: pre-wrap;">' . $row['product_name'] . '</small>
 
@@ -477,11 +582,16 @@ class Search_products extends CI_Controller
                                   
                                 </div></div>';
 
-			$i++;
-			//   if ($i % 4 == 0) $out .= '</div><div class="row">';
+				$i++;
+
+			}
+
+
+			$out .= '</div>';
+
+			echo $out;
 		}
 
-		echo $out;
 
 	}
 
