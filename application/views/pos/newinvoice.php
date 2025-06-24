@@ -209,9 +209,11 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="tab3" role="tabpanel" aria-labelledby="base-tab3">
-                                    <?php foreach ($draft_list as $rowd) {
-                                        echo '<li class="indigo p-1"><a href="' . base_url() . 'pos_invoices/draft?id=' . $rowd['invoice_number'] . '"> #' . $rowd['invoice_number'] . ' (' . $rowd['invoice_date'] . ')</a></li>';
-                                    } ?>
+                                   <?php foreach ($draft_list as $rowd) {
+										$formatted_date = date('Y-m-d', strtotime($rowd['invoice_date']));
+										echo '<li class="indigo p-1"><a href="' . base_url() . 'pos_invoices/draft?id=' . $rowd['invoice_number'] . '"> #' . $rowd['invoice_number'] . ' (' . $formatted_date . ')</a></li>';
+									} ?>
+
                                 </div>
                                 <div class="tab-pane" id="tab4" role="tabpanel" aria-labelledby="base-tab4">
                                     <div class="form-group row">
@@ -801,8 +803,7 @@
             </div>
             <div class="modal-body border_no_print" id="print_section">
                 <embed src="<?= base_url('assets/images/ssl-seal.png') ?>"
-                       type="application/pdf" height="600px" width="470" id="loader_pdf"
-                ">
+                       type="application/pdf" height="600px" width="470" id="loader_pdf">
                 <input id="loader_file" value="">
             </div>
             <div class="modal-footer">

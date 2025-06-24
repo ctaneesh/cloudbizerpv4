@@ -49,33 +49,33 @@
 						<tbody id="pos_items">
 						<?php $i = 0;
 						foreach ($products as $row) {
-							echo '<tr id="ppid-' . $i . '">
-							<td colspan="7"><input type="text" class="form-control text-center" name="product_name[]" placeholder="Enter Product name or Code" id="productname-' . $i . '"  value="' . $row['product'] . '"></td>
-							</tr>';
-							echo '    <tr>
-							<td>
-							<input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['quantity']) . '" >
-							<input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['quantity']) . '" >
-							</td> 
-							<td>
-							<input type="text" class="form-control req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
-							</td>
-							<td> <input type="text" class="form-control p-mobile vat" name="product_tax[]" id="vat-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['tax']) . '">
-							</td>  
-							<td><input type="text" class="form-control p-mobile discount pos_w" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' . $i . '" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['discount']) . '">
-							</td> 
-							<td><span class="currenty">' . $this->config->item('currency') . '</span> <strong><span class="ttlText" id="result-' . $i . '">' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '</span></strong>
-							</td> 
-							<td class="text-center"><button type="button" data-rowid="' . $i . '" class="btn btn-danger removeItem" title="Remove"> <i class="fa fa-minus-square"></i> </button> 
-							</td>
-							<input type="hidden" name="taxa[]" id="taxa-' . $i . '" value="' . amountExchange_s($row['totaltax'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
-							<input type="hidden" name="disca[]" id="disca-' . $i . '" value="' . amountExchange_s($row['totaldiscount'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
-							<input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' . $i . '" value="' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '"> 
-							<input type="hidden" class="pdIn" name="pid[]" id="pid-' . $i . '" value="' . $row['pid'] . '"> <input type="hidden" name="unit[]" id="unit-' . $i . '" value="' . $row['unit'] . '"> 
-							<input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['code'] . '"><input type="hidden" id="alert-' . $i . '" value="' . amountFormat_general($row['quantity']) . '" name="alert[]"> 
-							</tr>';
-							$i++;
-						} 
+                            echo '<tr id="ppid-' . $i . '">
+                            <td colspan="7"><input type="text" class="form-control text-center" name="product_name[]" placeholder="Enter Product name or Code" id="productname-' . $i . '"  value="' . $row['product_name'] . '"></td>
+                            </tr>';
+                            echo '    <tr>
+                            <td>
+                            <input type="text" class="form-control p-mobile req amnt" name="product_qty[]" id="amount-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['quantity']) . '" >
+                            <input type="hidden" class="old_amnt" name="old_product_qty[]" value="' . amountFormat_general($row['quantity']) . '" >
+                            </td> 
+                            <td>
+                            <input type="text" class="form-control req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
+                            </td>
+                            <td> <input type="text" class="form-control p-mobile vat" name="product_tax[]" id="vat-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['tax']) . '">
+                            </td>  
+                            <td><input type="text" class="form-control p-mobile discount pos_w" name="product_discount[]" onkeypress="return isNumber(event)" id="discount-' . $i . '" onkeyup="rowTotal(' . $i . '), billUpyog()" autocomplete="off" value="' . amountFormat_general($row['discount']) . '">
+                            </td> 
+                            <td><span class="currenty">' . $this->config->item('currency') . '</span> <strong><span class="ttlText" id="result-' . $i . '">' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '</span></strong>
+                            </td> 
+                            <td class="text-center"><button type="button" data-rowid="' . $i . '" class="btn btn-danger removeItem" title="Remove"> <i class="fa fa-minus-square"></i> </button> 
+                            </td>
+                            <input type="hidden" name="taxa[]" id="taxa-' . $i . '" value="' . amountExchange_s($row['total_tax'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
+                            <input type="hidden" name="disca[]" id="disca-' . $i . '" value="' . amountExchange_s($row['total_discount'], $invoice['multi'], $this->aauth->get_user()->loc) . '">
+                            <input type="hidden" class="ttInput" name="product_subtotal[]" id="total-' . $i . '" value="' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '"> 
+                            <input type="hidden" class="pdIn" name="pid[]" id="pid-' . $i . '" value="' . $row['product_code'] . '"> <input type="hidden" name="unit[]" id="unit-' . $i . '" value="' . $row['unit'] . '"> 
+                            <input type="hidden" name="hsn[]" id="hsn-' . $i . '" value="' . $row['product_code'] . '"><input type="hidden" id="alert-' . $i . '" value="' . amountFormat_general($row['quantity']) . '" name="alert[]"> 
+                            </tr>';
+                            $i++;
+} 
 						?>
 						</tbody>
 					</table>
@@ -220,7 +220,7 @@
 									   value="<?php echo $lastinvoice; ?>" >
 								<input type="hidden" name="iid"
 									   value="<?php echo $invoice['iid']; ?>">
-								<input type="text" name="draft_id"
+								<input type="hidden" name="draft_id"
 									   value="<?php echo $invoice['iid']; ?>">
 							</div>
 						</div>
@@ -739,6 +739,28 @@
 		</div>
 	</div>
 </div>
+<div id="pos_print" class="modal fade" role="dialog">
+    <div class="modal-dialog ">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title">Legacy Print Mode</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body border_no_print" id="print_section">
+                <embed src="<?= base_url('assets/images/ssl-seal.png') ?>"
+                       type="application/pdf" height="600px" width="470" id="loader_pdf">
+                <input id="loader_file" value="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 <script type="text/javascript">
 	$.ajax({
 		url: baseurl + 'search_products/pos_search',
@@ -883,6 +905,51 @@
 
 
 	///////add new code ///////
+
+	var file_id;
+    $(document.body).on('click', '.print_image', function (e) {
+
+        e.preventDefault();
+
+        var inv_id = $(this).attr('data-inid');
+
+        jQuery.ajax({
+            url: '<?php echo base_url('pos_invoices/invoice_legacy') ?>',
+            type: 'POST',
+            data: 'inv=' + inv_id + '&' + crsf_token + '=' + crsf_hash,
+            dataType: 'json',
+            success: function (data) {
+                file_id= data.file_name;
+                $("#loader_pdf").attr('src','<?= base_url() ?>userfiles/pos_temp/'+data.file_name+'.pdf');
+                $("#loader_file").val(data.file_name);
+            },
+        });
+
+        $('#pos_print').modal('toggle');
+        $("#print_section").printThis({
+            //  beforePrint: function (e) {$('#pos_print').modal('hide');},
+
+            printDelay: 500,
+            afterPrint: clean_data()
+        });
+    });
+
+
+    function clean_data() {
+        setTimeout(function(){
+        var file_id= $("#loader_file").val();
+        jQuery.ajax({
+            url: '<?php echo base_url('pos_invoices/invoice_clean') ?>',
+            type: 'POST',
+            data: 'file_id=' + file_id + '&' + crsf_token + '=' + crsf_hash,
+            dataType: 'json',
+            success: function (data) {
+
+            },
+        });
+}, 2500);
+
+    }
 
 	    $('#categories').change(function () {
         var whr = $('#v2_warehouses option:selected').val();
