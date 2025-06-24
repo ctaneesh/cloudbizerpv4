@@ -204,7 +204,6 @@
    <hr>
     <table class="toptable">
         <thead>
-
             <tr>
                 <?php
                     // if($invoice['invoicestatus']=='due')
@@ -231,6 +230,7 @@
                     <?php
                         echo '<strong>' . $invoice['name'] . '</strong><br>';
                         if ($invoice['company']) echo $invoice['company'] . '<br>';
+        
                         echo $invoice['address'] . '<br>' . $invoice['city'] . ', ' . $invoice['region'];
                         // if ($invoice['country']) echo '<br>' . $invoice['country'];
                         if ($invoice['postbox']) echo ' - ' . $invoice['postbox'];
@@ -252,11 +252,6 @@
                 <strong>Currency : <?=currency($this->aauth->get_user()->loc)?></strong>
             </td>
             </tr>
-            <td style="text-align:right;"><strong>Invoice No : <?= $invoice['invoice_number']?></strong><br> <strong>Invoice Date : <?= date('d-m-Y', strtotime($invoice['invoice_date']))?></strong><br>
-            <strong>Invoice Due Date : <?= date('d-m-Y', strtotime($invoice['due_date']))?></strong><br>
-            <strong>Currency : <?=currency($this->aauth->get_user()->loc)?></strong>
-        </td>
-        </tr>
         </thead>
         <!-- <tr><td>Currency : <?php //echo "<b>".currency($this->aauth->get_user()->loc)."</b>"; ?></td></tr> -->
     </table>
@@ -429,7 +424,7 @@
             // }
              //erp2024 removed section 06-06-2024
             if (CUSTOM) {
-                $p_custom_fields = $this->custom->view_fields_data($row['product_code'], 4, 1);
+                $p_custom_fields = $this->custom->view_fields_data($row['pid'], 4, 1);
 
                 if (is_array($p_custom_fields[0])) {
                     $z_custom_fields = '';
@@ -472,6 +467,8 @@
     ?>
  
     <table class="subtotal">
+
+
         <tr >
             <td class="myco2" style="width:50%; " rowspan="<?php echo $sub_t_col ?>">
                 <br>
@@ -485,15 +482,6 @@
                         <p><?php echo $this->lang->line('Status') . ' : <strong>'. $this->lang->line(ucwords($invoice['invoicestatus'])) . '</strong></p>';
                     }
                     if($invoice['invoicestatus']=='post dated cheque' && empty($receipt_number))
-        <tr>
-            <td class="myco2" style="width:50%;" rowspan="<?php echo $sub_t_col ?>"><br>
-            <?php if($invoice['status']=='Due')
-            { ?>
-                <p><?php echo $this->lang->line('Payment Method') . ' : <strong>' . $this->lang->line(ucwords($invoice['payment_method'])) . '</strong></p>'?> <br>
-           <?php  } ?>
-            
-                <p><?php echo $this->lang->line('Status') . ' : <strong>'. $this->lang->line(ucwords($invoice['status'])) . '</strong></p>';
-                    if($invoice['status']=='post dated cheque')
                     {
                        
                         echo '<br>'.$this->lang->line('Cheque Date') . ' : <strong>' . date('d-m-Y',strtotime($checkdate['cheque_date'])).'</strong><br>';
@@ -563,7 +551,6 @@
         }
         ?>
         <tr> <?php
-
             // if ($invoice['order_discount'] > 0 || $invoice['shipping'] > 0)
             // {
                 echo '<td></td>';
@@ -574,7 +561,6 @@
            ?>
             <td><?php echo $balance_caption; ?></td>
             <td style="text-align:right"><strong><?php 
-
                 if ($rming < 0) {
                     $rming = 0;
                 }
