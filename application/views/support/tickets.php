@@ -6,68 +6,68 @@
         }       
     ?>
     <div class="row">
-        <div class="col-xl-3 col-lg-6 col-xs-6">
+        <div class="col-xl-3 col-lg-6 col-6">
             <div class="card">
                 <div class="card-body">
                     <div class="card-block">
                         <div class="media">
-                            <div class="media-body text-xs-left">
+                            <div class="media-body text-start">
                                 <h3 class="" id="dash_0"></h3>
                                 <span><?php echo $this->lang->line('Waiting') ?></span>
                             </div>
-                            <div class="media-right media-middle">
-                                <i class="fa fa-clock-o font-large-2 float-xs-right"></i>
+                            <div class="media-end media-middle">
+                                <i class="fa fa-clock-o font-large-2 float-end"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-lg-6 col-xs-6">
+        <div class="col-xl-3 col-lg-6 col-6">
             <div class="card">
                 <div class="card-body">
                     <div class="card-block">
                         <div class="media">
-                            <div class="media-body text-xs-left">
+                            <div class="media-body text-start">
                                 <h3 class="" id="dash_1"></h3>
                                 <span><?php echo $this->lang->line('Processing') ?></span>
                             </div>
-                            <div class="media-right media-middle">
-                                <i class="fa fa-refresh font-large-2 float-xs-right"></i>
+                            <div class="media-end media-middle">
+                                <i class="fa fa-refresh font-large-2 float-end"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-lg-6 col-xs-6">
+        <div class="col-xl-3 col-lg-6 col-6">
             <div class="card">
                 <div class="card-body">
                     <div class="card-block">
                         <div class="media">
-                            <div class="media-body text-xs-left">
+                            <div class="media-body text-start">
                                 <h3 class="" id="dash_2"></h3>
                                 <span><?php echo $this->lang->line('Solved') ?></span>
                             </div>
-                            <div class="media-right media-middle">
-                                <i class="fa fa-check-circle font-large-2 float-xs-right"></i>
+                            <div class="media-end media-middle">
+                                <i class="fa fa-check-circle font-large-2 float-end"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-lg-6 col-xs-6">
+        <div class="col-xl-3 col-lg-6 col-6">
             <div class="card">
                 <div class="card-body">
                     <div class="card-block">
                         <div class="media">
-                            <div class="media-body text-xs-left">
+                            <div class="media-body text-start">
                                 <h3 class=""><?php echo $totalt ?></h3>
                                 <span><?php echo $this->lang->line('Total') ?></span>
                             </div>
-                            <div class="media-right media-middle">
-                                <i class="fa fa-pie-chart font-large-2 float-xs-right"></i>
+                            <div class="media-end media-middle">
+                                <i class="fa fa-pie-chart font-large-2 float-end"></i>
                             </div>
                         </div>
                     </div>

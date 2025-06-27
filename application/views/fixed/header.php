@@ -20,6 +20,7 @@
             document.getElementsByTagName('head')[0].appendChild(link);
         })();
     </script>
+	
     <!-- <link rel="apple-touch-icon" href="<?= assets_url(); ?>app-assets/images/ico/apple-icon-120.png">
     <link rel="icon" type="image/png" href="<?= assets_url(); ?>app-assets/images/ico/apple-icon-120.png">
     <link rel="shortcut icon" type="image/x-icon" href="<?= assets_url(); ?>app-assets/images/ico/favicon.ico"> -->
@@ -28,6 +29,7 @@
     <!-- BEGIN VENDOR CSS-->
     <link rel="stylesheet" type="text/css" href="<?= assets_url() ?>app-assets/<?= LTR ?>/vendors.css">
 
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     
     <link rel="stylesheet" type="text/css" href="<?= assets_url() ?>app-assets/vendors/css/extensions/unslider.css">
     <link rel="stylesheet" type="text/css"

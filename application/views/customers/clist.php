@@ -20,7 +20,7 @@ if ($this->input->get('due')) {
                         class="btn btn-primary btn-sm rounded addnewclass">
                         <?php echo $this->lang->line('Add new') ?></a>
 
-                   &nbsp;&nbsp;
+                   <!-- &nbsp;&nbsp; -->
                     <span class="due-client-wrapper">                        
                         <input class="form-check-input due-client-checkbox" type="checkbox" value="0" id="due-client-checkbox"> 
                         <label for="due-client-checkbox">                      
@@ -103,8 +103,8 @@ if ($this->input->get('due')) {
                         
                     
                         <div class="col-xl-2 col-lg-4 col-md-4 col-sm-12">                       
-                            <button class="btn btn-secondary mt-35 filter_clear_btn" type="submit" names="filter_clear_btn" id="filter_clear_btn">Reset</button>
-                            <button class="btn btn-primary mt-35" type="submit" names="filter_search_btn" id="filter_search_btn">Search</button>
+                            <button class="btn btn-secondary mt-28 filter_clear_btn" type="submit" names="filter_clear_btn" id="filter_clear_btn">Reset</button>
+                            <button class="btn btn-primary mt-28" type="submit" names="filter_search_btn" id="filter_search_btn">Search</button>
                         </div>
                     </div>
                 </div>  

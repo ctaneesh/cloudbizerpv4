@@ -128,7 +128,7 @@
                     ?>                        
                   </ul>  
                </div>
-                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-12 col-xs-12 text-right">
+                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-12 col-xs-12 text-end">
                     <?php 
                         if (($enquirymain['enquiry_status'] == "Open")) {
                             $statustext = "Open";
@@ -259,7 +259,7 @@
                                 <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 order-2 order-lg-1">
                                     <h3  class="title-sub row"><?php echo $this->lang->line('Lead & Customer Details') ?> <i class="fa fa-angle-down"></i></h3>
                                 </div>
-                                <div class="col-lg-9 col-md-12 quickview-scroll col-sm-12 col-xs-12 text-right order-1 order-lg-2">
+                                <div class="col-lg-9 col-md-12 quickview-scroll col-sm-12 col-xs-12 text-end order-1 order-lg-2">
                                     <div class="quick-view-section">                                            
                                         <div class="item-class text-center">
                                             <h4><?php echo $this->lang->line('Customer') ?></h4>
@@ -316,7 +316,7 @@
                     
                     <div class="<?=$pageclass?>">
                          
-                            <div class="row">
+                            <div class="row ">
                                 <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-xs-12 cmp-pnl">
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -406,7 +406,7 @@
                                 </div>
                                                             
                                 <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-xs-12 cmp-pnl">
-                                    <div class="form-row">
+                                    <div class="row">
                                         <div class="col-sm-12">
                                             <h3 class="title-sub"><?php echo $this->lang->line('Lead Details') ?></h3>
                                         </div>
@@ -621,7 +621,7 @@
                                                             <label for="email_contents"
                                                                 class="col-form-label"><?php echo $this->lang->line('Email Contents'); ?></label>
                                                         </div>
-                                                        <div class="col-lg-8 col-md-8 col-sm-12 text-right">
+                                                        <div class="col-lg-8 col-md-8 col-sm-12 text-end">
                                                             <label class="col-form-label"><a
                                                                     href="<?php echo base_url() ?>Invoices/convert_to_deals"
                                                                     class="btn btn-crud btn-secondary btn-sm <?php echo $approvedcls; ?>" type="button"><i
@@ -720,7 +720,7 @@
                         </div>
 
                         <hr>
-                        <div class="col-12 form-row mt-1 discount-toggle">
+                        <div class="col-12 row mt-1 discount-toggle">
                             <div class="form-check" >
                                 <input class="form-check-input discountshowhide" type="checkbox" value="2"  name="discountshowhide" id="discountshowhide">
                                 <label class="form-check-label dicount-checkbox" for="discountshowhide">
@@ -742,18 +742,18 @@
                                         <th width="22%" class="text-center1 pl-1"><?php echo $this->lang->line('Item Name') ?></th>
                                         <th width="5%" class="text-center"><?php echo $this->lang->line('Quantity') ?></th>
                                         <th width="4%" class="text-center"><?php echo $this->lang->line('On Hand') ?></th>
-                                        <th width="7%" class="text-right"><?php echo $this->lang->line('Selling Price') ?></th>
-                                        <th width="7%" class="text-right"><?php echo $this->lang->line('Lowest Price') ?></th>
+                                        <th width="7%" class="text-end"><?php echo $this->lang->line('Selling Price') ?></th>
+                                        <th width="7%" class="text-end"><?php echo $this->lang->line('Lowest Price') ?></th>
                                         <?php  //Verify that tax is enabled
                                         $colspan = 8;
                                         if($configurations['config_tax']!='0'){ 
                                             $colspan = 10;    
                                         ?>
-                                            <th width="10%" class="text-right"><?php echo $this->lang->line('Tax'); ?>(%) / <?php echo $this->lang->line('Amount'); ?></th>
+                                            <th width="10%" class="text-end"><?php echo $this->lang->line('Tax'); ?>(%) / <?php echo $this->lang->line('Amount'); ?></th>
                                         <?php } ?>
                                         <th width="5%" class="text-center"><?php echo $this->lang->line('Max discount %')?></th>
                                         <th width="12%" class="text-center discountcoloumn d-none"><?php echo $this->lang->line('Discount')?>/ <?php echo $this->lang->line('Amount'); ?></th>
-                                        <th width="10%" class="text-right">
+                                        <th width="10%" class="text-end">
                                             <?php echo $this->lang->line('Amount') ?>
                                             <!-- (<?php //echo $this->config->item('currency'); ?>) -->
                                         </th>
@@ -812,9 +812,9 @@
 
                                                     echo '<td class="text-center"><strong id="onhandQty-'.$i.'">'.$row['totalQty'].'</strong></td>';
 
-                                                    echo '<td class="text-right"><strong id="pricelabel-' . $i . '">' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '</strong><input type="hidden" class="form-control req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()"  autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '"></td>';
+                                                    echo '<td class="text-end"><strong id="pricelabel-' . $i . '">' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '</strong><input type="hidden" class="form-control req prc" name="product_price[]" id="price-' . $i . '" onkeypress="return isNumber(event)" onkeyup="rowTotal(' . $i . '), billUpyog()"  autocomplete="off" value="' . amountExchange_s($row['price'], $invoice['multi'], $this->aauth->get_user()->loc) . '"></td>';
                                                     
-                                                    echo '<td class="text-right">
+                                                    echo '<td class="text-end">
                                                     <input type="hidden" class="form-control" name="lowest_price[]" id="lowestprice-' . $i . '" onkeypress="return isNumber(event)" autocomplete="off" value="' .$row['lowest_price']. '">
                                                     <strong id="lowestpricelabel-' . $i . '">' .$row['lowest_price']. '</strong>
                                                     </td>';
@@ -866,7 +866,7 @@
 
 
                                                     
-                                                    echo '<td class="text-right">
+                                                    echo '<td class="text-end">
                                                         <strong><span class="ttlText" id="result-' . $i . '">' . amountExchange_s($row['subtotal'], $invoice['multi'], $this->aauth->get_user()->loc) . '</span></strong></td>';
 
                                                     echo '<td class="text-center1 d-flex"><button onclick="producthistory('.$i.')" type="button" class="btn btn-crud btn-sm btn-secondary producthis '.$converted_class.'" title="Previous Quoted History12" ><i class="fa fa-history"></i></button>&nbsp;<button onclick="single_product_details(' . $i . ')" type="button" class="btn btn-crud btn-sm btn-secondary '.$converted_class.'" title="Product Informations"><i class="fa fa-info"></i></button>&nbsp;<button type="button" data-rowid="' . $i . '" class="btn btn-crud btn-sm btn-secondary removeProd '.$converted_class.'" title="Remove"> <i class="fa fa-trash"></i> </button>
@@ -906,7 +906,7 @@
                                             <?php 
                                             if($configurations['config_tax']!='0'){ ?>
                                                 <tr class="sub_c noproduct-section <?=$dnonecls?>">
-                                                    <td colspan="7" align="right" class="no-border">
+                                                    <td colspan="7" align="end" class="no-border">
                                                         <input type="hidden" value="0" id="subttlform"                                                                     name="subtotal"><strong><?php echo $this->lang->line('Total Tax') ?></strong>
                                                     </td>
                                                     <td align="left" colspan="2" class="no-border"><span
@@ -915,19 +915,19 @@
                                                 </tr>
                                             <?php } ?>
                                             <tr class="sub_c noproduct-section <?=$dnonecls?>">
-                                                <td colspan="9" align="right" class="no-border td-colspan">
+                                                <td colspan="9" align="end" class="no-border td-colspan">
                                                     <strong><?php echo $this->lang->line('Total Discount') ?> <?php //echo '(<span class="currenty lightMode">' . $this->config->item('currency') . '</span>)'; ?></strong>
                                                 </td>
-                                                <td align="right" colspan="2" class="no-border">
+                                                <td align="end" colspan="2" class="no-border">
                                                     <span id="discs" class="lightMode"><?php echo number_format($totaldiscount,2); ?></span>
                                                 </td>
                                             </tr>
 
                                             <tr class="sub_c " style="display: none;">
-                                                <td colspan="8" align="right" class="no-border">
+                                                <td colspan="8" align="end" class="no-border">
                                                     <strong><?php echo $this->lang->line('Shipping') ?></strong>
                                                 </td>
-                                                <td align="right" colspan="3" class="no-border"><input type="text"
+                                                <td align="end" colspan="3" class="no-border"><input type="text"
                                                         class="form-control shipVal" onkeypress="return isNumber(event)"
                                                         placeholder="Value" name="shipping" autocomplete="off"
                                                         onkeyup="billUpyog()">
@@ -938,10 +938,10 @@
                                             </tr>
 
                                             <tr class="sub_c noproduct-section <?=$dnonecls?>">
-                                                <td colspan="9" align="right" class="no-border td-colspan"><strong><?php echo $this->lang->line('Grand Total') ?>
+                                                <td colspan="9" align="end" class="no-border td-colspan"><strong><?php echo $this->lang->line('Grand Total') ?>
                                                 <?php //echo '(<span class="currenty lightMode">' . $this->config->item('currency') . '</span>)'; ?></strong>
                                                 </td>
-                                                <td align="right" colspan="2" class="no-border">
+                                                <td align="end" colspan="2" class="no-border">
                                                     <span class="grandtotaltext"><?php echo number_format($enquirymain['total'],2);?></span>
                                                     <input type="hidden" name="total" class="form-control invoiceyoghtml" value="<?php echo $enquirymain['total'];?>"   readonly>
 
@@ -965,11 +965,11 @@
                                                 <div class="tooltip1"></div>
                                                 </td>
                                                 <td class="text-center"><strong id="onhandQty-0"></strong></td>
-                                                <td class="text-right">
+                                                <td class="text-end">
                                                     <strong id="pricelabel-0"></strong>
                                                     <input type="hidden" class="form-control req prc" name="product_price[]" id="price-0" onkeypress="return isNumber(event)" onkeyup="rowTotal('0'), billUpyog()" autocomplete="off">
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="text-end">
                                                     <input type="hidden" class="form-control" name="lowest_price[]" id="lowestprice-0" onkeypress="return isNumber(event)" autocomplete="off">
                                                     <strong id="lowestpricelabel-0"></strong>
                                                 </td>
@@ -1000,7 +1000,7 @@
                                                     <div><strong id="discount-error-0"></strong></div>                                    
                                                 </td>
 
-                                                <td class="text-right">
+                                                <td class="text-end">
                                                     <strong><span class='ttlText' id="result-0">0</span></strong></td>
 
                                                 <td class="text-center1  d-flex">
@@ -1028,19 +1028,19 @@
                                             <?php 
                                             if($configurations['config_tax']!='0'){ ?>
                                                 <tr class="sub_c noproduct-section d-none">
-                                                    <td colspan="7" align="right" class="no-border">
+                                                    <td colspan="7" align="end" class="no-border">
                                                         <input type="hidden" value="0" id="subttlform"                                                                     name="subtotal"><strong><?php echo $this->lang->line('Total Tax') ?></strong>
                                                     </td>
-                                                    <td align="right" colspan="2" class="no-border"><span
+                                                    <td align="end" colspan="2" class="no-border"><span
                                                                 class="currenty lightMode"><?php //echo $this->config->item('currency'); ?></span>
                                                         <span id="taxr" class="lightMode">0</span></td>
                                                 </tr>
                                             <?php } ?>
                                             <tr class="sub_c noproduct-section d-none1" >
-                                                <td colspan="9" align="right" class="no-border td-colspan">
+                                                <td colspan="9" align="end" class="no-border td-colspan">
                                                     <strong><?php //echo $this->lang->line('Total Discount').'('.$this->config->item('currency').')'
                                                     echo $this->lang->line('Total Discount'); ?></strong></td>
-                                                <td align="right" colspan="2" class="no-border">
+                                                <td align="end" colspan="2" class="no-border">
                                                     <span id="discs" class="lightMode">0.00</span></td>
                                             </tr>
 
@@ -1057,10 +1057,10 @@
                                             </tr> -->
 
                                             <tr class="sub_c noproduct-section d-none1" >
-                                                <td colspan="9" align="right" class="no-border td-colspan"><strong><?php echo $this->lang->line('Grand Total') ?>
+                                                <td colspan="9" align="end" class="no-border td-colspan"><strong><?php echo $this->lang->line('Grand Total') ?>
                                                 <?php //echo '(<span class="currenty lightMode">' . $this->config->item('currency') . '</span>)'; ?></strong>
                                                 </td>
-                                                <td align="right" colspan="2" class="no-border">
+                                                <td align="end" colspan="2" class="no-border">
                                                     <span class="grandtotaltext">0.00</span>
                                                     <input type="hidden" name="total" class="form-control invoiceyoghtml"  value="0" readonly>
                                                    
@@ -1111,7 +1111,7 @@
                                     <?php }
                                     ?>
                                 </div>  
-                                <div class="col-xl-9 col-lg-9 col-sm-12 responsive-text-right">
+                                <div class="col-xl-9 col-lg-9 col-sm-12 text-sm-end">
                                 <?php
                                 if(($enquirymain['enquiry_status']!="Closed")){ ?>   
                                 <!-- if(($this->aauth->get_user()->roleid ==5) && ($enquirymain['enquiry_status']!="Closed")){ ?>    -->

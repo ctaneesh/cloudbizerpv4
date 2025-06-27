@@ -73,71 +73,75 @@
 
                             </ul>
                             <div class="tab-content px-1 pt-1">
+
                                 <div class="tab-pane active show" id="tab1" role="tabpanel" aria-labelledby="base-tab1">
-                                    <div class="form-row mt-1">
-                                        <div class="col-12">
-                                            <h5 class="popup-title"><?php echo $this->lang->line('Company Address') ?></h5>
-                                            <hr>
-                                        </div>
-                                        <input type="hidden" id="customerid" name="customerid" value="<?=$customerid?>">
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="name"><?php echo $this->lang->line('Company') ?><span class="compulsoryfld">*</span></label>
-                                            <input type="text" placeholder="Company" class="form-control margin-bottom b_input" name="company" id="companyname" value="<?=$customer['company']?>" data-original-value="<?php echo $customer['company'] ?>">
-                                        </div>
+								<div class="row g-2 mt-1">
+									<div class="col-12">
+										<h5 class="popup-title"><?php echo $this->lang->line('Company Address') ?></h5>
+										<hr>
+									</div>
 
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">                                        
-                                            <label class="col-form-label" for="name"><?php echo $this->lang->line('Name') ?><span class="compulsoryfld">*</span></label>
-                                            <input type="text" placeholder="Name"  class="form-control margin-bottom b_input required" name="name" id="mcustomer_name" required value="<?=$customer['name']?>" data-original-value="<?php echo $customer['name'] ?>">
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="address"><?php echo $this->lang->line('Address') ?></label>                                            
-                                            <textarea placeholder="Address" class="form-textarea margin-bottom b_input" name="address"  id="mcustomer_address1" data-original-value="<?php echo $customer['address'] ?>"><?=$customer['address']?></textarea>
-                                        </div>
-                                        
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="city"><?php echo $this->lang->line('City') ?></label>
-                                            <input type="text" placeholder="city" class="form-control margin-bottom b_input" name="city" id="mcustomer_city" value="<?=$customer['city']?>" data-original-value="<?php echo $customer['city'] ?>">
-                                        </div>
-                                        
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="region"><?php echo $this->lang->line('Region') ?></label>
-                                            <input type="text" placeholder="Region" class="form-control margin-bottom b_input" name="region" id="region" value="<?=$customer['region']?>" data-original-value="<?php echo $customer['region'] ?>">
-                                        </div>
-                                        
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="postbox"><?php echo $this->lang->line('PostBox') ?></label>
-                                            <input type="text" placeholder="PostBox" class="form-control margin-bottom b_input" name="postbox" id="postbox" value="<?=$customer['postbox']?>" data-original-value="<?php echo $customer['postbox'] ?>">
-                                        </div>
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="phone"><?php echo $this->lang->line('Phone') ?><span class="compulsoryfld">*</span></label>
-                                            <input type="text" placeholder="phone" class="form-control margin-bottom required b_input" name="phone" id="mcustomer_phone" required value="<?=$customer['phone']?>" data-original-value="<?php echo $customer['phone'] ?>">
-                                        </div>                                        
+									<input type="hidden" id="customerid" name="customerid" value="<?=$customerid?>">
 
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="email">Email<span class="compulsoryfld">*</span></label>
-                                            <input type="email" placeholder="email" class="form-control margin-bottom required b_input" name="email" id="mcustomer_email" required value="<?=$customer['email']?>"  data-original-value="<?php echo $customer['email'] ?>">
-                                        </div>
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="companyname"><?php echo $this->lang->line('Company') ?><span class="compulsoryfld">*</span></label>
+										<input type="text" placeholder="Company" class="form-control margin-bottom b_input" name="company" id="companyname" value="<?=$customer['company']?>" data-original-value="<?php echo $customer['company'] ?>">
+									</div>
 
-                                        <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
-                                            <label class="col-form-label" for="country"><?php echo $this->lang->line('Country') ?><span class="compulsoryfld">*</span></label>
-                                            <!-- <input type="text" placeholder="Country" class="form-control margin-bottom b_input" name="country" id="mcustomer_country"> -->
-                                            <select name="country" id="mcustomer_country" class="form-control margin-bottom" required data-original-value="<?php echo $customer['country'] ?>">
-                                                <?php
-                                                    echo "<option value=''>Select Country</option>";
-                                                    foreach ($countries as $row) {
-                                                        $cid = $row['id'];
-                                                        $title = $row['name'];
-                                                        $code = $row['code'];
-                                                        $sel= ($customer['country'] && $customer['country']==$cid) ? "selected" : "";
-                                                        echo "<option value='$cid' $sel>$title($code)</option>";
-                                                    }
-                                                ?>
-                                            </select>
-                                        </div>
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="mcustomer_name"><?php echo $this->lang->line('Name') ?><span class="compulsoryfld">*</span></label>
+										<input type="text" placeholder="Name" class="form-control margin-bottom b_input required" name="name" id="mcustomer_name" required value="<?=$customer['name']?>" data-original-value="<?php echo $customer['name'] ?>">
+									</div>
+
+									<div class="col-lg-4 col-md-4 col-sm-12">
+										<label class="col-form-label" for="mcustomer_address1"><?php echo $this->lang->line('Address') ?></label>
+										<textarea placeholder="Address" class="form-textarea margin-bottom b_input" name="address" id="mcustomer_address1" data-original-value="<?php echo $customer['address'] ?>"><?=$customer['address']?></textarea>
+									</div>
+
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="mcustomer_city"><?php echo $this->lang->line('City') ?></label>
+										<input type="text" placeholder="City" class="form-control margin-bottom b_input" name="city" id="mcustomer_city" value="<?=$customer['city']?>" data-original-value="<?php echo $customer['city'] ?>">
+									</div>
+
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="region"><?php echo $this->lang->line('Region') ?></label>
+										<input type="text" placeholder="Region" class="form-control margin-bottom b_input" name="region" id="region" value="<?=$customer['region']?>" data-original-value="<?php echo $customer['region'] ?>">
+									</div>
+
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="postbox"><?php echo $this->lang->line('PostBox') ?></label>
+										<input type="text" placeholder="PostBox" class="form-control margin-bottom b_input" name="postbox" id="postbox" value="<?=$customer['postbox']?>" data-original-value="<?php echo $customer['postbox'] ?>">
+									</div>
+
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="mcustomer_phone"><?php echo $this->lang->line('Phone') ?><span class="compulsoryfld">*</span></label>
+										<input type="text" placeholder="Phone" class="form-control margin-bottom required b_input" name="phone" id="mcustomer_phone" required value="<?=$customer['phone']?>" data-original-value="<?php echo $customer['phone'] ?>">
+									</div>
+
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="mcustomer_email">Email<span class="compulsoryfld">*</span></label>
+										<input type="email" placeholder="Email" class="form-control margin-bottom required b_input" name="email" id="mcustomer_email" required value="<?=$customer['email']?>" data-original-value="<?php echo $customer['email'] ?>">
+									</div>
+
+									<div class="col-lg-2 col-md-4 col-sm-12">
+										<label class="col-form-label" for="mcustomer_country"><?php echo $this->lang->line('Country') ?><span class="compulsoryfld">*</span></label>
+										<select name="country" id="mcustomer_country" class="form-control margin-bottom" required data-original-value="<?php echo $customer['country'] ?>">
+											<option value=''>Select Country</option>
+											<?php
+												foreach ($countries as $row) {
+													$cid = $row['id'];
+													$title = $row['name'];
+													$code = $row['code'];
+													$sel = ($customer['country'] && $customer['country'] == $cid) ? "selected" : "";
+													echo "<option value='$cid' $sel>$title($code)</option>";
+												}
+											?>
+										</select>
+									</div>
+								</div>
+							</div>
 
 
-                                    </div>                               
-                                </div>
                                 <div class="tab-pane" id="tab2" role="tabpanel" aria-labelledby="base-tab2">
                                       
                                     <div class="form-group">
@@ -154,7 +158,7 @@
                                            
                                         </div>
                                         <hr>
-                                        <div class="form-row">
+                                        <div class="row g-2">
                                         <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
                                             <label class="col-form-label" for="billing_name"><?php echo $this->lang->line('Name') ?></label>
                                             <input type="text" placeholder="Name" class="form-control margin-bottom b_input" name="billing_name" id="billing_name" value="<?=$customer['billing_name']?>" data-original-value="<?php echo $customer['billing_name'] ?>">
@@ -232,7 +236,7 @@
                                         
                                         <hr>
                                     </div>
-                                    <div class="form-row">
+                                    <div class="row g-2">
                                         <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
                                             <label class="col-form-label" for="shipping_name"><?php echo $this->lang->line('Name') ?></label>
                                             <input type="text" placeholder="Name" class="form-control margin-bottom b_input" name="shipping_name" id="shipping_name" value="<?=$customer['shipping_name']?>"  data-original-value="<?php echo $customer['shipping_name'] ?>">
@@ -299,7 +303,7 @@
                                 
                                 <div class="tab-pane" id="tab3" role="tabpanel" aria-labelledby="base-tab3">
                                     <!-- erp2024 newly added 01-06-2024 -->
-                                    <div class="form-row">
+                                    <div class="row g-2">
                                         <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">
                                                 <label class="col-form-label" for="Registration Number"><?php echo $this->lang->line('Registration Number') ?> </label>
                                                 <input type="text" placeholder="Registration Number" class="form-control margin-bottom b_input" name="registration_number" id="registration_number" value="<?=$customer['registration_number']?>" data-original-value="<?php echo $customer['registration_number'] ?>">
@@ -314,7 +318,7 @@
                                             <label for="computer_card_number" class="col-form-label">
                                                 <?php echo $this->lang->line('Computer Card'); ?>
                                             </label>
-                                            <div class="form-row">
+                                            <div class="row g-2">
                                                 <div class="<?=$card_with_first?>">
                                                     <input type="text" placeholder="Computer Card Number" class="form-control b_input" name="computer_card_number" id="computer_card_number" value="<?=$customer['computer_card_number']?>" data-original-value="<?php echo $customer['computer_card_number'] ?>">
                                                 </div>
@@ -334,7 +338,7 @@
                                             <label for="computer_card_number" class="col-form-label">
                                                 <?php echo $this->lang->line('Sponser ID'); ?>
                                             </label>
-                                            <div class="form-row">
+                                            <div class="row g-2">
                                                 <div class="<?=$card_with_first?>">
                                                     <input type="text" placeholder="Sponser ID" class="form-control b_input" name="sponser_id" id="sponser_id" value="<?=$customer['sponser_id']?>" data-original-value="<?php echo $customer['sponser_id'] ?>">
                                                 </div>
@@ -414,7 +418,7 @@
                                         <!-- erp2024 new field 03-06-2024 -->                                         
                                          <div class="<?=$mainsection?>">
                                             <label class="col-form-label" for="currency"><?php echo $this->lang->line('Profile Picture') ?></label>
-                                            <div class="form-row">
+                                            <div class="row g-2">
                                                 <div class="<?=$inputfile?>">                                                   
                                                      <input type="file" placeholder="Profile Picture" class="form-control margin-bottom b_input" name="picture" id="picture" data-original-value="<?php echo $customer['picture'] ?>">
                                                 </div>
@@ -458,7 +462,7 @@
                                         <!-- erp2024 newly added sales man -->
                                     </div>
                                     <br><h5><b>Contact Details</b></h5><hr>
-                                    <div class="form-group row">
+                                    <div class="form-group row g-2">
                                         <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12">                                    
                                             <label class="col-form-label" for="Contact Person"><?php echo $this->lang->line('Contact Person') ?> </label>
                                             <input type="text" placeholder="Contact Person's Name" class="form-control margin-bottom b_input" name="contact_person" id="contact_person" value="<?=$customer['contact_person']?>" data-original-value="<?php echo $customer['contact_person'] ?>">
@@ -509,8 +513,8 @@
 
                                 </div>
                                 <hr>
-                                <div id="mybutton" class="submit-section text-right">
-                                    <input type="submit" id="cust_add_submit" class="btn btn-crud btn-lg btn-primary margin-bottom float-xs-right mr-2" value="<?php echo $btn_label; ?>"  data-loading-text="Adding...">
+                                <div id="mybutton" class="submit-section text-end">
+                                    <input type="submit" id="cust_add_submit" class="btn btn-crud btn-lg btn-primary margin-bottom float-xs-end mr-2" value="<?php echo $btn_label; ?>"  data-loading-text="Adding...">
                                 </div>
                             </div>
                         </div>

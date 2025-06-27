@@ -107,8 +107,8 @@
                         </div>   
                     
                         <div class="col-xl-2 col-lg-4 col-md-4 col-sm-12">                       
-                            <button class="btn btn-secondary mt-35 filter_clear_btn btn-crud" type="submit" names="filter_clear_btn" id="filter_clear_btn">Reset</button>
-                            <button class="btn btn-primary mt-35 btn-crud" type="submit" names="filter_search_btn" id="filter_search_btn">Search</button>
+                            <button class="btn btn-secondary mt-28 filter_clear_btn btn-crud" type="submit" names="filter_clear_btn" id="filter_clear_btn">Reset</button>
+                            <button class="btn btn-primary mt-28 btn-crud" type="submit" names="filter_search_btn" id="filter_search_btn">Search</button>
                         </div>
                     </div>
                     

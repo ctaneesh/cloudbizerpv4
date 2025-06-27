@@ -27,9 +27,9 @@
                         role="form">
                                 <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>"
                                        value="<?php echo $this->security->get_csrf_hash(); ?>">
-                                <div class="form-group row">
+                                <div class="row mb-1">
                                  
-                                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                                    <div class="col-lg-3 col-md-3 col-sm-12 col-12">
                                         <select name="customer" class="form-control required" id="customer_statement" >
                                             <option value="<?php echo ($custdata['id']) ? $custdata['id'] : ''; ?>"><?php echo ($custdata['name']) ? $custdata['name'] : 'Select Customer'; ?></option>
                                             <?php 
@@ -81,9 +81,9 @@
                                         <input type="hidden" name="filter_expiry_date_from" id="filter_expiry_date_from" class="form-control filter_element" value="<?php echo ($start_date) ? $start_date : ''; ?>">
                                         <input type="hidden" name="filter_expiry_date_to" id="filter_expiry_date_to" class="form-control filter_element" value="<?php echo ($end_date) ? $end_date : ''; ?>">
                                 
-                                    </div>
+                                    </div><div class="col-auto">
                                     <button class="btn btn-crud btn-primary" type="submit" names="filter_search_btn" id="filter_search_btn">Get</button>
-
+</div>
                                 </div>
 
                             </form>

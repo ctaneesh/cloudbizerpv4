@@ -73,7 +73,7 @@
                             </ul>
                             <div class="tab-content pt-1">
                                 <div class="tab-pane active show" id="tab1" role="tabpanel" aria-labelledby="base-tab1">
-                                    <div class="form-row mt-1">
+                                    <div class="row g-2">
                                        
                                         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
                                             <input type="hidden" name="supplierid" id="supplierid" value="<?=$supplierid?>">
@@ -156,7 +156,7 @@
                                            
                                         </div>
                                         <hr>
-                                        <div class="form-row">
+                                        <div class="row g-2">
                                         <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
                                             <label class="col-form-label" for="billing_name"><?php echo $this->lang->line('Name') ?></label>
                                             <input type="text" placeholder="Name" class="form-control margin-bottom b_input" name="billing_name" id="billing_name" value="<?=$supplier['billing_name']?>" data-original-value="<?php echo $supplier['billing_name'] ?>">
@@ -234,7 +234,7 @@
                                         
                                         <hr>
                                     </div>
-                                    <div class="form-row">
+                                    <div class="row g-2">
                                         <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
                                             <label class="col-form-label" for="shipping_name"><?php echo $this->lang->line('Name') ?></label>
                                             <input type="text" placeholder="Name" class="form-control margin-bottom b_input" name="shipping_name" id="shipping_name" value="<?=$supplier['shipping_name']?>"  data-original-value="<?php echo $supplier['shipping_name'] ?>">
@@ -300,7 +300,7 @@
                                 </div>
                                 <div class="tab-pane" id="tab3" role="tabpanel" aria-labelledby="base-tab3">
                                     <!-- erp2024 newly added 01-06-2024 -->
-                                    <div class="form-row">
+                                    <div class="row g-2">
                                         <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
                                         <label class="col-form-label" for="Registration Number"><?php echo $this->lang->line('Registration Number') ?><span class="compulsoryfld">*</span></label>
                                             <input type="text" placeholder="Registration Number" class="form-control margin-bottom b_input" name="registration_number" id="registration_number" required data-original-value="<?php echo $supplier['registration_number']?>" value="<?php echo $supplier['registration_number']?>">
@@ -550,12 +550,12 @@
                                     </div>
 
                                 </div>
-                                <div  id="mybutton" class="text-right">
+                                <div  id="mybutton" class="text-end">
                                     <hr>
                                      <!-- <button class="btn btn-crud btn-lg btn-secondary" type="button" id="prevTab"><i class="fa fa-backward" aria-hidden="true"></i> Previous</button>
                                     <button class="btn btn-crud btn-lg btn-secondary" type="button" id="nextTab">Next <i class="fa fa-forward" aria-hidden="true"></i></button> -->
                                     <input type="submit" id="supplier_add_submit"
-                                           class="btn btn-crud1 btn-lg btn-primary margin-bottom float-xs-right mr-2"
+                                           class="btn btn-crud1 btn-lg btn-primary margin-bottom float-end mr-2"
                                            value="<?php echo $btn_label; ?>"
                                            data-loading-text="Adding...">
                                 </div>
